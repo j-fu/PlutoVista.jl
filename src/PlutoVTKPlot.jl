@@ -2,6 +2,8 @@ module PlutoVTKPlot
 using Pluto
 using PlutoCanvasPlot
 using UUIDs
+using Colors
+using ColorSchemes
 
 loadvtk()=HTML("""<script type="text/javascript" src="https://unpkg.com/vtk.js"></script>""")
 
@@ -37,10 +39,67 @@ end
 
 
 function triplot!(p::VTKPlot,pts, tris,f)
-    p.jsdict["points"]=vec(vec(vcat(pts,f')))
-    p.jsdict["tris"]= vec(tris)
+    pfx=PlutoCanvasPlot._command!(p,"triplot")
+    p.jsdict[pfx*"_points"]=vec(vcat(pts,f'))
+
+    # we need to set up  the triangle data for vtk. 
+    # Coding is  [3, i1, i2, i3,   3, i1, i2, i3]
+    # Careful: js indexing counts from zero
+    ipoly=1
+    ntri=size(tris,2)
+    polys=Vector{Int32}(undef,4*ntri)
+    for itri=1:ntri
+        polys[ipoly] = 3
+        polys[ipoly+1] = tris[1,itri]-1
+        polys[ipoly+2] = tris[2,itri]-1
+        polys[ipoly+3] = tris[3,itri]-1
+        ipoly+=4
+    end
+    p.jsdict[pfx*"_polys"]=polys
+    p.jsdict[pfx*"_cam"]="3D"
     p
 end
+
+function tricolor!(p::VTKPlot,pts, tris,f;cmap=:summer)
+    pfx=PlutoCanvasPlot._command!(p,"tricolor")
+    (fmin,fmax)=extrema(f)
+    p.jsdict[pfx*"_points"]=vec(vcat(pts,zeros(length(f))'))
+                                
+    # we need to set up  the triangle data for vtk. 
+    # Coding is  [3, i1, i2, i3,   3, i1, i2, i3]
+    # Careful: js indexing counts from zero
+    ipoly=1
+    ntri=size(tris,2)
+    polys=Vector{Int32}(undef,4*ntri)
+    for itri=1:ntri
+        polys[ipoly] = 3
+        polys[ipoly+1] = tris[1,itri]-1
+        polys[ipoly+2] = tris[2,itri]-1
+        polys[ipoly+3] = tris[3,itri]-1
+        ipoly+=4
+    end
+    p.jsdict[pfx*"_polys"]=polys
+    cscheme=colorschemes[cmap]
+    p.jsdict[pfx*"_colors"]=collect(reinterpret(Float64,map(x->get(cscheme,(x-fmin)/(fmax-fmin)),f)))
+    p.jsdict[pfx*"_cam"]="2D"
+    p
+end
+
+
+
+function axis3d!(p::VTKPlot;
+                 xtics=0:1,
+                 ytics=0:1,
+                 ztics=0:1)
+    pfx=PlutoCanvasPlot._command!(p,"axis3d")
+    p.jsdict[pfx*"_bounds"]=[extrema(xtics)..., extrema(ytics)...,extrema(ztics)...]
+    p.jsdict[pfx*"_cam"]= ztics[1]==ztics[end] ? "2D" : "3D"
+
+    p
+end
+
+axis2d!(p::VTKPlot;kwargs...)=axis3d!(p;ztics=0.0,kwargs...)
+
 
 """
 Show plot
@@ -60,5 +119,5 @@ end
 
 
 
-export loadvtk, VTKPlot,triplot!
+export loadvtk, VTKPlot,triplot!,tricolor!, axis3d!, axis2d!
 end # module

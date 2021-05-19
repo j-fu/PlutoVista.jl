@@ -27,6 +27,9 @@ begin
 	using Printf
 	using Triangulate
 	using PlutoVTKPlot
+	
+	Pkg.add(["Colors","ColorSchemes"])
+	using Colors,ColorSchemes
 end
 
 # ╔═╡ 75fbe996-b746-11eb-3551-c3a5944c312c
@@ -45,18 +48,29 @@ function maketriangulation(maxarea)
 end
 
 # ╔═╡ db2823d9-aa6d-4be3-af5c-873c072cfd2b
-@bind resolution Slider(5:1000)
+@bind resolution Slider(5:100)
 
 # ╔═╡ 890710fe-dac0-4256-b1ba-79776f1ea7e5
 (pts,tris)=maketriangulation(1/resolution^2)
 
 # ╔═╡ b8a976e3-7fef-4527-ae6a-4da31c93a04f
-func=0.2*[sin(10*pts[1,i])*cos(10*pts[2,i]) for i=1:size(pts,2)]
+func=0.5*[sin(10*pts[1,i])*cos(10*pts[2,i]) for i=1:size(pts,2)]
 
 # ╔═╡ 60dcfcf5-391e-418f-8e7c-3a0fe94f1e0d
 let
-	p=VTKPlot(resolution=(600,300))
+	p=VTKPlot(resolution=(600,400))
 	triplot!(p,pts,tris,func)
+	axis3d!(p; xtics=-1:1,ytics=-1:1,ztics=extrema(func))
+end
+
+# ╔═╡ bce0cfe7-4112-4bb8-aac6-43885f3746a9
+size(pts,2)
+
+# ╔═╡ 81046dcd-3cfb-4133-943f-61b9b3cdb183
+let
+	p=VTKPlot(resolution=(400,400))
+	tricolor!(p,pts,tris,func;cmap=:spring)
+	axis2d!(p; xtics=-1:1,ytics=-1:1)
 end
 
 # ╔═╡ Cell order:
@@ -67,3 +81,5 @@ end
 # ╠═b8a976e3-7fef-4527-ae6a-4da31c93a04f
 # ╠═60dcfcf5-391e-418f-8e7c-3a0fe94f1e0d
 # ╠═db2823d9-aa6d-4be3-af5c-873c072cfd2b
+# ╠═bce0cfe7-4112-4bb8-aac6-43885f3746a9
+# ╠═81046dcd-3cfb-4133-943f-61b9b3cdb183
