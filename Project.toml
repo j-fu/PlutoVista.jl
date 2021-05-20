@@ -1,7 +1,7 @@
 name = "PlutoVTKPlot"
 uuid = "19f70b67-2887-4cf9-b19e-fe1a30c34d85"
 authors = ["Juergen Fuhrmann <juergen.fuhrmann@wias-berlin.de>"]
-version = "0.0.2"
+version = "0.0.3"
 
 [deps]
 ColorSchemes = "35d6a980-a343-548e-a6ea-1d62b119f2f4"
@@ -12,5 +12,5 @@ UUIDs = "cf7118a7-6976-5b1a-9a39-7adc72f591a4"
 [compat]
 ColorSchemes = "3"
 Colors = "0.12"
-PlutoCanvasPlot = "0.0.4"
+PlutoCanvasPlot = "0.0.5"
 julia = "1.5"

@@ -20,8 +20,8 @@ begin
 	# Pkg.add("Revise");	using Revise
 	Pkg.add("PlutoUI")
 	Pkg.add("Triangulate")
-#	Pkg.add(name="PlutoVTKPlot",version="0.0.2")
-	Pkg.develop("PlutoVTKPlot")
+	Pkg.add(name="PlutoVTKPlot",version="0.0.3")
+#	Pkg.develop("PlutoVTKPlot")
 	using PlutoUI
 	using UUIDs
 	using Printf

@@ -117,11 +117,11 @@ to 2D mode.
 """
 axis2d!(p::VTKPlot;kwargs...)=axis3d!(p;ztics=0.0,kwargs...)
 
-const vtkplot = read(joinpath(@__DIR__, "..", "assets", "vtkplot.js"), String)
 """
 Show plot
 """
 function Base.show(io::IO, ::MIME"text/html", p::VTKPlot)
+    vtkplot = read(joinpath(@__DIR__, "..", "assets", "vtkplot.js"), String)
     result="""
     <script type="text/javascript" src="https://unpkg.com/vtk.js@18"></script>
     <script>

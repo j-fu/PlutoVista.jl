@@ -1,3 +1,11 @@
+function setinteractorstyle(interactor, cam)
+{
+    if (cam=="2D")
+        interactor.setInteractorStyle(vtk.Interaction.Style.vtkInteractorStyleImage.newInstance());
+    else
+        interactor.setInteractorStyle(vtk.Interaction.Style.vtkInteractorStyleTrackballCamera.newInstance());
+}
+
 
 function vtkplot(uuid,jsdict,invalidation)
 {
@@ -52,11 +60,7 @@ function vtkplot(uuid,jsdict,invalidation)
             mapper.setInputData(dataset);
             actor.setMapper(mapper);
             renderer.addActor(actor);
-            if (cam=="2D")
-                interactor.setInteractorStyle(vtk.Interaction.Style.vtkInteractorStyleImage.newInstance());
-            else
-                interactor.setInteractorStyle(vtk.Interaction.Style.vtkInteractorStyleTrackballCamera.newInstance());
-
+            setinteractorstyle(interactor,cam)
         }
         if (jsdict[cmd]=="tricolor")
         {
@@ -85,11 +89,7 @@ function vtkplot(uuid,jsdict,invalidation)
             actor.setMapper(mapper);
             renderer.addActor(actor);
 
-            if (cam=="2D")
-                interactor.setInteractorStyle(vtk.Interaction.Style.vtkInteractorStyleImage.newInstance());
-            else
-                interactor.setInteractorStyle(vtk.Interaction.Style.vtkInteractorStyleTrackballCamera.newInstance());
-
+            setinteractorstyle(interactor,cam)
         }
         else if (jsdict[cmd]=="axis3d")
         {
@@ -104,14 +104,9 @@ function vtkplot(uuid,jsdict,invalidation)
 	    renderer.addActor(cubeAxes);
 
             if (cam=="2D")
-            {
-                interactor.setInteractorStyle(vtk.Interaction.Style.vtkInteractorStyleImage.newInstance());
                 cubeAxes.setGridLines(false)
-            }
-            else
-            {
-                interactor.setInteractorStyle(vtk.Interaction.Style.vtkInteractorStyleTrackballCamera.newInstance());
-            }
+
+            setinteractorstyle(interactor,cam)
         }
     }
     
