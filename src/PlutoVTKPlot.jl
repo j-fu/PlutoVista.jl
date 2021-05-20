@@ -7,7 +7,6 @@ using ColorSchemes
 
 loadvtk()=HTML("""<script type="text/javascript" src="https://unpkg.com/vtk.js"></script>""")
 
-
 mutable struct VTKPlot
     # command list passed to javascript
     jsdict::Dict{String,Any}
@@ -39,7 +38,7 @@ end
 
 
 function triplot!(p::VTKPlot,pts, tris,f)
-    pfx=PlutoCanvasPlot._command!(p,"triplot")
+    pfx=command!(p,"triplot")
     p.jsdict[pfx*"_points"]=vec(vcat(pts,f'))
 
     # we need to set up  the triangle data for vtk. 
@@ -61,7 +60,7 @@ function triplot!(p::VTKPlot,pts, tris,f)
 end
 
 function tricolor!(p::VTKPlot,pts, tris,f;cmap=:summer)
-    pfx=PlutoCanvasPlot._command!(p,"tricolor")
+    pfx=command!(p,"tricolor")
     (fmin,fmax)=extrema(f)
     p.jsdict[pfx*"_points"]=vec(vcat(pts,zeros(length(f))'))
                                 
@@ -91,7 +90,7 @@ function axis3d!(p::VTKPlot;
                  xtics=0:1,
                  ytics=0:1,
                  ztics=0:1)
-    pfx=PlutoCanvasPlot._command!(p,"axis3d")
+    pfx=command!(p,"axis3d")
     p.jsdict[pfx*"_bounds"]=[extrema(xtics)..., extrema(ytics)...,extrema(ztics)...]
     p.jsdict[pfx*"_cam"]= ztics[1]==ztics[end] ? "2D" : "3D"
 
