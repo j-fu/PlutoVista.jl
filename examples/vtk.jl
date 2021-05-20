@@ -27,9 +27,6 @@ begin
 	using Printf
 	using Triangulate
 	using PlutoVTKPlot
-	
-	Pkg.add(["Colors","ColorSchemes"])
-	using Colors,ColorSchemes
 end
 
 # ╔═╡ 75fbe996-b746-11eb-3551-c3a5944c312c
@@ -48,7 +45,7 @@ function maketriangulation(maxarea)
 end
 
 # ╔═╡ db2823d9-aa6d-4be3-af5c-873c072cfd2b
-@bind resolution Slider(5:100)
+@bind resolution Slider(5:200)
 
 # ╔═╡ 890710fe-dac0-4256-b1ba-79776f1ea7e5
 (pts,tris)=maketriangulation(1/resolution^2)
