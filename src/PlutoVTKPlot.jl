@@ -6,6 +6,12 @@ using ColorSchemes
 
 loadvtk()=error("Deprecated: loadvtk() is now called automatically when you render a plot, you can delete this cell.")
 
+
+"""
+Structure containig plot information. 
+In particular it contains dict of data sent to javascript.
+The semantics of the keys is explaind in PlutoCanvasPlot.jl
+"""
 mutable struct VTKPlot
     # command list passed to javascript
     jsdict::Dict{String,Any}
@@ -13,8 +19,9 @@ mutable struct VTKPlot
     # size in canvas coordinates
     w::Float64
     h::Float64
-    uuid::UUID
 
+    # uuid for identifying html element
+    uuid::UUID
     VTKPlot(::Nothing)=new()
 end
 
@@ -36,13 +43,12 @@ function VTKPlot(;resolution=(300,300))
 end
 
 
-function triplot!(p::VTKPlot,pts, tris,f)
-    pfx=command!(p,"triplot")
-    p.jsdict[pfx*"_points"]=vec(vcat(pts,f'))
-
-    # we need to set up  the triangle data for vtk. 
-    # Coding is  [3, i1, i2, i3,   3, i1, i2, i3]
-    # Careful: js indexing counts from zero
+"""
+Set up  polygon data for vtk. 
+Coding is   [3, i11, i12, i13,   3 , i21, i22 ,i23, ...]
+Careful: js indexing counts from zero
+"""
+function vtkpolys(tris)
     ipoly=1
     ntri=size(tris,2)
     polys=Vector{Int32}(undef,4*ntri)
@@ -53,38 +59,47 @@ function triplot!(p::VTKPlot,pts, tris,f)
         polys[ipoly+3] = tris[3,itri]-1
         ipoly+=4
     end
-    p.jsdict[pfx*"_polys"]=polys
+    polys
+end
+
+"""
+     triplot!(p::VTKPlot,pts, tris,f)
+
+Plot piecewise linear function on  triangular grid given by points and triangles
+as matrices
+"""
+function triplot!(p::VTKPlot,pts, tris,f)
+    pfx=command!(p,"triplot")
+    # make 3D points from 2D points by adding function value as
+    # z coordinate
+    p.jsdict[pfx*"_points"]=vec(vcat(pts,f'))
+    p.jsdict[pfx*"_polys"]=vtkpolys(tris)
     p.jsdict[pfx*"_cam"]="3D"
     p
 end
 
+"""
+     tricolor!(p::VTKPlot,pts, tris,f; colormap)
+
+Plot piecewise linear function on  triangular grid given as "heatmap" 
+"""
 function tricolor!(p::VTKPlot,pts, tris,f;cmap=:summer)
     pfx=command!(p,"tricolor")
+    cscheme=colorschemes[cmap]
     (fmin,fmax)=extrema(f)
     p.jsdict[pfx*"_points"]=vec(vcat(pts,zeros(length(f))'))
-                                
-    # we need to set up  the triangle data for vtk. 
-    # Coding is  [3, i1, i2, i3,   3, i1, i2, i3]
-    # Careful: js indexing counts from zero
-    ipoly=1
-    ntri=size(tris,2)
-    polys=Vector{Int32}(undef,4*ntri)
-    for itri=1:ntri
-        polys[ipoly] = 3
-        polys[ipoly+1] = tris[1,itri]-1
-        polys[ipoly+2] = tris[2,itri]-1
-        polys[ipoly+3] = tris[3,itri]-1
-        ipoly+=4
-    end
-    p.jsdict[pfx*"_polys"]=polys
-    cscheme=colorschemes[cmap]
+    p.jsdict[pfx*"_polys"]=vtkpolys(tris)
     p.jsdict[pfx*"_colors"]=collect(reinterpret(Float64,map(x->get(cscheme,(x-fmin)/(fmax-fmin)),f)))
     p.jsdict[pfx*"_cam"]="2D"
     p
 end
 
 
-
+"""
+Add 3D coordinate system axes to the plot.
+Sets camera handling
+to 3D mode.
+"""
 function axis3d!(p::VTKPlot;
                  xtics=0:1,
                  ytics=0:1,
@@ -96,14 +111,17 @@ function axis3d!(p::VTKPlot;
     p
 end
 
+"""
+Add 2D coordinate system axes to the plot. Sets camera handling
+to 2D mode.
+"""
 axis2d!(p::VTKPlot;kwargs...)=axis3d!(p;ztics=0.0,kwargs...)
 
-
+const vtkplot = read(joinpath(@__DIR__, "..", "assets", "vtkplot.js"), String)
 """
 Show plot
 """
 function Base.show(io::IO, ::MIME"text/html", p::VTKPlot)
-    vtkplot = read(joinpath(@__DIR__, "..", "assets", "vtkplot.js"), String)
     result="""
     <script type="text/javascript" src="https://unpkg.com/vtk.js@18"></script>
     <script>

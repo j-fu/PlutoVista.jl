@@ -8,6 +8,7 @@ function vtkplot(uuid,jsdict,invalidation)
     var openGlRenderWindow = vtk.Rendering.OpenGL.vtkRenderWindow.newInstance();
     renderWindow.addView(openGlRenderWindow);
     renderer.setBackground(1,1,1)
+
     // Interactor
     var interactor = vtk.Rendering.Core.vtkRenderWindowInteractor.newInstance();
     interactor.setView(openGlRenderWindow);
@@ -23,6 +24,7 @@ function vtkplot(uuid,jsdict,invalidation)
     interactor.bindEvents(rootContainer);
     renderWindow.addRenderer(renderer)
 
+    // Loop over content of jsdict
     var cmdcount=jsdict.cmdcount
     for (var icmd = 1 ; icmd <= cmdcount ; icmd++)
     {  
@@ -37,7 +39,6 @@ function vtkplot(uuid,jsdict,invalidation)
             var actor = vtk.Rendering.Core.vtkActor.newInstance();
             var mapper = vtk.Rendering.Core.vtkMapper.newInstance();
             
-            // for color, see 	https://github.com/Kitware/vtk-js/issues/1167
             // Apply transformation to the points coordinates // figure this out later
             //    vtkMatrixBuilder
             ///      .buildFromRadian()
@@ -64,7 +65,6 @@ function vtkplot(uuid,jsdict,invalidation)
  	    var colors=jsdict[cmd+"_colors"]
  	    var cam=jsdict[cmd+"_cam"]
 
-            // Loop over content of jsdict
             var actor = vtk.Rendering.Core.vtkActor.newInstance();
             var mapper = vtk.Rendering.Core.vtkMapper.newInstance();
             
