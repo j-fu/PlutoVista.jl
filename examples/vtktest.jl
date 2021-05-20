@@ -48,9 +48,6 @@ Julia folder.
 
 """
 
-# ╔═╡ 75fbe996-b746-11eb-3551-c3a5944c312c
-loadvtk()
-
 # ╔═╡ 7c06fcf0-8c98-49f7-add8-435f57a9c9da
 function maketriangulation(maxarea)
 	
@@ -92,7 +89,6 @@ end
 # ╔═╡ Cell order:
 # ╟─93ca4fd0-8f61-4174-b459-55f5395c0f56
 # ╠═d6c0fb79-4129-444a-978a-bd2222b53df6
-# ╠═75fbe996-b746-11eb-3551-c3a5944c312c
 # ╠═7c06fcf0-8c98-49f7-add8-435f57a9c9da
 # ╠═890710fe-dac0-4256-b1ba-79776f1ea7e5
 # ╠═b8a976e3-7fef-4527-ae6a-4da31c93a04f
