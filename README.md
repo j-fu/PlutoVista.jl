@@ -6,7 +6,7 @@ Code design study for a plot library for Pluto notebooks based on [vtk.js](https
 This uses the Pluto [💁 API to make objects available inside JS](https://github.com/fonsp/Pluto.jl/pull/1124)
 to pass plot data from Julia to HTML5.
 
-Please see the [example pluto notebook](https://raw.githubusercontent.com/j-fu/PlutoVTKPlot.jl/main/examples/vtkexample.jl).
+Please see the [example pluto notebook](https://raw.githubusercontent.com/j-fu/PlutoVTKPlot.jl/main/examples/vtktest.jl).
 
 
 So far, this package is in an early state. The current version of the code
