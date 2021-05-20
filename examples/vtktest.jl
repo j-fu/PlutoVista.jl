@@ -20,8 +20,8 @@ begin
 	# Pkg.add("Revise");	using Revise
 	Pkg.add("PlutoUI")
 	Pkg.add("Triangulate")
-	Pkg.add(name="PlutoVTKPlot",version="0.0.2")
-#	Pkg.develop("PlutoVTKPlot")
+#	Pkg.add(name="PlutoVTKPlot",version="0.0.2")
+	Pkg.develop("PlutoVTKPlot")
 	using PlutoUI
 	using UUIDs
 	using Printf
@@ -85,7 +85,7 @@ size(pts,2)
 # ╔═╡ 81046dcd-3cfb-4133-943f-61b9b3cdb183
 let
 	p=VTKPlot(resolution=(400,400))
-	tricolor!(p,pts,tris,func;cmap=:spring)
+	tricolor!(p,pts,tris,func;cmap=:viridis)
 	axis2d!(p; xtics=-1:1,ytics=-1:1)
 end
 
