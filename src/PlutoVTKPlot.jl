@@ -109,7 +109,7 @@ function Base.show(io::IO, ::MIME"text/html", p::VTKPlot)
     <script>
     $(vtkplot)
     const jsdict = $(Main.PlutoRunner.publish_to_js(p.jsdict))
-    vtkplot("$(p.uuid)",jsdict)        
+    vtkplot("$(p.uuid)",jsdict,invalidation)        
     </script>
     <div id="$(p.uuid)" style= "width: $(p.w)px; height: $(p.h)px;"></div>
     """
