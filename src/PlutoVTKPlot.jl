@@ -5,7 +5,7 @@ using UUIDs
 using Colors
 using ColorSchemes
 
-loadvtk()=HTML("""<script type="text/javascript" src="https://unpkg.com/vtk.js"></script>""")
+loadvtk()=error("Deprecated: loadvtk() is now called automatically when you render a plot, you can delete this cell.")
 
 mutable struct VTKPlot
     # command list passed to javascript
@@ -106,6 +106,7 @@ Show plot
 function Base.show(io::IO, ::MIME"text/html", p::VTKPlot)
     vtkplot = read(joinpath(@__DIR__, "..", "assets", "vtkplot.js"), String)
     result="""
+    <script type="text/javascript" src="https://unpkg.com/vtk.js@18"></script>
     <script>
     $(vtkplot)
     const jsdict = $(Main.PlutoRunner.publish_to_js(p.jsdict))
