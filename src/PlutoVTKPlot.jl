@@ -1,5 +1,4 @@
 module PlutoVTKPlot
-using Pluto
 using PlutoCanvasPlot
 using UUIDs
 using Colors
