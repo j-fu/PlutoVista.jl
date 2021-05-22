@@ -17,13 +17,12 @@ end
 begin
 	using Pkg
 	Pkg.activate(mktempdir())
-	# Pkg.add("Revise");	using Revise
+#	 Pkg.add("Revise");	using Revise
 	Pkg.add("PlutoUI")
 	Pkg.add("Triangulate")
-	Pkg.add(name="PlutoVTKPlot",version="0.0.3")
+	Pkg.add(name="PlutoVTKPlot",version="0.0.4")
 #	Pkg.develop("PlutoVTKPlot")
 	using PlutoUI
-	using UUIDs
 	using Printf
 	using Triangulate
 	using PlutoVTKPlot
@@ -61,7 +60,9 @@ function maketriangulation(maxarea)
 end
 
 # ╔═╡ db2823d9-aa6d-4be3-af5c-873c072cfd2b
-@bind resolution Slider(5:200)
+md"""
+Change grid resolution: $(@bind resolution Slider(5:200))
+"""
 
 # ╔═╡ 890710fe-dac0-4256-b1ba-79776f1ea7e5
 (pts,tris)=maketriangulation(1/resolution^2)
@@ -70,18 +71,18 @@ end
 func=0.5*[sin(10*pts[1,i])*cos(10*pts[2,i]) for i=1:size(pts,2)]
 
 # ╔═╡ 60dcfcf5-391e-418f-8e7c-3a0fe94f1e0d
-let
-	p=VTKPlot(resolution=(600,400))
+begin
+	p=VTKPlot(resolution=(300,300))
 	triplot!(p,pts,tris,func)
-	axis3d!(p; xtics=-1:1,ytics=-1:1,ztics=extrema(func))
+	axis3d!(p; xtics=-1:1,ytics=-1:1,ztics=-1:1)
 end
 
 # ╔═╡ bce0cfe7-4112-4bb8-aac6-43885f3746a9
-size(pts,2)
+md"""Number of gridpoints: $(size(pts,2)) """
 
 # ╔═╡ 81046dcd-3cfb-4133-943f-61b9b3cdb183
 let
-	p=VTKPlot(resolution=(400,400))
+	p=VTKPlot(resolution=(300,300))
 	tricolor!(p,pts,tris,func;cmap=:viridis)
 	axis2d!(p; xtics=-1:1,ytics=-1:1)
 end
@@ -93,6 +94,6 @@ end
 # ╠═890710fe-dac0-4256-b1ba-79776f1ea7e5
 # ╠═b8a976e3-7fef-4527-ae6a-4da31c93a04f
 # ╠═60dcfcf5-391e-418f-8e7c-3a0fe94f1e0d
-# ╠═db2823d9-aa6d-4be3-af5c-873c072cfd2b
-# ╠═bce0cfe7-4112-4bb8-aac6-43885f3746a9
+# ╟─db2823d9-aa6d-4be3-af5c-873c072cfd2b
+# ╟─bce0cfe7-4112-4bb8-aac6-43885f3746a9
 # ╠═81046dcd-3cfb-4133-943f-61b9b3cdb183

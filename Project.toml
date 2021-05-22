@@ -1,7 +1,7 @@
 name = "PlutoVTKPlot"
 uuid = "19f70b67-2887-4cf9-b19e-fe1a30c34d85"
 authors = ["Juergen Fuhrmann <juergen.fuhrmann@wias-berlin.de>"]
-version = "0.0.3"
+version = "0.0.4"
 
 [deps]
 ColorSchemes = "35d6a980-a343-548e-a6ea-1d62b119f2f4"
