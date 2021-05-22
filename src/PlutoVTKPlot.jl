@@ -89,8 +89,21 @@ function tricolor!(p::VTKPlot,pts, tris,f;cmap=:summer)
     (fmin,fmax)=extrema(f)
     p.jsdict[pfx*"_points"]=vec(vcat(pts,zeros(length(f))'))
     p.jsdict[pfx*"_polys"]=vtkpolys(tris)
-    p.jsdict[pfx*"_colors"]=collect(reinterpret(Float64,map(x->get(cscheme,(x-fmin)/(fmax-fmin)),f)))
+
+    # save transfer capacity by passing rgb values as UInt8
+    colors=Array{UInt8,2}(undef,3,length(f))
+    for i=1:length(f)
+        rgb=get(cscheme,(f[i]-fmin)/(fmax-fmin))
+        colors[1,i]=Int(floor(rgb.r*256))
+        colors[2,i]=Int(floor(rgb.g*256))
+        colors[3,i]=Int(floor(rgb.b*256))       
+    end
+    p.jsdict[pfx*"_colors"]=vec(colors)
     p.jsdict[pfx*"_cam"]="2D"
+
+    # It seems a colorbar is best drawn via canvas...
+    # https://github.com/Kitware/vtk-js/issues/1621
+    
     p
 end
 
