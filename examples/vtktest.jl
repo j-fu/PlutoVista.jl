@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.14.5
+# v0.14.7
 
 using Markdown
 using InteractiveUtils
@@ -16,12 +16,12 @@ end
 # ╔═╡ d6c0fb79-4129-444a-978a-bd2222b53df6
 begin
 	using Pkg
-	Pkg.activate(mktempdir())
-#	 Pkg.add("Revise");	using Revise
+	Pkg.activate(mktempdir()) 
+	Pkg.add("Revise");	using Revise
 	Pkg.add("PlutoUI")
 	Pkg.add("Triangulate")
-	Pkg.add(name="PlutoVTKPlot",version="0.0.4")
-#	Pkg.develop("PlutoVTKPlot")
+#	Pkg.add(name="PlutoVTKPlot",version="0.0.4")
+	Pkg.develop("PlutoVTKPlot")
 	using PlutoUI
 	using Printf
 	using Triangulate
@@ -71,11 +71,19 @@ Change grid resolution: $(@bind resolution Slider(5:200))
 func=0.5*[sin(10*pts[1,i])*cos(10*pts[2,i]) for i=1:size(pts,2)]
 
 # ╔═╡ 60dcfcf5-391e-418f-8e7c-3a0fe94f1e0d
-begin
+p=let
 	p=VTKPlot(resolution=(300,300))
 	triplot!(p,pts,tris,func)
 	axis3d!(p; xtics=-1:1,ytics=-1:1,ztics=-1:1)
 end
+
+# ╔═╡ 401b36bd-fa8f-4a9c-9556-bbc82c3ddbca
+md"""
+Change time: $(@bind time Slider(0:0.1:10,show_value=true))
+"""
+
+# ╔═╡ e76f8a6a-ab91-454a-b200-cfc8b57eb331
+triupdate!(p,pts,tris,0.5*[sin(10*pts[1,i]-time)*cos(10*pts[2,i]-time) for i=1:size(pts,2)])
 
 # ╔═╡ bce0cfe7-4112-4bb8-aac6-43885f3746a9
 md"""Number of gridpoints: $(size(pts,2)) """
@@ -94,6 +102,8 @@ end
 # ╠═890710fe-dac0-4256-b1ba-79776f1ea7e5
 # ╠═b8a976e3-7fef-4527-ae6a-4da31c93a04f
 # ╠═60dcfcf5-391e-418f-8e7c-3a0fe94f1e0d
-# ╟─db2823d9-aa6d-4be3-af5c-873c072cfd2b
+# ╠═db2823d9-aa6d-4be3-af5c-873c072cfd2b
+# ╠═401b36bd-fa8f-4a9c-9556-bbc82c3ddbca
+# ╠═e76f8a6a-ab91-454a-b200-cfc8b57eb331
 # ╟─bce0cfe7-4112-4bb8-aac6-43885f3746a9
 # ╠═81046dcd-3cfb-4133-943f-61b9b3cdb183

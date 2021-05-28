@@ -7,9 +7,19 @@ function setinteractorstyle(interactor, cam)
 }
 
 
+function vtkupdate(uuid,jsdict,invalidation)
+{
+    var points=jsdict["xpoints"]
+    var dataset=window.dataset
+    dataset.getPoints().setData(points, 3);
+    dataset.modified()
+    renderWindow.render();
+}
+
 function vtkplot(uuid,jsdict,invalidation)
 {
-    var renderWindow = vtk.Rendering.Core.vtkRenderWindow.newInstance();
+    window.renderWindow = vtk.Rendering.Core.vtkRenderWindow.newInstance();
+    var renderWindow=window.renderWindow
     var renderer = vtk.Rendering.Core.vtkRenderer.newInstance();
 
     // OpenGlRenderWindow
@@ -54,15 +64,15 @@ function vtkplot(uuid,jsdict,invalidation)
             ///      .rotateFromDirections([1, 0, 0], model.direction)
             ///      .apply(points);
             
-            var  dataset = vtk.Common.DataModel.vtkPolyData.newInstance();
-            dataset.getPoints().setData(points, 3);
-            dataset.getPolys().setData(polys,1);
-            mapper.setInputData(dataset);
+            window.dataset = vtk.Common.DataModel.vtkPolyData.newInstance();
+            window.dataset.getPoints().setData(points, 3);
+            window.dataset.getPolys().setData(polys,1);
+            mapper.setInputData(window.dataset);
             actor.setMapper(mapper);
             renderer.addActor(actor);
             setinteractorstyle(interactor,cam)
         }
-        if (jsdict[cmd]=="tricolor")
+        else if (jsdict[cmd]=="tricolor")
         {
     	    var points=jsdict[cmd+"_points"]
  	    var polys=jsdict[cmd+"_polys"]

@@ -20,6 +20,7 @@ mutable struct VTKPlot
     w::Float64
     h::Float64
 
+    update::Bool
     # uuid for identifying html element
     uuid::UUID
     VTKPlot(::Nothing)=new()
@@ -39,6 +40,7 @@ function VTKPlot(;resolution=(300,300))
     p.jsdict=Dict{String,Any}("cmdcount" => 0)
     p.w=resolution[1]
     p.h=resolution[2]
+    p.update=false
     p
 end
 
@@ -78,6 +80,8 @@ function triplot!(p::VTKPlot,pts, tris,f)
     p
 end
 
+
+
 """
      tricolor!(p::VTKPlot,pts, tris,f; colormap)
 
@@ -96,6 +100,15 @@ function tricolor!(p::VTKPlot,pts, tris,f;cmap=:summer)
     # It seems a colorbar is best drawn via canvas...
     # https://github.com/Kitware/vtk-js/issues/1621
     
+    p
+end
+
+function triupdate!(p::VTKPlot,pts,tris,f)
+    pfx=command!(p,"triplot")
+    # make 3D points from 2D points by adding function value as
+    # z coordinate
+    p.jsdict["xpoints"]=vec(vcat(pts,f'))
+    p.update=true
     p
 end
 
@@ -122,24 +135,40 @@ to 2D mode.
 """
 axis2d!(p::VTKPlot;kwargs...)=axis3d!(p;ztics=0.0,kwargs...)
 
+
+
 """
 Show plot
 """
 function Base.show(io::IO, ::MIME"text/html", p::VTKPlot)
     vtkplot = read(joinpath(@__DIR__, "..", "assets", "vtkplot.js"), String)
-    result="""
-    <script type="text/javascript" src="https://unpkg.com/vtk.js@18"></script>
-    <script>
-    $(vtkplot)
-    const jsdict = $(Main.PlutoRunner.publish_to_js(p.jsdict))
-    vtkplot("$(p.uuid)",jsdict,invalidation)        
-    </script>
-    <div id="$(p.uuid)" style= "width: $(p.w)px; height: $(p.h)px;"></div>
-    """
+    result=" "
+    if p.update
+        result="""
+        <script type="text/javascript" src="https://unpkg.com/vtk.js@18"></script>
+        <script>
+        $(vtkplot)
+        const jsdict = $(Main.PlutoRunner.publish_to_js(p.jsdict))
+        vtkupdate("$(p.uuid)",jsdict,invalidation)        
+        </script>
+        """
+    else
+        result="""
+        <script type="text/javascript" src="https://unpkg.com/vtk.js@18"></script>
+        <script>
+        $(vtkplot)
+        const jsdict = $(Main.PlutoRunner.publish_to_js(p.jsdict))
+        vtkplot("$(p.uuid)",jsdict,invalidation)        
+        </script>
+        <div id="$(p.uuid)" style= "width: $(p.w)px; height: $(p.h)px;"></div>
+        """
+    end
     write(io,result)
 end
 
 
 
 export loadvtk, VTKPlot,triplot!,tricolor!, axis3d!, axis2d!
+export triupdate!
+
 end # module
