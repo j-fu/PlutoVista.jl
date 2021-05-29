@@ -21,16 +21,16 @@ begin
 	Pkg.add("PlutoUI")
 	Pkg.add("Triangulate")
 #	Pkg.add(name="PlutoVTKPlot",version="0.0.4")
-	Pkg.develop("PlutoVTKPlot")
+	Pkg.develop("PlutoVista")
 	using PlutoUI
 	using Printf
 	using Triangulate
-	using PlutoVTKPlot
+	using PlutoVista
 end
 
 # ╔═╡ 93ca4fd0-8f61-4174-b459-55f5395c0f56
 md"""
-Test Notebook for [PlutoVTKPlot](https://github.com/j-fu/PlutoVTKPlot.jl)
+Test Notebook for [PlutoVista](https://github.com/j-fu/PlutoVista.jl)
 
 So far, this package is in an early state. The current version  of the code is available via the registry `https://github.com/j-fu/PackageNursery.git` .
 
@@ -96,7 +96,7 @@ let
 end
 
 # ╔═╡ Cell order:
-# ╟─93ca4fd0-8f61-4174-b459-55f5395c0f56
+# ╠═93ca4fd0-8f61-4174-b459-55f5395c0f56
 # ╠═d6c0fb79-4129-444a-978a-bd2222b53df6
 # ╠═7c06fcf0-8c98-49f7-add8-435f57a9c9da
 # ╠═890710fe-dac0-4256-b1ba-79776f1ea7e5

@@ -1,11 +1,3 @@
-module PlutoVTKPlot
-using PlutoCanvasPlot
-using UUIDs
-using Colors
-using ColorSchemes
-
-loadvtk()=error("Deprecated: loadvtk() is now called automatically when you render a plot, you can delete this cell.")
-
 
 """
 Structure containig plot information. 
@@ -168,7 +160,3 @@ end
 
 
 
-export loadvtk, VTKPlot,triplot!,tricolor!, axis3d!, axis2d!
-export triupdate!
-
-end # module
