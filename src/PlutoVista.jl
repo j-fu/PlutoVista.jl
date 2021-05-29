@@ -5,11 +5,11 @@ using ColorSchemes
 
 
 
-include("command.jl")
+include("common.jl")
 
 include("canvas.jl")
 
-export CanvasPlot,  polygon!,linecolor!, fillcolor!
+export polygon!,linecolor!, fillcolor!
 export textcolor!,textsize!,text!
 export polyline!,linecolor!
 export polygon!,fillcolor!
@@ -19,8 +19,8 @@ export axis!
 include("vtk.jl")
 
 
-
-export VTKPlot,triplot!,tricolor!, axis3d!, axis2d!
+export plutovista
+export triplot!,tricolor!, axis3d!, axis2d!
 export triupdate!
 
 end # module

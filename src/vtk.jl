@@ -4,7 +4,7 @@ Structure containig plot information.
 In particular it contains dict of data sent to javascript.
 The semantics of the keys is explaind in PlutoCanvasPlot.jl
 """
-mutable struct VTKPlot
+mutable struct VTKPlot  <: AbstractVistaPlot
     # command list passed to javascript
     jsdict::Dict{String,Any}
 

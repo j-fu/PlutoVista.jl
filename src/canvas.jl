@@ -1,6 +1,6 @@
 
 
-mutable struct CanvasPlot
+mutable struct CanvasPlot <:AbstractVistaPlot
     # command list passed to javascript
     jsdict::Dict{String,Any}
 

@@ -19,7 +19,7 @@ md"""
 """
 
 # ╔═╡ 2acd1978-03b1-4e8f-ba9f-2b3d58123613
-develop=false
+develop=true
 
 # ╔═╡ d6c0fb79-4129-444a-978a-bd2222b53df6
 begin
@@ -63,7 +63,7 @@ func=0.5*[sin(10*pts[1,i])*cos(10*pts[2,i]) for i=1:size(pts,2)]
 
 # ╔═╡ 60dcfcf5-391e-418f-8e7c-3a0fe94f1e0d
 p=let
-	p=VTKPlot(resolution=(300,300))
+	p=plutovista(resolution=(300,300),zrange=-1:1)
 	triplot!(p,pts,tris,func)
 	axis3d!(p; xtics=-1:1,ytics=-1:1,ztics=-1:1)
 end
@@ -81,7 +81,7 @@ md"""Number of gridpoints: $(size(pts,2)) """
 
 # ╔═╡ 81046dcd-3cfb-4133-943f-61b9b3cdb183
 let
-	p=VTKPlot(resolution=(300,300))
+	p=plutovista(resolution=(300,300),zrange=-1:1)
 	tricolor!(p,pts,tris,func;cmap=:viridis)
 	axis2d!(p; xtics=-1:1,ytics=-1:1)
 end

@@ -19,18 +19,18 @@ md"""
 """
 
 # ╔═╡ 50d7298b-40ac-429c-8e4a-7e4d980bbfab
-develop=false
+develop=true
 
 # ╔═╡ 21b1f4b6-2172-4292-8249-35a615db4f59
 begin    
     using Pkg
     Pkg.activate(mktempdir())
     Pkg.add("PlutoUI")
+	Pkg.add("Revise");using Revise
     if develop	
-    	Pkg.add("Revise");using Revise
-	Pkg.develop("PlutoVista")
+     	Pkg.develop("PlutoVista")
     else
-	Pkg.add(name="PlutoVista",url="https://github.com/j-fu/PlutoVista.jl")
+	    Pkg.add(name="PlutoVista",url="https://github.com/j-fu/PlutoVista.jl")
     end	
     using PlutoUI
     using PlutoVista
@@ -39,7 +39,7 @@ end
 # ╔═╡ 825f6068-0f02-44e4-b083-1be3eb4c764d
 let
 	X=0:0.1:10
-	p=CanvasPlot(;xrange=X,yrange=-1:1,resolution=(600,200))
+	p=plutovista(;xrange=X,yrange=-1:1,resolution=(600,200))
 	polyline!(p,X,sin.(X))
 	polyline!(p,X,cos.(X))
     p
@@ -47,7 +47,7 @@ end
 
 # ╔═╡ 2a5510d3-7355-4095-ab43-ad6d75bba090
 let 
-	p=CanvasPlot(resolution=(600,300))
+	p=plutovista(resolution=(600,300))
 	
 	axis!(p; xtics=(0:2.5:10),ytics=(-1:0.5:1))
 	X=0:0.1:10
@@ -59,7 +59,7 @@ end
 
 # ╔═╡ 405b81de-3fd9-48f7-81a7-dc8f06dfda9c
 let 
-	p=CanvasPlot(resolution=(300,300),xrange=-1:1,yrange=-1:1)
+	p=plutovista(resolution=(300,300),xrange=-1:1,yrange=-1:1)
 	T=0:0.01:2π
 	X=0.45.*sin.(T)
 	Y=0.45.*cos.(T)
@@ -74,7 +74,7 @@ end
 
 # ╔═╡ fd7c959b-94d6-43ff-b535-49b0883874d5
 let 
-	p=CanvasPlot(resolution=(300,300),xrange=-1:1,yrange=-1:1)
+	p=plutovista(resolution=(300,300),xrange=-1:1,yrange=-1:1)
 	time=0.005*clock_t
 	dt=0.01
     T=time:dt:2π/2+time	

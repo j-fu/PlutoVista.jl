@@ -1,5 +1,8 @@
+abstract type AbstractVistaPlot end
+
+
 """
-    command!(p::CanvasPlot,cmd)
+    command!(p<: AbstractVistaPlot,cmd)
 
 Enter new command named `cmd`.
 
@@ -27,9 +30,24 @@ E.g. for a polyline as command number 5, we create the entres
 "5_x" => Vector of x coordinates in canvas coordinate system
 "5_y" => Vector of y coordinates in canvas coordinate system
 """
-function command!(p,cmd)
+function command!(p::T,cmd) where {T <: AbstractVistaPlot}
     p.jsdict["cmdcount"]=p.jsdict["cmdcount"]+1
     pfx=string(p.jsdict["cmdcount"])
     p.jsdict[pfx]=cmd
     pfx
+end
+
+
+function plutovista(;resolution=(300,300),
+                    xrange::AbstractVector=0:1,
+                    yrange::AbstractVector=0:1,
+                    zrange::AbstractVector=0:0,
+                    )
+
+    zextrema=extrema(zrange)
+    if zextrema[begin]==zextrema[end]
+        CanvasPlot(;resolution=resolution,xrange=xrange,yrange=yrange)
+    else
+        VTKPlot(;resolution=resolution)
+    end
 end
