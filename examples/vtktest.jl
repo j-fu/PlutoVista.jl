@@ -13,39 +13,30 @@ macro bind(def, element)
     end
 end
 
-# ╔═╡ d6c0fb79-4129-444a-978a-bd2222b53df6
-begin
-	using Pkg
-	Pkg.activate(mktempdir()) 
-	Pkg.add("Revise");	using Revise
-	Pkg.add("PlutoUI")
-	Pkg.add("Triangulate")
-#	Pkg.add(name="PlutoVTKPlot",version="0.0.4")
-	Pkg.develop("PlutoVista")
-	using PlutoUI
-	using Printf
-	using Triangulate
-	using PlutoVista
-end
-
 # ╔═╡ 93ca4fd0-8f61-4174-b459-55f5395c0f56
 md"""
-Test Notebook for [PlutoVista](https://github.com/j-fu/PlutoVista.jl)
-
-So far, this package is in an early state. The current version  of the code is available via the registry `https://github.com/j-fu/PackageNursery.git` .
-
-So, in order to run this notebook, you need to add this registry to you Julia environment.
-
-```
-pkg> registry add https://github.com/j-fu/PackageNursery.jl.git
-```
-
-This step can be safely undone by removing `.julia/registries/PackageNursery` in your
-Julia folder.
-
-
-
+# Test Notebook for [PlutoVista](https://github.com/j-fu/PlutoVista.jl)
 """
+
+# ╔═╡ 2acd1978-03b1-4e8f-ba9f-2b3d58123613
+develop=false
+
+# ╔═╡ d6c0fb79-4129-444a-978a-bd2222b53df6
+begin
+    using Pkg
+    Pkg.activate(mktempdir())
+    Pkg.add(["PlutoUI","Triangulate"])
+    if develop	
+    	Pkg.add("Revise");using Revise
+	    Pkg.develop("PlutoVista")
+    else
+	    Pkg.add(name="PlutoVista",url="https://github.com/j-fu/PlutoVista.jl")
+    end	
+    using PlutoUI
+    using PlutoVista
+    using Printf
+    using Triangulate
+end
 
 # ╔═╡ 7c06fcf0-8c98-49f7-add8-435f57a9c9da
 function maketriangulation(maxarea)
@@ -96,7 +87,8 @@ let
 end
 
 # ╔═╡ Cell order:
-# ╠═93ca4fd0-8f61-4174-b459-55f5395c0f56
+# ╟─93ca4fd0-8f61-4174-b459-55f5395c0f56
+# ╠═2acd1978-03b1-4e8f-ba9f-2b3d58123613
 # ╠═d6c0fb79-4129-444a-978a-bd2222b53df6
 # ╠═7c06fcf0-8c98-49f7-add8-435f57a9c9da
 # ╠═890710fe-dac0-4256-b1ba-79776f1ea7e5

@@ -13,36 +13,28 @@ macro bind(def, element)
     end
 end
 
+# ╔═╡ c54da25c-0dbf-41d1-bd7f-657b115bf6bf
+md"""
+# Test Notebook for [PlutoVista](https://github.com/j-fu/PlutVista.jl)
+"""
+
+# ╔═╡ 50d7298b-40ac-429c-8e4a-7e4d980bbfab
+develop=false
+
 # ╔═╡ 21b1f4b6-2172-4292-8249-35a615db4f59
 begin    
     using Pkg
-	Pkg.activate(mktempdir())
-	 Pkg.add("Revise");using Revise
-	Pkg.add("PlutoUI")
-	using PlutoUI
-#	Pkg.add(name="PlutoCanvasPlot",version="0.0.5")
+    Pkg.activate(mktempdir())
+    Pkg.add("PlutoUI")
+    if develop	
+    	Pkg.add("Revise");using Revise
 	Pkg.develop("PlutoVista")
-	using PlutoVista
-
+    else
+	Pkg.add(name="PlutoVista",url="https://github.com/j-fu/PlutoVista.jl")
+    end	
+    using PlutoUI
+    using PlutoVista
 end
-
-# ╔═╡ c54da25c-0dbf-41d1-bd7f-657b115bf6bf
-md"""
-Test Notebook for [PlutoVista](https://github.com/j-fu/PlutVista.jl)
-
-So far, this package is in an early state. The current version  of the code is available via the registry `https://github.com/j-fu/PackageNursery.git` .
-
-So, in order to run this notebook, you need to add this registry to you Julia environment.
-
-```
-pkg> registry add https://github.com/j-fu/PackageNursery.jl.git
-```
-
-This step can be safely undone by removing `.julia/registries/PackageNursery` in your
-Julia folder.
-
-
-"""
 
 # ╔═╡ 825f6068-0f02-44e4-b083-1be3eb4c764d
 let
@@ -94,7 +86,8 @@ let
 end
 
 # ╔═╡ Cell order:
-# ╠═c54da25c-0dbf-41d1-bd7f-657b115bf6bf
+# ╟─c54da25c-0dbf-41d1-bd7f-657b115bf6bf
+# ╠═50d7298b-40ac-429c-8e4a-7e4d980bbfab
 # ╠═21b1f4b6-2172-4292-8249-35a615db4f59
 # ╠═825f6068-0f02-44e4-b083-1be3eb4c764d
 # ╠═2a5510d3-7355-4095-ab43-ad6d75bba090
