@@ -69,25 +69,22 @@ end
 """
 Transform a pair of coordinates from world to canvas
 """
-_tran2d(p,x,y)=(x*p.ax+p.bx,y*p.ay+p.by)
-
-
+@inline _tran2d(p,x,y)=(x*p.ax+p.bx,y*p.ay+p.by)
 
 """
 Pass pair of coordinate arrays for `lines!`,`polyline!`,`polygon!`  
 """
 function _poly!(p::CanvasPlot,cmd,x,y)
-    pfx=command!(p,cmd)
+    command!(p,cmd)
     
     tx=Vector{Float32}(undef,length(x))
     ty=Vector{Float32}(undef,length(y))
     for i=1:length(x)
-        tx[i],ty[i]=_tran2d(p,x[i],y[i])
+        @inbounds @fastmath tx[i],ty[i]=_tran2d(p,x[i],y[i])
     end
-    p.jsdict[pfx*"_x"]=tx
-    p.jsdict[pfx*"_y"]=ty
+    parameter!(p,"x",tx)
+    parameter!(p,"y",ty)
     p
-    
 end
 
 
@@ -144,8 +141,8 @@ end
 Set line color.
 """
 function linecolor!(p::CanvasPlot,r,g,b)
-    pfx=command!(p,"linecolor")
-    p.jsdict[pfx*"_rgb"]=255*Float32[r,g,b]
+    command!(p,"linecolor")
+    parameter!(p,"rgb",255*Float32[r,g,b])
 end
 
 
@@ -155,8 +152,8 @@ end
 Set line width in pixels
 """
 function linewidth!(p::CanvasPlot,w)
-    pfx=command!(p,"linewidth")
-    p.jsdict[pfx*"_w"]=w
+    command!(p,"linewidth")
+    parameter!(p,"w",w)
 end
 
 """
@@ -165,8 +162,8 @@ end
 Set polygon fill color.
 """
 function fillcolor!(p::CanvasPlot,r,g,b)
-    pfx=command!(p,"fillcolor")
-    p.jsdict[pfx*"_rgb"]=255*Float32[r,g,b]
+    command!(p,"fillcolor")
+    parameter!(p,"rgb",255*Float32[r,g,b])
 end
 
 
@@ -176,8 +173,8 @@ end
 Set text color
 """
 function textcolor!(p::CanvasPlot,r,g,b)
-    pfx=command!(p,"textcolor")
-    p.jsdict[pfx*"_rgb"]=255*Float32[r,g,b]
+    command!(p,"textcolor")
+    parameter!(p,"rgb",255*Float32[r,g,b])
 end
 
 
@@ -187,8 +184,8 @@ end
 Set text size in pixels
 """
 function textsize!(p::CanvasPlot,px)
-    pfx=command!(p,"textsize")
-    p.jsdict[pfx*"_pt"]=px
+    command!(p,"textsize")
+    parameter!(p,"pt",px)
 end
 
 
@@ -211,12 +208,11 @@ Set text alignment.
 function textalign!(p::CanvasPlot,align)
     a=String(align)
 
-    pfx=command!(p,"textalign")
-    p.jsdict[pfx*"_align"]=halign[a[1:1]]
+    command!(p,"textalign")
+    parameter!(p,"align",halign[a[1:1]])
 
-    pfx=command!(p,"textbaseline")
-    p.jsdict[pfx*"_align"]=valign[a[2:2]]
-
+    command!(p,"textbaseline")
+    parameter!(p,"align",valign[a[2:2]])
 end
 
 
@@ -226,11 +222,11 @@ end
 Draw text at position x,y.
 """
 function text!(p::CanvasPlot,txt,x,y)
-    pfx=command!(p,"text")
+    command!(p,"text")
     tx,ty=_tran2d(p,x,y)
-    p.jsdict[pfx*"_x"]=tx
-    p.jsdict[pfx*"_y"]=ty
-    p.jsdict[pfx*"_txt"]=txt
+    parameter!(p,"x",tx)
+    parameter!(p,"y",ty)
+    parameter!(p,"txt",txt)
 end
 
 """

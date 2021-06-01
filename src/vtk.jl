@@ -63,13 +63,12 @@ Plot piecewise linear function on  triangular grid given by points and triangles
 as matrices
 """
 function triplot!(p::VTKPlot,pts, tris,f)
-    pfx=command!(p,"triplot")
+    command!(p,"triplot")
     # make 3D points from 2D points by adding function value as
     # z coordinate
-    p.jsdict[pfx*"_points"]=vec(vcat(pts,f'))
-    p.jsdict[pfx*"_polys"]=vtkpolys(tris)
-    p.jsdict[pfx*"_cam"]="3D"
-    p
+    parameter!(p,"points",vec(vcat(pts,f')))
+    parameter!(p,"polys",vtkpolys(tris))
+    parameter!(p,"cam","3D")
 end
 
 
@@ -80,23 +79,21 @@ end
 Plot piecewise linear function on  triangular grid given as "heatmap" 
 """
 function tricolor!(p::VTKPlot,pts, tris,f;cmap=:summer)
-    pfx=command!(p,"tricolor")
+    command!(p,"tricolor")
     (fmin,fmax)=extrema(f)
-    p.jsdict[pfx*"_points"]=vec(vcat(pts,zeros(length(f))'))
-    p.jsdict[pfx*"_polys"]=vtkpolys(tris)
+    parameter!(p,"points",vec(vcat(pts,zeros(length(f))')))
+    parameter!(p,"polys",vtkpolys(tris))
 
     rgb=reinterpret(Float64,get(colorschemes[cmap],f,:extrema))
-    p.jsdict[pfx*"_colors"]=UInt8.(floor.(rgb*256))
-    p.jsdict[pfx*"_cam"]="2D" 
-
+    parameter!(p,"colors",UInt8.(floor.(rgb*256)))
+    parameter!(p,"cam","2D")
+    
     # It seems a colorbar is best drawn via canvas...
     # https://github.com/Kitware/vtk-js/issues/1621
-    
-    p
 end
 
 function triupdate!(p::VTKPlot,pts,tris,f)
-    pfx=command!(p,"triplot")
+    command!(p,"triplot")
     # make 3D points from 2D points by adding function value as
     # z coordinate
     p.jsdict["xpoints"]=vec(vcat(pts,f'))
@@ -114,15 +111,13 @@ function axis3d!(p::VTKPlot;
                  xtics=0:1,
                  ytics=0:1,
                  ztics=0:1)
-    pfx=command!(p,"axis3d")
-    p.jsdict[pfx*"_bounds"]=[extrema(xtics)..., extrema(ytics)...,extrema(ztics)...]
-    p.jsdict[pfx*"_cam"]= ztics[1]==ztics[end] ? "2D" : "3D"
-
-    p
+    command!(p,"axis3d")
+    parameter!(p,"bounds",[extrema(xtics)..., extrema(ytics)...,extrema(ztics)...])
+    parameter!(p,"cam",ztics[1]==ztics[end] ? "2D" : "3D")
 end
 
 """
-Add 2D coordinate system axes to the plot. Sets camera handling
+    Add 2D coordinate system axes to the plot. Sets camera handling
 to 2D mode.
 """
 axis2d!(p::VTKPlot;kwargs...)=axis3d!(p;ztics=0.0,kwargs...)

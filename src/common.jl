@@ -23,7 +23,7 @@ in javascript in the same sequence as they have been entered.
 Parameters are named and entered into the dictionary with the 
 command number as prefix.
 
-E.g. for a polyline as command number 5, we create the entres
+E.g. for a polyline as command number 5, we create the entries
 
 ```
 "5" => "polyline"
@@ -34,7 +34,20 @@ function command!(p::T,cmd) where {T <: AbstractVistaPlot}
     p.jsdict["cmdcount"]=p.jsdict["cmdcount"]+1
     pfx=string(p.jsdict["cmdcount"])
     p.jsdict[pfx]=cmd
-    pfx
+    p
+end
+
+
+"""
+    parameter!(p<: AbstractVistaPlot,name, value)
+
+After [`command!`](@ref), create a parameter entry
+"""
+function parameter!(p::T,name,value) where {T <: AbstractVistaPlot}
+    pfx=string(p.jsdict["cmdcount"])
+    key=pfx*"_"*name
+    p.jsdict[key]=value
+    p
 end
 
 

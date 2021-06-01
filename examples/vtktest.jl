@@ -26,8 +26,8 @@ begin
     using Pkg
     Pkg.activate(mktempdir())
     Pkg.add(["PlutoUI","Triangulate"])
+	Pkg.add("Revise");using Revise
     if develop	
-    	Pkg.add("Revise");using Revise
 	    Pkg.develop("PlutoVista")
     else
 	    Pkg.add(name="PlutoVista",url="https://github.com/j-fu/PlutoVista.jl")
