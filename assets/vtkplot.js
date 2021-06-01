@@ -74,9 +74,16 @@ function vtkplot(uuid,jsdict,invalidation)
         }
         else if (jsdict[cmd]=="tricolor")
         {
+
+            // for line see https://discourse.vtk.org/t/manually-create-polydata-in-vtk-js/885/15
     	    var points=jsdict[cmd+"_points"]
  	    var polys=jsdict[cmd+"_polys"]
- 	    var colors=jsdict[cmd+"_colors"]
+
+    	    var isopoints=jsdict[cmd+"_isopoints"]
+ 	    var isolines=jsdict[cmd+"_isolines"]
+
+
+            var colors=jsdict[cmd+"_colors"]
  	    var cam=jsdict[cmd+"_cam"]
 
             var actor = vtk.Rendering.Core.vtkActor.newInstance();
@@ -91,6 +98,8 @@ function vtkplot(uuid,jsdict,invalidation)
                 values: colors,
                 numberOfComponents: 3,
             });
+
+            
             dataset.getPointData().setScalars(colorData);        
             dataset.getPointData().setActiveScalars('Colors');
 
@@ -98,7 +107,19 @@ function vtkplot(uuid,jsdict,invalidation)
             mapper.setColorModeToDirectScalars()
             actor.setMapper(mapper);
             renderer.addActor(actor);
+            
+            //https://discourse.vtk.org/t/manually-create-polydata-in-vtk-js/885/4
+            var isodataset=vtk.Common.DataModel.vtkPolyData.newInstance();
+            isodataset.getPoints().setData(isopoints, 3);
+            isodataset.getLines().setData(isolines);
 
+            var isomapper = vtk.Rendering.Core.vtkMapper.newInstance();
+            var isoactor = vtk.Rendering.Core.vtkActor.newInstance();
+            isomapper.setInputData(isodataset);
+            isoactor.setMapper(isomapper);
+            isoactor.getProperty().setColor(0, 0, 0)
+            renderer.addActor(isoactor);
+            
             setinteractorstyle(interactor,cam)
         }
         else if (jsdict[cmd]=="axis3d")

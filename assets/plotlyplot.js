@@ -1,39 +1,50 @@
-function trisurf(Tri, X, Y, Z, C, uuid) {
-  var data = {
-    type: 'mesh3d',
-    x: X,
-    y: Y,
-    z: Z,
-    i: Tri.map(function(f) { return f[0] }),
-    j: Tri.map(function(f) { return f[1] }),
-    k: Tri.map(function(f) { return f[2] }),
-    facecolor: C,
-    flatshading: true,
-  }
-  Plotly.newPlot(uuid, [data])
-}
 
 
 
-
-function plotlyplot(uuid,jsdict,invalidation)
+function plotlyplot(uuid,jsdict,w,h)
 {
-trisurf(
-  [
-    [0, 1, 2],
-    [0, 2, 3],
-    [0, 3, 1],
-    [1, 2, 3]
-  ], 
-  [0, 1, 0, 0],
-  [0, 0, 1, 0],
-  [0, 0, 0, 1],
-  [ 
-    'rgb(0, 0, 0)',
-    'rgb(255, 0, 0)',
-    'rgb(0, 255, 0)',
-    'rgb(0, 0, 255)'
-  ],
-uuid)
 
+    var cmdcount=jsdict.cmdcount
+    for (var icmd = 1 ; icmd <= cmdcount ; icmd++)
+    {  
+        var cmd=icmd.toString() 
+        if (jsdict[cmd]=="triplot"|| jsdict[cmd]=="triupdate")
+        {
+            var data = {
+                type: 'mesh3d',
+                x: jsdict[cmd+"_x"],
+                y: jsdict[cmd+"_y"],
+                z: jsdict[cmd+"_z"],
+                i: jsdict[cmd+"_i"],
+                j: jsdict[cmd+"_j"],
+                k: jsdict[cmd+"_k"],
+                facecolor: [0.75,0.75,0.75],
+                flatshading: false,
+                lightposition: {x: -10, y: 0, z:20},
+                lighting: {specular: 2,
+                           diffuse: 0.8,
+                           fresnel: 0.5,
+                           ambient: 0.25,
+                          },
+            }
+            
+            var layout = {
+                autosize: false,
+                width: w,
+                height:h,
+                margin: {
+                    l: 0,
+                    r: 0,
+                    b: 0,
+                    t: 0,
+                    pad: 4
+                },
+            };
+            
+            if (jsdict[cmd]=="triplot")
+                Plotly.newPlot(uuid, [data],layout)
+            else
+                Plotly.react(uuid, [data],layout)                
+        }
+    }
 }

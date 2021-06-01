@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.14.5
+# v0.14.7
 
 using Markdown
 using InteractiveUtils
@@ -26,7 +26,7 @@ begin
     using Pkg
     Pkg.activate(mktempdir())
     Pkg.add(["PlutoUI","Triangulate"])
-	Pkg.add("Revise");using Revise
+	Pkg.add("Revise"); using Revise
     if develop	
 	    Pkg.develop("PlutoVista")
     else
@@ -63,9 +63,9 @@ func=0.5*[sin(10*pts[1,i])*cos(10*pts[2,i]) for i=1:size(pts,2)]
 
 # ╔═╡ 60dcfcf5-391e-418f-8e7c-3a0fe94f1e0d
 p=let
-	p=plutovista(resolution=(300,300),zrange=-1:1)
+	p=PlotlyPlot(resolution=(500,300))
 	triplot!(p,pts,tris,func)
-	axis3d!(p; xtics=-1:1,ytics=-1:1,ztics=-1:1)
+#	axis3d!(p; xtics=-1:1,ytics=-1:1,ztics=-1:1)
 end
 
 # ╔═╡ 401b36bd-fa8f-4a9c-9556-bbc82c3ddbca
@@ -81,13 +81,10 @@ md"""Number of gridpoints: $(size(pts,2)) """
 
 # ╔═╡ 81046dcd-3cfb-4133-943f-61b9b3cdb183
 let
-	p=plutovista(resolution=(600,600),zrange=-1:1)
-	tricolor!(p,pts,tris,func;cmap=:spring,isolevels=-0.5:0.1:0.5)
+	p=PlotlyPlot(resolution=(300,300))
+	tricolor!(p,pts,tris,func;cmap=:viridis)
 	axis2d!(p; xtics=-1:1,ytics=-1:1)
 end
-
-# ╔═╡ 8370183d-b927-4bea-8777-eb3e0c1b61e4
-extrema(func)
 
 # ╔═╡ Cell order:
 # ╟─93ca4fd0-8f61-4174-b459-55f5395c0f56
@@ -102,4 +99,3 @@ extrema(func)
 # ╠═e76f8a6a-ab91-454a-b200-cfc8b57eb331
 # ╟─bce0cfe7-4112-4bb8-aac6-43885f3746a9
 # ╠═81046dcd-3cfb-4133-943f-61b9b3cdb183
-# ╠═8370183d-b927-4bea-8777-eb3e0c1b61e4

@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.14.7
+# v0.14.5
 
 using Markdown
 using InteractiveUtils
@@ -25,8 +25,8 @@ develop=true
 begin    
     using Pkg
     Pkg.activate(mktempdir())
-    Pkg.add("PlutoUI")
 	Pkg.add("Revise");using Revise
+    Pkg.add("PlutoUI")
     if develop	
      	Pkg.develop("PlutoVista")
     else
@@ -85,6 +85,9 @@ let
 	polyline!(p,X,Y)
 end
 
+# ╔═╡ b338ee25-27af-4adc-8e52-8d1e99b59034
+CanvasColorbar(30,200)
+
 # ╔═╡ Cell order:
 # ╟─c54da25c-0dbf-41d1-bd7f-657b115bf6bf
 # ╠═50d7298b-40ac-429c-8e4a-7e4d980bbfab
@@ -94,3 +97,4 @@ end
 # ╠═405b81de-3fd9-48f7-81a7-dc8f06dfda9c
 # ╟─83c16003-8196-4f2c-a602-c298f27475fb
 # ╠═fd7c959b-94d6-43ff-b535-49b0883874d5
+# ╠═b338ee25-27af-4adc-8e52-8d1e99b59034

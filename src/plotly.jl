@@ -66,11 +66,29 @@ function triplot!(p::PlotlyPlot,pts, tris,f)
     command!(p,"triplot")
     # make 3D points from 2D points by adding function value as
     # z coordinate
-    parameter!(p,"points",vec(vcat(pts,f')))
-    parameter!(p,"polys",plotlypolys(tris))
-    parameter!(p,"cam","3D")
+    p.update=false
+    parameter!(p,"x",pts[1,:])
+    parameter!(p,"y",pts[2,:])
+    parameter!(p,"z",f)
+
+    parameter!(p,"i",tris[1,:].-1)
+    parameter!(p,"j",tris[2,:].-1)
+    parameter!(p,"k",tris[3,:].-1)
 end
 
+function triupdate!(p::PlotlyPlot,pts,tris,f)
+    command!(p,"triupdate")
+    p.update=true
+    # make 3D points from 2D points by adding function value as
+    # z coordinate
+    parameter!(p,"x",pts[1,:])
+    parameter!(p,"y",pts[2,:])
+    parameter!(p,"z",f)
+
+    parameter!(p,"i",tris[1,:].-1)
+    parameter!(p,"j",tris[2,:].-1)
+    parameter!(p,"k",tris[3,:].-1)
+end
 
 
 """
@@ -87,19 +105,8 @@ function tricolor!(p::PlotlyPlot,pts, tris,f;cmap=:summer)
     rgb=reinterpret(Float64,get(colorschemes[cmap],f,:extrema))
     parameter!(p,"colors",UInt8.(floor.(rgb*256)))
     parameter!(p,"cam","2D")
-    
-    # It seems a colorbar is best drawn via canvas...
-    # https://github.com/Kitware/vtk-js/issues/1621
 end
 
-function triupdate!(p::PlotlyPlot,pts,tris,f)
-    command!(p,"triplot")
-    # make 3D points from 2D points by adding function value as
-    # z coordinate
-    p.jsdict["xpoints"]=vec(vcat(pts,f'))
-    p.update=true
-    p
-end
 
 
 """
@@ -129,29 +136,17 @@ Show plot
 """
 function Base.show(io::IO, ::MIME"text/html", p::PlotlyPlot)
     plotlyplot = read(joinpath(@__DIR__, "..", "assets", "plotlyplot.js"), String)
-    result=" "
-    if p.update
-        result="""
-        <script type="text/javascript" src="https://unpkg.com/plotly.js"></script>
-        <script>
-        $(plotlyplot)
-        const jsdict = $(Main.PlutoRunner.publish_to_js(p.jsdict))
-//        vtkupdate("$(p.uuid)",jsdict,invalidation)        
-        </script>
-        """
-    else
-        result="""
-
+    result="""
         <script type="text/javascript" src="https://cdn.plot.ly/plotly-1.58.4.min.js"></script>
         <script>
-        alert(Plotly)
-
         $(plotlyplot)
-        const jsdict = $(Main.PlutoRunner.publish_to_js(p.jsdict))
-        plotlyplot("$(p.uuid)",jsdict,invalidation)        
+        var jsdict = $(Main.PlutoRunner.publish_to_js(p.jsdict))
+        plotlyplot("$(p.uuid)",jsdict,$(p.w), $(p.h))        
         </script>
-        <div id="$(p.uuid)" style= "width: $(p.w)px; height: $(p.h)px;"></div>
         """
+
+    if !p.update
+        result=result*"""<div id="$(p.uuid)" style= "width: $(p.w)px; height: $(p.h)px;"></div>"""
     end
     write(io,result)
 end
