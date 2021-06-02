@@ -186,7 +186,7 @@ function Base.show(io::IO, ::MIME"text/html", p::VTKPlot)
         <p>
         <div style="white-space:nowrap;">
         <div id="$(p.uuid)" style= "width: $(p.w)px; height: $(p.h)px; display: inline-block; "></div>
-        <canvas id="$(uuidcbar)" width="$(p.w)" height="$(p.h)"  style="display: inline-block; "></canvas>
+        <canvas id="$(uuidcbar)" width=50, height="$(p.h)"  style="display: inline-block; "></canvas>
         </div>
 </p>
         """

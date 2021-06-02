@@ -42,7 +42,7 @@ end
 function maketriangulation(maxarea)
 	
     triin=Triangulate.TriangulateIO()
-    triin.pointlist=Matrix{Cdouble}([-1.0 -1.0 ; 1.0 -1.0 ; 1.0  1.0 ; -1.0 1.0]')
+    triin.pointlist=Matrix{Cdouble}([-1.0 -1.0 ; 1.0 -1.0 ; 1.0 2 ; -1.0 1.0]')
     triin.segmentlist=Matrix{Cint}([1 2 ; 2 3 ; 3 4 ; 4 1 ]')
     triin.segmentmarkerlist=Vector{Int32}([1, 2, 3, 4])
     area=@sprintf("%.15f",maxarea)
@@ -65,25 +65,30 @@ func=0.5*[sin(10*pts[1,i])*cos(10*pts[2,i]) for i=1:size(pts,2)]
 p=let
 	p=plutovista(resolution=(300,300),zrange=-1:1)
 	triplot!(p,pts,tris,func)
-	axis3d!(p; xtics=-1:1,ytics=-1:1,ztics=-1:1)
+	axis3d!(p; xtics=-1:1,ytics=-1:2,ztics=-1:1)
 end
 
 # ╔═╡ 401b36bd-fa8f-4a9c-9556-bbc82c3ddbca
-md"""
+ md"""
 Change time: $(@bind time Slider(0:0.1:10,show_value=true))
 """
 
+# ╔═╡ 6fd4a1ee-7a4a-405b-8e1f-5819eababe10
+ft=0.5*[sin(10*pts[1,i]-time)*cos(10*pts[2,i]-time) for i=1:size(pts,2)]
+
 # ╔═╡ e76f8a6a-ab91-454a-b200-cfc8b57eb331
-triupdate!(p,pts,tris,0.5*[sin(10*pts[1,i]-time)*cos(10*pts[2,i]-time) for i=1:size(pts,2)])
+triupdate!(p,pts,tris,ft)
 
 # ╔═╡ bce0cfe7-4112-4bb8-aac6-43885f3746a9
 md"""Number of gridpoints: $(size(pts,2)) """
 
 # ╔═╡ 81046dcd-3cfb-4133-943f-61b9b3cdb183
 let
-	p=plutovista(resolution=(600,600),zrange=-1:1)
-	tricolor!(p,pts,tris,func;cmap=:spring,isolevels=-0.5:0.1:0.5)
-	axis2d!(p; xtics=-1:1,ytics=-1:1)
+	p=plutovista(resolution=(300,300),zrange=-1:1)
+	tricolor!(p,pts,tris,ft;cmap=:spring,isolevels=-0.5:0.1:0.5)
+	axis2d!(p; xtics=-1:1,ytics=-1:2)
+	p
+
 end
 
 # ╔═╡ 8370183d-b927-4bea-8777-eb3e0c1b61e4
@@ -99,6 +104,7 @@ extrema(func)
 # ╠═60dcfcf5-391e-418f-8e7c-3a0fe94f1e0d
 # ╠═db2823d9-aa6d-4be3-af5c-873c072cfd2b
 # ╠═401b36bd-fa8f-4a9c-9556-bbc82c3ddbca
+# ╠═6fd4a1ee-7a4a-405b-8e1f-5819eababe10
 # ╠═e76f8a6a-ab91-454a-b200-cfc8b57eb331
 # ╟─bce0cfe7-4112-4bb8-aac6-43885f3746a9
 # ╠═81046dcd-3cfb-4133-943f-61b9b3cdb183

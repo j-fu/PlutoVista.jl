@@ -126,13 +126,22 @@ function vtkplot(uuid,jsdict,invalidation)
         {
  	    var cam=jsdict[cmd+"_cam"]
             var cubeAxes = vtk.Rendering.Core.vtkCubeAxesActor.newInstance();
-            
+
 	    cubeAxes.setCamera(renderer.getActiveCamera());
-            cubeAxes.setTickTextStyle({fontColor: "black"})
-            cubeAxes.setAxisTextStyle({fontColor: "black"})
+            cubeAxes.setAxisLabels(['x','y','z'])
 	    cubeAxes.setDataBounds(jsdict[cmd+"_bounds"]);
+
+            cubeAxes.setTickTextStyle({fontColor: "black"})
+            cubeAxes.setTickTextStyle({fontFamily: "Arial"})
+            cubeAxes.setTickTextStyle({fontSize: "10"})
+
+            cubeAxes.setAxisTextStyle({fontColor: "black"})
+            cubeAxes.setAxisTextStyle({fontFamily: "Arial"})
+            cubeAxes.setAxisTextStyle({fontSize: "12"})
+
             cubeAxes.getProperty().setColor(0,0,0);
 	    renderer.addActor(cubeAxes);
+            renderWindow.render();
 
             if (cam=="2D")
                 cubeAxes.setGridLines(false)

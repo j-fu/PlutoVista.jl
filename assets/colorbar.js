@@ -2,6 +2,11 @@ function colorbar(uuid,w,h,cbdict)
 {
     if (cbdict["cbar"]==1)
     {
+        var hpad=0.1*h
+        var h0=hpad
+        var h1=h-hpad
+        var dh=h1-h0
+        
         var canvas = document.getElementById(uuid);
         var ctx = canvas.getContext("2d");
 
@@ -9,7 +14,8 @@ function colorbar(uuid,w,h,cbdict)
         var cstops=cbdict["cstops"]
         var colors=cbdict["colors"]
         var levels=cbdict["levels"]
-        var grad = ctx.createLinearGradient(0,h, 0, 0);
+
+        var grad = ctx.createLinearGradient(0,h1, 0, h0);
 
         var icol=0
         for (var i=0;i<cstops.length;i++)
@@ -20,7 +26,7 @@ function colorbar(uuid,w,h,cbdict)
         }
 
         ctx.fillStyle = grad;
-        ctx.fillRect(0,0,w,h);
+        ctx.fillRect(0,h0,w,dh);
 
 
         ctx.font = "12px Arial"
@@ -33,7 +39,7 @@ function colorbar(uuid,w,h,cbdict)
         var lmax=levels[levels.length-1]
         for (var i=0;i<levels.length;i++)
         {
-            var hlev=h-h*(levels[i]-lmin)/(lmax-lmin)
+            var hlev=h1-dh*(levels[i]-lmin)/(lmax-lmin)
     	    ctx.beginPath();
             ctx.moveTo(0, hlev);
             ctx.lineTo(1.1*w,hlev);
