@@ -14,8 +14,8 @@ macro bind(def, element)
 end
 
 # ╔═╡ d6c0fb79-4129-444a-978a-bd2222b53df6
-if !haskey(ENV,"PLUTO_USE_MANIFEST")
-    using Pkg
+begin
+	using Pkg
     Pkg.activate(mktempdir())
 	Pkg.add("Revise"); using Revise
     Pkg.add(["PlutoUI","Triangulate"])

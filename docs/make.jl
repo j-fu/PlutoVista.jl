@@ -1,4 +1,3 @@
-ENV["PLUTO_USE_MANIFEST"]="true"
 using Documenter, Pluto,PlutoVista
 
 
