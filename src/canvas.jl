@@ -1,3 +1,6 @@
+###############################
+# All experimental code here.
+
 mutable struct CanvasPlot <:AbstractVistaPlot
     # command list passed to javascript
     jsdict::Dict{String,Any}
@@ -303,17 +306,3 @@ function axis!(p::CanvasPlot;
 end
 
 
-
-mutable struct CanvasColorbar
-    w
-    h
-end
-
-function Base.show(io::IO, ::MIME"text/html", p::CanvasColorbar)
-    result="""
-    <script>
-    </script>
-    <canvas id="yyy" width="$(p.w)" height="$(p.h)"></canvas>
-    """
-    write(io,result)
-end
