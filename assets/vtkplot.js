@@ -54,7 +54,7 @@ function vtkplot(uuid,jsdict,invalidation)
  	    var cam=jsdict[cmd+"_cam"]
 
             // Loop over content of jsdict
-            var actor = vtk.Rendering.Core.vtkActor.newInstance();
+            window.actor = vtk.Rendering.Core.vtkActor.newInstance();
             var mapper = vtk.Rendering.Core.vtkMapper.newInstance();
             
             // Apply transformation to the points coordinates // figure this out later
@@ -68,8 +68,25 @@ function vtkplot(uuid,jsdict,invalidation)
             window.dataset.getPoints().setData(points, 3);
             window.dataset.getPolys().setData(polys,1);
             mapper.setInputData(window.dataset);
-            actor.setMapper(mapper);
-            renderer.addActor(actor);
+            window.actor.setMapper(mapper);
+            renderer.addActor(window.actor);
+            setinteractorstyle(interactor,cam)
+        }
+        else if (jsdict[cmd]=="plot")
+        {
+    	    var points=jsdict[cmd+"_points"]
+ 	    var lines=jsdict[cmd+"_lines"]
+
+            window.actor = vtk.Rendering.Core.vtkActor.newInstance();
+            var mapper = vtk.Rendering.Core.vtkMapper.newInstance();
+
+            var dataset=vtk.Common.DataModel.vtkPolyData.newInstance();
+            dataset.getPoints().setData(points, 3);
+            dataset.getLines().setData(lines);
+            mapper.setInputData(dataset);
+            window.actor.setMapper(mapper);
+            window.actor.getProperty().setColor(0, 0, 0)
+            renderer.addActor(window.actor);
             setinteractorstyle(interactor,cam)
         }
         else if (jsdict[cmd]=="tricolor")
@@ -86,7 +103,7 @@ function vtkplot(uuid,jsdict,invalidation)
             var colors=jsdict[cmd+"_colors"]
  	    var cam=jsdict[cmd+"_cam"]
 
-            var actor = vtk.Rendering.Core.vtkActor.newInstance();
+            window.actor = vtk.Rendering.Core.vtkActor.newInstance();
             var mapper = vtk.Rendering.Core.vtkMapper.newInstance();
             
             
@@ -105,8 +122,8 @@ function vtkplot(uuid,jsdict,invalidation)
 
             mapper.setInputData(dataset);
             mapper.setColorModeToDirectScalars()
-            actor.setMapper(mapper);
-            renderer.addActor(actor);
+            window.actor.setMapper(mapper);
+            renderer.addActor(window.actor);
             
             //https://discourse.vtk.org/t/manually-create-polydata-in-vtk-js/885/4
             var isodataset=vtk.Common.DataModel.vtkPolyData.newInstance();
@@ -127,9 +144,11 @@ function vtkplot(uuid,jsdict,invalidation)
  	    var cam=jsdict[cmd+"_cam"]
             var cubeAxes = vtk.Rendering.Core.vtkCubeAxesActor.newInstance();
 
-	    cubeAxes.setCamera(renderer.getActiveCamera());
+            var  camera=renderer.getActiveCamera()
+	    cubeAxes.setCamera(camera);
             cubeAxes.setAxisLabels(['x','y','z'])
-	    cubeAxes.setDataBounds(jsdict[cmd+"_bounds"]);
+//	    cubeAxes.setDataBounds(jsdict[cmd+"_bounds"]);
+	    cubeAxes.setDataBounds(window.actor.getBounds());
 
             cubeAxes.setTickTextStyle({fontColor: "black"})
             cubeAxes.setTickTextStyle({fontFamily: "Arial"})

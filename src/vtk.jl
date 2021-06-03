@@ -87,6 +87,8 @@ function tricolor!(p::VTKPlot,pts, tris,f;cmap=:summer, isolevels=-1:0.2:1)
     command!(p,"tricolor")
     (fmin,fmax)=extrema(isolevels)
     parameter!(p,"points",vec(vcat(pts,zeros(length(f))')))
+
+    
     parameter!(p,"polys",vtkpolys(tris))
 
     rgb=reinterpret(Float64,get(colorschemes[cmap],f,(fmin,fmax)))
@@ -131,6 +133,23 @@ function triupdate!(p::VTKPlot,pts,tris,f)
     p.update=true
     p
 end
+
+
+
+function plot!(p::VTKPlot,x,y)
+    command!(p,"plot")
+    n=length(x)
+    points=vec(vcat(x',y',zeros(n)'))
+    lines=collect(UInt16,0:n)
+    lines[1]=n
+    parameter!(p,"points",points)
+    parameter!(p,"lines",lines)
+    parameter!(p,"cam","2D")
+    p
+end
+
+
+
 
 
 """

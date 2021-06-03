@@ -23,8 +23,7 @@ end
  PlotlyPlot(;resolution=(300,300))
 ````
 
-Create a canvas plot with given resolution in the notebook
-and given "world coordinate" range.
+Create a plotly plot with given resolution in the notebook
 """
 function PlotlyPlot(;resolution=(300,300))
     p=PlotlyPlot(nothing)
@@ -36,9 +35,84 @@ function PlotlyPlot(;resolution=(300,300))
     p
 end
 
-
 """
-Set up  polygon data for vtk. 
+Show plot
+"""
+function Base.show(io::IO, ::MIME"text/html", p::PlotlyPlot)
+    plotlyplot = read(joinpath(@__DIR__, "..", "assets", "plotlyplot.js"), String)
+    result="""
+        <script type="text/javascript" src="https://cdn.plot.ly/plotly-1.58.4.min.js"></script>
+        <script>
+        $(plotlyplot)
+        var jsdict = $(Main.PlutoRunner.publish_to_js(p.jsdict))
+        plotlyplot("$(p.uuid)",jsdict,$(p.w), $(p.h))        
+        </script>
+        """
+
+    if !p.update
+        result=result*"""<div id="$(p.uuid)" style= "width: $(p.w)px; height: $(p.h)px;"></div>"""
+    end
+    write(io,result)
+end
+
+
+
+
+#translate Julia attribute symbols to pyplot-speak
+const mshapes=Dict(
+    :dtriangle => "triangle-down",
+    :utriangle => "triangle-up",
+    :rtriangle => "triangle-right",
+    :ltriangle => "triangle-left",
+    :circle => "circle",
+    :square => "square",
+    :cross => "cross",
+    :+ => "cross",
+    :xcross => "x",
+    :x => "x",
+    :diamond => "diamond",
+    :star5 => "star",
+    :pentagon => "pentagon",
+    :hexagon => "hexagon",
+    :none => "none"
+)
+
+
+function plot!(p::PlotlyPlot,x,y;
+               label="",
+               color=:black,
+               linewidth=2,
+               linestyle=:solid,
+               markersize=6,
+               markercount=10,
+               markertype=:none)
+
+    p.update=false
+    command!(p,"plot")
+    parameter!(p,"x",collect(x))
+    parameter!(p,"y",collect(y))
+    parameter!(p,"label",label)
+    parameter!(p,"linewidth",linewidth)
+    parameter!(p,"markercount",markercount)
+    parameter!(p,"markertype",mshapes[markertype])
+    parameter!(p,"markersize",markersize)
+    parameter!(p,"linestyle",String(linestyle))
+
+    rgb=RGB(color)
+    rgb=[rgb.r,rgb.g,rgb.b]
+    rgb=UInt8.(floor.(rgb*255))
+    parameter!(p,"color",rgb)
+    
+end
+
+
+
+
+###############################################################
+# Experimental part
+# It turns out that plotly is significantly slower
+# than VTK for 3D data. 
+"""
 Coding is   [3, i11, i12, i13,   3 , i21, i22 ,i23, ...]
 Careful: js indexing counts from zero
 """
@@ -131,25 +205,6 @@ axis2d!(p::PlotlyPlot;kwargs...)=axis3d!(p;ztics=0.0,kwargs...)
 
 
 
-"""
-Show plot
-"""
-function Base.show(io::IO, ::MIME"text/html", p::PlotlyPlot)
-    plotlyplot = read(joinpath(@__DIR__, "..", "assets", "plotlyplot.js"), String)
-    result="""
-        <script type="text/javascript" src="https://cdn.plot.ly/plotly-1.58.4.min.js"></script>
-        <script>
-        $(plotlyplot)
-        var jsdict = $(Main.PlutoRunner.publish_to_js(p.jsdict))
-        plotlyplot("$(p.uuid)",jsdict,$(p.w), $(p.h))        
-        </script>
-        """
-
-    if !p.update
-        result=result*"""<div id="$(p.uuid)" style= "width: $(p.w)px; height: $(p.h)px;"></div>"""
-    end
-    write(io,result)
-end
 
 
 

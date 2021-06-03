@@ -19,7 +19,7 @@ md"""
 """
 
 # ╔═╡ 2acd1978-03b1-4e8f-ba9f-2b3d58123613
-develop=false
+develop=true
 
 # ╔═╡ d6c0fb79-4129-444a-978a-bd2222b53df6
 begin
@@ -91,8 +91,16 @@ let
 
 end
 
-# ╔═╡ 8370183d-b927-4bea-8777-eb3e0c1b61e4
-extrema(func)
+# ╔═╡ 1d2d449d-1c6e-4915-b4be-19df27a19438
+X=0:0.01:10
+
+# ╔═╡ f5eaf656-5572-483b-b919-7b1dd48422cf
+let
+	p=plutovista(resolution=(300,300),zrange=-1:1)
+	plot!(p,X,sin.(10*X))
+	axis2d!(p)
+	p
+end
 
 # ╔═╡ Cell order:
 # ╟─93ca4fd0-8f61-4174-b459-55f5395c0f56
@@ -108,4 +116,5 @@ extrema(func)
 # ╠═e76f8a6a-ab91-454a-b200-cfc8b57eb331
 # ╟─bce0cfe7-4112-4bb8-aac6-43885f3746a9
 # ╠═81046dcd-3cfb-4133-943f-61b9b3cdb183
-# ╠═8370183d-b927-4bea-8777-eb3e0c1b61e4
+# ╠═1d2d449d-1c6e-4915-b4be-19df27a19438
+# ╠═f5eaf656-5572-483b-b919-7b1dd48422cf
