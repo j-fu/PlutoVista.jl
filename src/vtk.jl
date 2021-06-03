@@ -88,7 +88,7 @@ function Base.show(io::IO, ::MIME"text/html", p::VTKPlot)
         <div id="$(p.uuid)" style= "width: $(p.w)px; height: $(p.h)px; display: inline-block; "></div>
         <canvas id="$(uuidcbar)" width=60, height="$(p.h)"  style="display: inline-block; "></canvas>
         </div>
-</p>
+    </p>
         """
     end
     write(io,result)
