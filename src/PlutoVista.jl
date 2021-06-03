@@ -26,7 +26,7 @@ export triupdate!
 include("plotly.jl")
 
 
-export plot!,plot,tricontour,tricontour!
+export plot!,plot,tricontour,tricontour!,contour,contour!
 
 
 export PlotlyPlot

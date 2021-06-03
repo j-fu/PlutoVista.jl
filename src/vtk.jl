@@ -86,7 +86,7 @@ function Base.show(io::IO, ::MIME"text/html", p::VTKPlot)
         <p>
         <div style="white-space:nowrap;">
         <div id="$(p.uuid)" style= "width: $(p.w)px; height: $(p.h)px; display: inline-block; "></div>
-        <canvas id="$(uuidcbar)" width=55, height="$(p.h)"  style="display: inline-block; "></canvas>
+        <canvas id="$(uuidcbar)" width=60, height="$(p.h)"  style="display: inline-block; "></canvas>
         </div>
 </p>
         """
@@ -120,32 +120,32 @@ end
 
 Plot piecewise linear function on  triangular grid given as "heatmap" 
 """
-function tricontour!(p::VTKPlot,pts, tris,f;cmap=:summer, isolevels=0)
+function tricontour!(p::VTKPlot, pts, tris,f;cmap=:summer, isolines=0, kwargs...)
     command!(p,"tricontour")
 
-    if isa(isolevels,Number)
+    if isa(isolines,Number)
         (fmin,fmax)=extrema(f)
     else
-        (fmin,fmax)=extrema(isolevels)
+        (fmin,fmax)=extrema(isolines)
     end        
-    parameter!(p,"points",vec(vcat(pts,zeros(length(f))')))
+    parameter!(p,"points",vec(vcat(pts,zeros(eltype(pts),length(f))')))
     parameter!(p,"polys",vtkpolys(tris))
 
     rgb=reinterpret(Float64,get(colorschemes[cmap],f,(fmin,fmax)))
     parameter!(p,"colors",UInt8.(floor.(rgb*255)))
 
-    xisolevels=[fmin,fmax]
+    xisolines=[fmin,fmax]
     
-    if isolevels==0
+    if isolines==0
         parameter!(p,"isopoints","none")
         parameter!(p,"isolines","none")
     else
-        if isa(isolevels,Number)
-            xisolevels=range(fmin,fmax,length=isolevels)
+        if isa(isolines,Number)
+            xisolines=range(fmin,fmax,length=isolines)
         else
-            xisolevels=isolevels
+            xisolines=isolines
         end
-        iso_pts=GridVisualize.marching_triangles(pts,tris,f,xisolevels)
+        iso_pts=GridVisualize.marching_triangles(pts,tris,f,xisolines)
         niso_pts=length(iso_pts)
         iso_pts=vcat(reshape(reinterpret(Float32,iso_pts),(2,niso_pts)),zeros(niso_pts)')
         iso_lines=Vector{UInt32}(undef,niso_pts+Int32(niso_pts//2))
@@ -171,7 +171,7 @@ function tricontour!(p::VTKPlot,pts, tris,f;cmap=:summer, isolevels=0)
     p.cbdict["cbar"]=1
     p.cbdict["cstops"]=bar_stops
     p.cbdict["colors"]=bar_rgb
-    p.cbdict["levels"]=collect(xisolevels)
+    p.cbdict["levels"]=collect(xisolines)
     
     p
 end
@@ -182,9 +182,8 @@ function tricontour(pts,tris,f; kwargs...)
     axis2d!(p)
 end
 
-
-
-
+contour(X,Y,f; kwargs...)=tricontour(triang(X,Y)...,vec(f);kwargs...)
+contour!(p::VTKPlot,X,Y,f; kwargs...)=tricontour!(p,triang(X,Y)...,vec(f);kwargs...)
 
 #####################################
 # Experimental part

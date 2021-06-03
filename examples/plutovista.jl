@@ -79,10 +79,28 @@ func=0.5*[sin(10*pts[1,i])*cos(10*pts[2,i]) for i=1:size(pts,2)]
 
 # ╔═╡ c6d700ec-91a1-4ef7-a104-8574cc162b9a
 tricontour(pts,tris,func;cmap=:viridis),
-tricontour(pts,tris,func;cmap=:summer,isolevels=3)
+tricontour(pts,tris,func;cmap=:summer,isolines=3)
 
 # ╔═╡ 8b25e922-12db-4fae-8f28-65fe4faf40f3
-tricontour(pts,tris,func;cmap=:hot,isolevels=-0.5:0.2:0.5)
+tricontour(pts,tris,func;cmap=:hot,isolines=-0.5:0.2:0.5)
+
+# ╔═╡ fe7fdb00-88a1-4d24-aedd-cedb6e50120b
+f(x,y)=sqrt(x^2+y^2)*cos(x)*cos(y)
+
+# ╔═╡ 5745f449-abc7-4f9a-a439-645698b781ea
+X1=0:0.1:20
+
+# ╔═╡ 595539f8-f14e-418f-90d6-b6040292a9b6
+Y1=0:0.1:10
+
+# ╔═╡ 2eadced9-9e4a-4fa3-aea4-5f163933cb02
+contour(X1,Y1,[f(x,y) for x∈X1, y∈Y1],isolines=10,resolution=(600,300) )
+
+# ╔═╡ 63c1aeca-b7d3-46a0-b987-5bae8eb15d5b
+PlutoVista.triang(X1,Y1)
+
+# ╔═╡ b79745e0-0a3f-46d6-b682-0a89b804f35a
+length(map(f,X1,Y1))
 
 # ╔═╡ Cell order:
 # ╟─93ca4fd0-8f61-4174-b459-55f5395c0f56
@@ -98,3 +116,9 @@ tricontour(pts,tris,func;cmap=:hot,isolevels=-0.5:0.2:0.5)
 # ╟─724495e1-d501-4a03-be88-16b644938afd
 # ╠═c6d700ec-91a1-4ef7-a104-8574cc162b9a
 # ╠═8b25e922-12db-4fae-8f28-65fe4faf40f3
+# ╠═fe7fdb00-88a1-4d24-aedd-cedb6e50120b
+# ╠═5745f449-abc7-4f9a-a439-645698b781ea
+# ╠═595539f8-f14e-418f-90d6-b6040292a9b6
+# ╠═2eadced9-9e4a-4fa3-aea4-5f163933cb02
+# ╠═63c1aeca-b7d3-46a0-b987-5bae8eb15d5b
+# ╠═b79745e0-0a3f-46d6-b682-0a89b804f35a
