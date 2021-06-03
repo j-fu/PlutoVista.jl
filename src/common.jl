@@ -1,24 +1,22 @@
 abstract type AbstractVistaPlot end
-
-
 """
     command!(p<: AbstractVistaPlot,cmd)
 
 Enter new command named `cmd`.
 
-The idea is to pass one single Dict
-with all plot data to javascript.
+The idea is to pass one single Dict with all plot data to javascript
+using `publish_to_js`.
 
-For this purpose we need a some "language".
+For this purpose we need a some "language" hidden in 
+behind the dict.
 
-Plot elements are described by commands executed
-one after another. For this purpose, we use 
-integers converted to strings as dict keys and pass the command
-name as the corresponding entry.
+Plot   elements  are   described  by   commands  executed   one  after
+another. For  this purpose,  we use integers  converted to  strings as
+dict keys and pass the command name as the corresponding entry.
 
-The entry `cmdcount` keeps track of the number of
-commands. So we can parse all commands from 1 to jsdict[:cmdcount]
-in javascript in the same sequence as they have been entered.
+The entry `cmdcount` keeps track of  the number of commands. So we can
+parse all  commands from 1  to jsdict[:cmdcount] in javascript  in the
+same sequence as they have been entered.
 
 Parameters are named and entered into the dictionary with the 
 command number as prefix.

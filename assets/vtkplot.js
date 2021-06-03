@@ -180,7 +180,7 @@ function vtkplot(uuid,jsdict,invalidation)
         win.renderWindow.delete();
         win.openGlRenderWindow.delete();
         win.interactor.delete();
-    });
+     });
 }
 
     

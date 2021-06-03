@@ -1,3 +1,5 @@
+/* Javascripr pendant of canvas.jl - so far experimental */
+
 function canvasplot(canvas_uuid,jsdict)
 {
     var canvas = document.getElementById(canvas_uuid);

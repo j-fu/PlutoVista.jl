@@ -7,27 +7,28 @@ using GridVisualize
 
 include("common.jl")
 
-include("canvas.jl")
 
+include("vtk.jl")
+export tricontour,tricontour!,contour,contour!
+export axis3d!, axis2d!
+export VTKPlot
+
+
+include("plotly.jl")
+export plot!,plot
+export PlotlyPlot
+
+
+# Experimental:
+include("canvas.jl")
 export polygon!,linecolor!, fillcolor!
 export textcolor!,textsize!,text!
 export polyline!,linecolor!
 export polygon!,fillcolor!
 export axis!
-export CanvasColorbar
-include("vtk.jl")
+export CanvasPlot
 
 
-export plutovista
-export triplot!,tricolor!, axis3d!, axis2d!
-export triupdate!
+export triupdate!,  triplot!
 
-
-include("plotly.jl")
-
-
-export plot!,plot,tricontour,tricontour!,contour,contour!
-
-
-export PlotlyPlot
 end # module

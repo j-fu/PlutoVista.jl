@@ -1,0 +1,6 @@
+[deps]
+Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+Pluto = "c3e4b0f8-55cb-11ea-2926-15256bba5781"
+PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
+PlutoVista = "646e1f28-b900-46d7-9d87-d554eb38a413"
+Triangulate = "f7e6ffb2-c36d-4f8f-a77e-16e897189344"

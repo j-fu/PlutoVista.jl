@@ -1,13 +1,10 @@
-
 """
 Structure containig plot information. 
 In particular it contains dict of data sent to javascript.
-The semantics of the keys is explaind in PlutoCanvasPlot.jl
 """
 mutable struct VTKPlot  <: AbstractVistaPlot
     # command list passed to javascript
     jsdict::Dict{String,Any}
-    cbdict::Dict{String,Any}
 
     # size in canvas coordinates
     w::Float64
@@ -21,7 +18,7 @@ end
 
 """
 ````
- VTKPlot(;resolution=(300,300))
+    VTKPlot(;resolution=(300,300))
 ````
 
 Create a canvas plot with given resolution in the notebook
@@ -30,9 +27,7 @@ and given "world coordinate" range.
 function VTKPlot(;resolution=(300,300), kwargs...)
     p=VTKPlot(nothing)
     p.uuid=uuid1()
-    p.jsdict=Dict{String,Any}("cmdcount" => 0)
-    p.cbdict=Dict{String,Any}("cbar" => 0)
-
+    p.jsdict=Dict{String,Any}("cmdcount" => 0,"cbar" => 0)
     p.w=resolution[1]
     p.h=resolution[2]
     p.update=false
@@ -40,24 +35,26 @@ function VTKPlot(;resolution=(300,300), kwargs...)
 end
 
 """
+    axis3d!(vtkplot)
 Add 3D coordinate system axes to the plot.
-Sets camera handling
-to 3D mode.
+Sets camera handling to 3D mode.
 """
 function axis3d!(p::VTKPlot)
     command!(p,"axis")
     parameter!(p,"cam","3D")
 end
 
+"""
+    axis2d!(vtkplot)
+Add 2D coordinate system axes to the plot.
+Sets camera handling to 2D mode.
+"""
 function axis2d!(p::VTKPlot)
     command!(p,"axis")
     parameter!(p,"cam","2D")
 end
 
 
-"""
-Show plot
-"""
 function Base.show(io::IO, ::MIME"text/html", p::VTKPlot)
     vtkplot = read(joinpath(@__DIR__, "..", "assets", "vtkplot.js"), String)
     colorbar = read(joinpath(@__DIR__, "..", "assets", "colorbar.js"), String)
@@ -80,8 +77,7 @@ function Base.show(io::IO, ::MIME"text/html", p::VTKPlot)
         $(colorbar)
         const jsdict = $(Main.PlutoRunner.publish_to_js(p.jsdict))
         vtkplot("$(p.uuid)",jsdict,invalidation)
-        const cbdict = $(Main.PlutoRunner.publish_to_js(p.cbdict))
-        colorbar("$(uuidcbar)",20,$(p.h),cbdict)        
+        colorbar("$(uuidcbar)",20,$(p.h),jsdict)        
         </script>
         <p>
         <div style="white-space:nowrap;">
@@ -96,6 +92,7 @@ end
 
 
 """
+       vtkpolys(tris)
 Set up  polygon data for vtk. 
 Coding is   [3, i11, i12, i13,   3 , i21, i22 ,i23, ...]
 Careful: js indexing counts from zero
@@ -120,7 +117,7 @@ end
 
 Plot piecewise linear function on  triangular grid given as "heatmap" 
 """
-function tricontour!(p::VTKPlot, pts, tris,f;cmap=:summer, isolines=0, kwargs...)
+function tricontour!(p::VTKPlot, pts, tris,f;colormap=:summer, isolines=0, kwargs...)
     command!(p,"tricontour")
 
     if isa(isolines,Number)
@@ -131,7 +128,7 @@ function tricontour!(p::VTKPlot, pts, tris,f;cmap=:summer, isolines=0, kwargs...
     parameter!(p,"points",vec(vcat(pts,zeros(eltype(pts),length(f))')))
     parameter!(p,"polys",vtkpolys(tris))
 
-    rgb=reinterpret(Float64,get(colorschemes[cmap],f,(fmin,fmax)))
+    rgb=reinterpret(Float64,get(colorschemes[colormap],f,(fmin,fmax)))
     parameter!(p,"colors",UInt8.(floor.(rgb*255)))
 
     xisolines=[fmin,fmax]
@@ -166,13 +163,12 @@ function tricontour!(p::VTKPlot, pts, tris,f;cmap=:summer, isolines=0, kwargs...
     # It seems a colorbar is best drawn via canvas...
     # https://github.com/Kitware/vtk-js/issues/1621
     bar_stops=collect(0:0.01:1)
-    bar_rgb=reinterpret(Float64,get(colorschemes[cmap],bar_stops,(0,1)))
+    bar_rgb=reinterpret(Float64,get(colorschemes[colormap],bar_stops,(0,1)))
     bar_rgb=UInt8.(floor.(bar_rgb*255))
-    p.cbdict["cbar"]=1
-    p.cbdict["cstops"]=bar_stops
-    p.cbdict["colors"]=bar_rgb
-    p.cbdict["levels"]=collect(xisolines)
-    
+    p.jsdict["cbar"]=1
+    p.jsdict["cstops"]=bar_stops
+    p.jsdict["colors"]=bar_rgb
+    p.jsdict["levels"]=collect(xisolines)
     p
 end
 
@@ -198,7 +194,7 @@ function triplot!(p::VTKPlot,pts, tris,f)
     p.update=false
     # make 3D points from 2D points by adding function value as
     # z coordinate
-    p.cbdict["cbar"]=0
+    p.jsdict["cbar"]=0
     parameter!(p,"points",vec(vcat(pts,f')))
     parameter!(p,"polys",vtkpolys(tris))
     parameter!(p,"cam","3D")

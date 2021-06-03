@@ -2,7 +2,6 @@
 """
 Structure containig plot information. 
 In particular it contains dict of data sent to javascript.
-The semantics of the keys is explaind in PlutoCanvasPlot.jl
 """
 mutable struct PlotlyPlot  <: AbstractVistaPlot
     # command list passed to javascript
@@ -178,13 +177,13 @@ end
 
 Plot piecewise linear function on  triangular grid given as "heatmap" 
 """
-function tricolor!(p::PlotlyPlot,pts, tris,f;cmap=:summer)
+function tricolor!(p::PlotlyPlot,pts, tris,f;colormap=:summer)
     command!(p,"tricolor")
     (fmin,fmax)=extrema(f)
     parameter!(p,"points",vec(vcat(pts,zeros(length(f))')))
     parameter!(p,"polys",plotlypolys(tris))
 
-    rgb=reinterpret(Float64,get(colorschemes[cmap],f,:extrema))
+    rgb=reinterpret(Float64,get(colorschemes[colormap],f,:extrema))
     parameter!(p,"colors",UInt8.(floor.(rgb*256)))
     parameter!(p,"cam","2D")
 end
