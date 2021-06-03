@@ -5,7 +5,7 @@ using Documenter, Pluto,PlutoVista
 
 function rendernotebook(name)
     input=joinpath(@__DIR__,"..","examples",name*".jl")
-    output=joinpath(@__DIR__,"build",name*".html")
+    output=joinpath(@__DIR__,"src",name*".html")
     session = Pluto.ServerSession();
     notebook = Pluto.SessionActions.open(session, input; run_async=false)
     html_contents = Pluto.generate_html(notebook)
