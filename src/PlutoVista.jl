@@ -15,7 +15,6 @@ export polyline!,linecolor!
 export polygon!,fillcolor!
 export axis!
 export CanvasColorbar
-export plot!
 include("vtk.jl")
 
 
@@ -25,6 +24,10 @@ export triupdate!
 
 
 include("plotly.jl")
+
+
+export plot!,plot,tricontour,tricontour!
+
 
 export PlotlyPlot
 end # module

@@ -26,47 +26,45 @@ function plotlyplot(uuid,jsdict,w,h)
     };
             
     
-    var cmdcount=jsdict.cmdcount
-    for (var icmd = 1 ; icmd <= cmdcount ; icmd++)
+    for (var cmd = 1 ; cmd <= jsdict.cmdcount ; cmd++)
     {  
-        var cmd=icmd.toString()
-
-        var mode = jsdict[cmd+"_markertype"] == "none" ? "lines" : "lines+markers"
 
         if (jsdict[cmd]=="plot")
         {
-            var color=jsdict[cmd+"_color"]
-            var col=`"rgb(${color[0]},${color[1]},${color[2]})"`
+            
+            var mode  = jsdict[cmd+"markertype"] == "none" ? "lines" : "lines+markers"
+            var color=jsdict[cmd+"color"] 
+            var rgb = color == "auto" ? ""      : `"rgb(${color[0]},${color[1]},${color[2]})"`
             var trace = {
-                x: jsdict[cmd+"_x"],
-                y: jsdict[cmd+"_y"],
+                x: jsdict[cmd+"x"],
+                y: jsdict[cmd+"y"],
                 mode: mode,
-                name: jsdict[cmd+"_label"],
-                showlegend: jsdict[cmd+"_label"] == "" ? false : true,
+                name: jsdict[cmd+"label"],
+                showlegend: jsdict[cmd+"label"] == "" ? false : true,
                 marker: {
-                    color: col,
-                    symbol: jsdict[cmd+"_markertype"],
-                    size: jsdict[cmd+"_markersize"],
-                    maxdisplayed: jsdict[cmd+"_markercount"],
+                    color: rgb,
+                    symbol: jsdict[cmd+"markertype"],
+                    size: jsdict[cmd+"markersize"],
+                    maxdisplayed: jsdict[cmd+"markercount"],
                 },
                 line: {
-                    color: col,
-                    width: jsdict[cmd+"_linewidth"],
-                    dash: jsdict[cmd+"_linestyle"],
+                    color: rgb,
+                    width: jsdict[cmd+"linewidth"],
+                    dash:  jsdict[cmd+"linestyle"],
                 }
             };
             data.push(trace)
         }
         else if (jsdict[cmd]=="triplot"|| jsdict[cmd]=="triupdate")
-        {
+        { //  Experimental, slower than js
             var data = {
                 type: 'mesh3d',
-                x: jsdict[cmd+"_x"],
-                y: jsdict[cmd+"_y"],
-                z: jsdict[cmd+"_z"],
-                i: jsdict[cmd+"_i"],
-                j: jsdict[cmd+"_j"],
-                k: jsdict[cmd+"_k"],
+                x: jsdict[cmd+"x"],
+                y: jsdict[cmd+"y"],
+                z: jsdict[cmd+"z"],
+                i: jsdict[cmd+"i"],
+                j: jsdict[cmd+"j"],
+                k: jsdict[cmd+"k"],
                 facecolor: [0.75,0.75,0.75],
                 flatshading: false,
                 lightposition: {x: -10, y: 0, z:20},
@@ -99,5 +97,4 @@ function plotlyplot(uuid,jsdict,w,h)
     }
 
     Plotly.newPlot(uuid, data,layout)
-
 }

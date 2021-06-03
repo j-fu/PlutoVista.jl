@@ -9,103 +9,58 @@ function setinteractorstyle(interactor, cam)
 
 function vtkupdate(uuid,jsdict,invalidation)
 {
+    var win=window[uuid+"data"]
     var points=jsdict["xpoints"]
-    var dataset=window.dataset
+    var dataset=win.dataset
     dataset.getPoints().setData(points, 3);
     dataset.modified()
-    renderWindow.render();
+    win.renderWindow.render();
 }
 
 function vtkplot(uuid,jsdict,invalidation)
 {
-    window.renderWindow = vtk.Rendering.Core.vtkRenderWindow.newInstance();
-    var renderWindow=window.renderWindow
-    var renderer = vtk.Rendering.Core.vtkRenderer.newInstance();
+    if (window[uuid+"data"]==undefined)
+    {
+        window[uuid+"data"]={}
+        var win=window[uuid+"data"]
+        win.renderWindow = vtk.Rendering.Core.vtkRenderWindow.newInstance();
+        win.renderer = vtk.Rendering.Core.vtkRenderer.newInstance();
 
-    // OpenGlRenderWindow
-    var openGlRenderWindow = vtk.Rendering.OpenGL.vtkRenderWindow.newInstance();
-    renderWindow.addView(openGlRenderWindow);
-    renderer.setBackground(1,1,1)
+        // OpenGlRenderWindow
+        win.openGlRenderWindow = vtk.Rendering.OpenGL.vtkRenderWindow.newInstance();
+        win.renderWindow.addView(win.openGlRenderWindow);
+        win.renderer.setBackground(1,1,1)
 
-    // Interactor
-    var interactor = vtk.Rendering.Core.vtkRenderWindowInteractor.newInstance();
-    interactor.setView(openGlRenderWindow);
-    interactor.initialize();
+        // Interactor
+        win.interactor = vtk.Rendering.Core.vtkRenderWindowInteractor.newInstance();
+        win.interactor.setView(win.openGlRenderWindow);
+        win.interactor.initialize();
 
-    interactor.setInteractorStyle(vtk.Interaction.Style.vtkInteractorStyleTrackballCamera.newInstance());
+        win.interactor.setInteractorStyle(vtk.Interaction.Style.vtkInteractorStyleTrackballCamera.newInstance());
 
-    //ensure to plot to the right place
-    var rootContainer = document.getElementById(uuid);
-    openGlRenderWindow.setContainer(rootContainer);
-    const dims = rootContainer.getBoundingClientRect();	
-    openGlRenderWindow.setSize(dims.width, dims.height);
-    interactor.bindEvents(rootContainer);
-    renderWindow.addRenderer(renderer)
-
+        //ensure to plot to the right place
+        var rootContainer = document.getElementById(uuid);
+        win.openGlRenderWindow.setContainer(rootContainer);
+        const dims = rootContainer.getBoundingClientRect();	
+        win.openGlRenderWindow.setSize(dims.width, dims.height);
+        win.interactor.bindEvents(rootContainer);
+        win.renderWindow.addRenderer(win.renderer)
+        
+    }
+    
     // Loop over content of jsdict
-    var cmdcount=jsdict.cmdcount
-    for (var icmd = 1 ; icmd <= cmdcount ; icmd++)
+    for (var cmd = 1 ; cmd <= jsdict.cmdcount ; cmd++)
     {  
-        var cmd=icmd.toString() 
-        if (jsdict[cmd]=="triplot")
+        if (jsdict[cmd]=="tricontour")
         {
-    	    var points=jsdict[cmd+"_points"]
- 	    var polys=jsdict[cmd+"_polys"]
- 	    var cam=jsdict[cmd+"_cam"]
-
-            // Loop over content of jsdict
-            window.actor = vtk.Rendering.Core.vtkActor.newInstance();
-            var mapper = vtk.Rendering.Core.vtkMapper.newInstance();
-            
-            // Apply transformation to the points coordinates // figure this out later
-            //    vtkMatrixBuilder
-            ///      .buildFromRadian()
-            ///      .translate(...model.center)
-            ///      .rotateFromDirections([1, 0, 0], model.direction)
-            ///      .apply(points);
-            
-            window.dataset = vtk.Common.DataModel.vtkPolyData.newInstance();
-            window.dataset.getPoints().setData(points, 3);
-            window.dataset.getPolys().setData(polys,1);
-            mapper.setInputData(window.dataset);
-            window.actor.setMapper(mapper);
-            renderer.addActor(window.actor);
-            setinteractorstyle(interactor,cam)
-        }
-        else if (jsdict[cmd]=="plot")
-        {
-    	    var points=jsdict[cmd+"_points"]
- 	    var lines=jsdict[cmd+"_lines"]
-
-            window.actor = vtk.Rendering.Core.vtkActor.newInstance();
-            var mapper = vtk.Rendering.Core.vtkMapper.newInstance();
-
-            var dataset=vtk.Common.DataModel.vtkPolyData.newInstance();
-            dataset.getPoints().setData(points, 3);
-            dataset.getLines().setData(lines);
-            mapper.setInputData(dataset);
-            window.actor.setMapper(mapper);
-            window.actor.getProperty().setColor(0, 0, 0)
-            renderer.addActor(window.actor);
-            setinteractorstyle(interactor,cam)
-        }
-        else if (jsdict[cmd]=="tricolor")
-        {
-
+            var win=window[uuid+"data"]
             // for line see https://discourse.vtk.org/t/manually-create-polydata-in-vtk-js/885/15
-    	    var points=jsdict[cmd+"_points"]
- 	    var polys=jsdict[cmd+"_polys"]
+    	    var points=jsdict[cmd+"points"]
+ 	    var polys=jsdict[cmd+"polys"]
 
-    	    var isopoints=jsdict[cmd+"_isopoints"]
- 	    var isolines=jsdict[cmd+"_isolines"]
-
-
-            var colors=jsdict[cmd+"_colors"]
- 	    var cam=jsdict[cmd+"_cam"]
-
-            window.actor = vtk.Rendering.Core.vtkActor.newInstance();
+            var colors=jsdict[cmd+"colors"]
+            win.actor = vtk.Rendering.Core.vtkActor.newInstance();
             var mapper = vtk.Rendering.Core.vtkMapper.newInstance();
-            
             
             var  dataset = vtk.Common.DataModel.vtkPolyData.newInstance();
             dataset.getPoints().setData(points, 3);
@@ -115,40 +70,40 @@ function vtkplot(uuid,jsdict,invalidation)
                 values: colors,
                 numberOfComponents: 3,
             });
-
             
             dataset.getPointData().setScalars(colorData);        
             dataset.getPointData().setActiveScalars('Colors');
-
             mapper.setInputData(dataset);
             mapper.setColorModeToDirectScalars()
-            window.actor.setMapper(mapper);
-            renderer.addActor(window.actor);
+            win.actor.setMapper(mapper);
+            win.renderer.addActor(win.actor);
             
-            //https://discourse.vtk.org/t/manually-create-polydata-in-vtk-js/885/4
-            var isodataset=vtk.Common.DataModel.vtkPolyData.newInstance();
-            isodataset.getPoints().setData(isopoints, 3);
-            isodataset.getLines().setData(isolines);
-
-            var isomapper = vtk.Rendering.Core.vtkMapper.newInstance();
-            var isoactor = vtk.Rendering.Core.vtkActor.newInstance();
-            isomapper.setInputData(isodataset);
-            isoactor.setMapper(isomapper);
-            isoactor.getProperty().setColor(0, 0, 0)
-            renderer.addActor(isoactor);
-            
-            setinteractorstyle(interactor,cam)
+            var isopoints=jsdict[cmd+"isopoints"]
+ 	    var isolines=jsdict[cmd+"isolines"]
+            if (isopoints != "none")
+            {
+                //https://discourse.vtk.org/t/manually-create-polydata-in-vtk-js/885/4
+                var isodataset=vtk.Common.DataModel.vtkPolyData.newInstance();
+                isodataset.getPoints().setData(isopoints, 3);
+                isodataset.getLines().setData(isolines);
+                
+                var isomapper = vtk.Rendering.Core.vtkMapper.newInstance();
+                var isoactor = vtk.Rendering.Core.vtkActor.newInstance();
+                isomapper.setInputData(isodataset);
+                isoactor.setMapper(isomapper);
+                isoactor.getProperty().setColor(0, 0, 0)
+                win.renderer.addActor(isoactor);
+            }
         }
-        else if (jsdict[cmd]=="axis3d")
+        else if (jsdict[cmd]=="axis")
         {
- 	    var cam=jsdict[cmd+"_cam"]
+            var win=window[uuid+"data"]
+ 	    var cam=jsdict[cmd+"cam"]
             var cubeAxes = vtk.Rendering.Core.vtkCubeAxesActor.newInstance();
-
-            var  camera=renderer.getActiveCamera()
+            var camera=win.renderer.getActiveCamera()
 	    cubeAxes.setCamera(camera);
             cubeAxes.setAxisLabels(['x','y','z'])
-//	    cubeAxes.setDataBounds(jsdict[cmd+"_bounds"]);
-	    cubeAxes.setDataBounds(window.actor.getBounds());
+	    cubeAxes.setDataBounds(win.actor.getBounds());
 
             cubeAxes.setTickTextStyle({fontColor: "black"})
             cubeAxes.setTickTextStyle({fontFamily: "Arial"})
@@ -159,26 +114,72 @@ function vtkplot(uuid,jsdict,invalidation)
             cubeAxes.setAxisTextStyle({fontSize: "12"})
 
             cubeAxes.getProperty().setColor(0,0,0);
-	    renderer.addActor(cubeAxes);
-            renderWindow.render();
+	    win.renderer.addActor(cubeAxes);
+            win.renderer.resetCamera();
+            win.renderWindow.render();
 
             if (cam=="2D")
                 cubeAxes.setGridLines(false)
+            setinteractorstyle(win.interactor,cam)
+        }
+        else if (jsdict[cmd]=="triplot")
+        {// Experimental
+            var win=window[uuid+"data"]
 
+    	    var points=jsdict[cmd+"points"]
+ 	    var polys=jsdict[cmd+"polys"]
+ 	    var cam=jsdict[cmd+"cam"]
+            // Loop over content of jsdict
+            win.actor = vtk.Rendering.Core.vtkActor.newInstance();
+            var mapper = vtk.Rendering.Core.vtkMapper.newInstance();
+            
+            // Apply transformation to the points coordinates // figure this out later
+            //    vtkMatrixBuilder
+            ///      .buildFromRadian()
+            ///      .translate(...model.center)
+            ///      .rotateFromDirections([1, 0, 0], model.direction)
+            ///      .apply(points);
+            
+            win.dataset = vtk.Common.DataModel.vtkPolyData.newInstance();
+            win.dataset.getPoints().setData(points, 3);
+            win.dataset.getPolys().setData(polys,1);
+            mapper.setInputData(win.dataset);
+            win.actor.setMapper(mapper);
+            win.renderer.addActor(win.actor);
+            setinteractorstyle(win.interactor,cam)
+        }
+        else if (jsdict[cmd]=="plot")
+        {// Experimental
+            var win=window[uuid+"data"]
+    	    var points=jsdict[cmd+"points"]
+ 	    var lines=jsdict[cmd+"lines"]
+
+            win.actor = vtk.Rendering.Core.vtkActor.newInstance();
+            var mapper = vtk.Rendering.Core.vtkMapper.newInstance();
+
+            var dataset=vtk.Common.DataModel.vtkPolyData.newInstance();
+            dataset.getPoints().setData(points, 3);
+            dataset.getLines().setData(lines);
+            mapper.setInputData(dataset);
+            win.actor.setMapper(mapper);
+            win.actor.getProperty().setColor(0, 0, 0)
+            win.renderer.addActor(window.actor);
             setinteractorstyle(interactor,cam)
         }
     }
     
     //renderer.setLayer(0);
-    renderer.resetCamera();
-    
-    renderWindow.render();
+    var win=window[uuid+"data"]
+    win.renderer.resetCamera();
+    win.renderWindow.render();
 
-    // The invalidation promise is resolved when the cell starts rendering a newer output. We use it to release the WebGL context. (More info at https://plutocon2021-demos.netlify.app/fonsp%20%E2%80%94%20javascript%20inside%20pluto or https://observablehq.com/@observablehq/invalidation )
+    // The invalidation promise is resolved when the cell starts rendering a newer output.
+    // We use it to release the WebGL context.
+    // (More info at https://plutocon2021-demos.netlify.app/fonsp%20%E2%80%94%20javascript%20inside%20pluto or https://observablehq.com/@observablehq/invalidation )
     invalidation.then(() => {
-        renderWindow.delete();
-        openGlRenderWindow.delete();
-        interactor.delete();
+        win.renderWindow.delete();
+        win.openGlRenderWindow.delete();
+        win.interactor.delete();
     });
 }
 

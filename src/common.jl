@@ -27,8 +27,8 @@ E.g. for a polyline as command number 5, we create the entries
 
 ```
 "5" => "polyline"
-"5_x" => Vector of x coordinates in canvas coordinate system
-"5_y" => Vector of y coordinates in canvas coordinate system
+"5x" => Vector of x coordinates in canvas coordinate system
+"5y" => Vector of y coordinates in canvas coordinate system
 """
 function command!(p::T,cmd) where {T <: AbstractVistaPlot}
     p.jsdict["cmdcount"]=p.jsdict["cmdcount"]+1
@@ -45,22 +45,16 @@ After [`command!`](@ref), create a parameter entry
 """
 function parameter!(p::T,name,value) where {T <: AbstractVistaPlot}
     pfx=string(p.jsdict["cmdcount"])
-    key=pfx*"_"*name
-    p.jsdict[key]=value
+    p.jsdict[pfx*name]=value
     p
 end
 
 
-function plutovista(;resolution=(300,300),
-                    xrange::AbstractVector=0:1,
-                    yrange::AbstractVector=0:1,
-                    zrange::AbstractVector=0:0,
-                    )
-
-    zextrema=extrema(zrange)
-    if zextrema[begin]==zextrema[end]
-        CanvasPlot(;resolution=resolution,xrange=xrange,yrange=yrange)
+function plutovista(;resolution=(300,300), datadim=1, kwargs...)
+    if datadim==1
+        PlotlyPlot(;resolution=resolution)
     else
         VTKPlot(;resolution=resolution)
     end
 end
+

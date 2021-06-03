@@ -25,7 +25,7 @@ end
 
 Create a plotly plot with given resolution in the notebook
 """
-function PlotlyPlot(;resolution=(300,300))
+function PlotlyPlot(;resolution=(300,300), kwargs...)
     p=PlotlyPlot(nothing)
     p.uuid=uuid1()
     p.jsdict=Dict{String,Any}("cmdcount" => 0)
@@ -80,7 +80,7 @@ const mshapes=Dict(
 
 function plot!(p::PlotlyPlot,x,y;
                label="",
-               color=:black,
+               color=:auto,
                linewidth=2,
                linestyle=:solid,
                markersize=6,
@@ -88,6 +88,7 @@ function plot!(p::PlotlyPlot,x,y;
                markertype=:none)
 
     p.update=false
+
     command!(p,"plot")
     parameter!(p,"x",collect(x))
     parameter!(p,"y",collect(y))
@@ -98,14 +99,21 @@ function plot!(p::PlotlyPlot,x,y;
     parameter!(p,"markersize",markersize)
     parameter!(p,"linestyle",String(linestyle))
 
-    rgb=RGB(color)
-    rgb=[rgb.r,rgb.g,rgb.b]
-    rgb=UInt8.(floor.(rgb*255))
-    parameter!(p,"color",rgb)
-    
+
+    if color == :auto
+        parameter!(p,"color","auto")
+    else
+        rgb=RGB(color)
+        rgb=[rgb.r,rgb.g,rgb.b]
+        rgb=UInt8.(floor.(rgb*255))
+        parameter!(p,"color",rgb)
+    end
 end
 
-
+function plot(x,y; kwargs...)
+    p=PlotlyPlot(;kwargs...)
+    plot!(p,x,y;kwargs...)
+end
 
 
 ###############################################################
