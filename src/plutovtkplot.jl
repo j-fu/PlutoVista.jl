@@ -2,7 +2,7 @@
 Structure containig plot information. 
 In particular it contains dict of data sent to javascript.
 """
-mutable struct VTKPlot  <: AbstractVistaPlot
+mutable struct PlutoVTKPlot  <: PlutoVistaPlot
     # command list passed to javascript
     jsdict::Dict{String,Any}
 
@@ -13,19 +13,19 @@ mutable struct VTKPlot  <: AbstractVistaPlot
     update::Bool
     # uuid for identifying html element
     uuid::UUID
-    VTKPlot(::Nothing)=new()
+    PlutoVTKPlot(::Nothing)=new()
 end
 
 """
 ````
-    VTKPlot(;resolution=(300,300))
+    PlutoVTKPlot(;resolution=(300,300))
 ````
 
 Create a canvas plot with given resolution in the notebook
 and given "world coordinate" range.
 """
-function VTKPlot(;resolution=(300,300), kwargs...)
-    p=VTKPlot(nothing)
+function PlutoVTKPlot(;resolution=(300,300), kwargs...)
+    p=PlutoVTKPlot(nothing)
     p.uuid=uuid1()
     p.jsdict=Dict{String,Any}("cmdcount" => 0,"cbar" => 0)
     p.w=resolution[1]
@@ -39,7 +39,7 @@ end
 Add 3D coordinate system axes to the plot.
 Sets camera handling to 3D mode.
 """
-function axis3d!(p::VTKPlot)
+function axis3d!(p::PlutoVTKPlot)
     command!(p,"axis")
     parameter!(p,"cam","3D")
 end
@@ -49,22 +49,22 @@ end
 Add 2D coordinate system axes to the plot.
 Sets camera handling to 2D mode.
 """
-function axis2d!(p::VTKPlot)
+function axis2d!(p::PlutoVTKPlot)
     command!(p,"axis")
     parameter!(p,"cam","2D")
 end
 
 
-function Base.show(io::IO, ::MIME"text/html", p::VTKPlot)
-    vtkplot = read(joinpath(@__DIR__, "..", "assets", "vtkplot.js"), String)
-    colorbar = read(joinpath(@__DIR__, "..", "assets", "colorbar.js"), String)
+function Base.show(io::IO, ::MIME"text/html", p::PlutoVTKPlot)
+    plutovtkplot = read(joinpath(@__DIR__, "..", "assets", "plutovtkplot.js"), String)
+    canvascolorbar = read(joinpath(@__DIR__, "..", "assets", "canvascolorbar.js"), String)
     uuidcbar="$(p.uuid)"*"cbar"
     result=" "
     if p.update
         result="""
         <script type="text/javascript" src="https://unpkg.com/vtk.js@18"></script>
         <script>
-        $(vtkplot)
+        $(plutovtkplot)
         const jsdict = $(Main.PlutoRunner.publish_to_js(p.jsdict))
         vtkupdate("$(p.uuid)",jsdict,invalidation)        
         </script>
@@ -73,11 +73,11 @@ function Base.show(io::IO, ::MIME"text/html", p::VTKPlot)
         result="""
         <script type="text/javascript" src="https://unpkg.com/vtk.js@18"></script>
         <script>
-        $(vtkplot)
-        $(colorbar)
+        $(plutovtkplot)
+        $(canvascolorbar)
         const jsdict = $(Main.PlutoRunner.publish_to_js(p.jsdict))
-        vtkplot("$(p.uuid)",jsdict,invalidation)
-        colorbar("$(uuidcbar)",20,$(p.h),jsdict)        
+        plutovtkplot("$(p.uuid)",jsdict,invalidation)
+        canvascolorbar("$(uuidcbar)",20,$(p.h),jsdict)        
         </script>
         <p>
         <div style="white-space:nowrap;">
@@ -113,11 +113,11 @@ end
 
 
 """
-     tricontour!(p::VTKPlot,pts, tris,f; colormap)
+     tricontour!(p::PlutoVTKPlot,pts, tris,f; colormap, isolines)
 
 Plot piecewise linear function on  triangular grid given as "heatmap" 
 """
-function tricontour!(p::VTKPlot, pts, tris,f;colormap=:summer, isolines=0, kwargs...)
+function tricontour!(p::PlutoVTKPlot, pts, tris,f;colormap=:viridis, isolines=0, kwargs...)
     command!(p,"tricontour")
 
     if isa(isolines,Number)
@@ -169,40 +169,19 @@ function tricontour!(p::VTKPlot, pts, tris,f;colormap=:summer, isolines=0, kwarg
     p.jsdict["cstops"]=bar_stops
     p.jsdict["colors"]=bar_rgb
     p.jsdict["levels"]=collect(xisolines)
+
+    axis2d!(p)
+
     p
 end
 
-function tricontour(pts,tris,f; kwargs...)
-    p=plutovista(;datadim=2, kwargs...)
-    tricontour!(p,pts,tris,f;kwargs...)
-    axis2d!(p)
-end
 
-contour(X,Y,f; kwargs...)=tricontour(triang(X,Y)...,vec(f);kwargs...)
-contour!(p::VTKPlot,X,Y,f; kwargs...)=tricontour!(p,triang(X,Y)...,vec(f);kwargs...)
-
-#####################################
-# Experimental part
-"""
-     triplot!(p::VTKPlot,pts, tris,f)
-
-Plot piecewise linear function on  triangular grid given by points and triangles
-as matrices
-"""
-function triplot!(p::VTKPlot,pts, tris,f)
-    command!(p,"triplot")
-    p.update=false
-    # make 3D points from 2D points by adding function value as
-    # z coordinate
-    p.jsdict["cbar"]=0
-    parameter!(p,"points",vec(vcat(pts,f')))
-    parameter!(p,"polys",vtkpolys(tris))
-    parameter!(p,"cam","3D")
-end
+contour!(p::PlutoVTKPlot,X,Y,f; kwargs...)=tricontour!(p,triang(X,Y)...,vec(f);kwargs...)
+contour!(p::PlutoVTKPlot,X,Y,f)=tricontour!(p,triang(X,Y)...,vec(f))
 
 
 
-function plot!(p::VTKPlot,x,y)
+function plot!(p::PlutoVTKPlot,x,y; kwargs...)
     command!(p,"plot")
     n=length(x)
     points=vec(vcat(x',y',zeros(n)'))
@@ -215,10 +194,33 @@ function plot!(p::VTKPlot,x,y)
 end
 
 
+#####################################
+# Experimental part
+"""
+     triplot!(p::PlutoVTKPlot,pts, tris,f)
+
+Plot piecewise linear function on  triangular grid given by points and triangles
+as matrices
+"""
+function triplot!(p::PlutoVTKPlot,pts, tris,f)
+    command!(p,"triplot")
+    p.update=false
+    # make 3D points from 2D points by adding function value as
+    # z coordinate
+    p.jsdict["cbar"]=0
+    parameter!(p,"points",vec(vcat(pts,f')))
+    parameter!(p,"polys",vtkpolys(tris))
+    parameter!(p,"cam","3D")
+end
 
 
 
-function triupdate!(p::VTKPlot,pts,tris,f)
+
+
+
+
+
+function triupdate!(p::PlutoVTKPlot,pts,tris,f)
     command!(p,"triplot")
     # make 3D points from 2D points by adding function value as
     # z coordinate

@@ -62,7 +62,7 @@ func=0.5*[sin(10*pts[1,i])*cos(10*pts[2,i]) for i=1:size(pts,2)]
 
 # ╔═╡ 60dcfcf5-391e-418f-8e7c-3a0fe94f1e0d
 p=let
-	p=plutovista(resolution=(300,300),datadim=2)
+	p=PlutoVTKPlot(resolution=(300,300))
 	triplot!(p,pts,tris,func)
 	axis3d!(p)
 end
@@ -83,11 +83,8 @@ md"""Number of gridpoints: $(size(pts,2)) """
 
 # ╔═╡ 81046dcd-3cfb-4133-943f-61b9b3cdb183
 let
-	p=plutovista(resolution=(300,300),datadim=2)
-	tricontour!(p,pts,tris,func;cmap=:spring,isolevels=-0.5:0.1:0.5)
-	axis2d!(p)
-	p
-
+	p=PlutoVTKPlot(resolution=(300,300))
+	tricontour!(p,pts,tris,func;cmap=:spring,isolines=-0.5:0.1:0.5)
 end
 
 # ╔═╡ Cell order:

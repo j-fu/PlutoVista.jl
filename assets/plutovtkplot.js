@@ -17,7 +17,7 @@ function vtkupdate(uuid,jsdict,invalidation)
     win.renderWindow.render();
 }
 
-function vtkplot(uuid,jsdict,invalidation)
+function plutovtkplot(uuid,jsdict,invalidation)
 {
     if (window[uuid+"data"]==undefined)
     {

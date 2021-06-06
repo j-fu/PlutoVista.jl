@@ -1,6 +1,6 @@
 /* Canvas based color bar for vtk plots */
 
-function colorbar(uuid,w,h,cbdict)
+function canvascolorbar(uuid,w,h,cbdict)
 {
     if (cbdict["cbar"]==1)
     {

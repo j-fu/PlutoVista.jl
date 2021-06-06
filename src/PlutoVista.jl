@@ -5,30 +5,34 @@ using ColorSchemes
 using GridVisualize
 
 
-include("common.jl")
+include("plutovistaplot.jl")
+export PlutoVistaPlot
+export  tricontour, contour
 
 
-include("vtk.jl")
-export tricontour,tricontour!,contour,contour!
-export axis3d!, axis2d!
-export VTKPlot
+include("plutovtkplot.jl")
+export PlutoVTKPlot
+export tricontour!,contour,contour!
 
 
-include("plotly.jl")
+include("plutoplotlyplot.jl")
 export plot!,plot
-export PlotlyPlot
+export PlutoPlotlyPlot
 
 
 # Experimental:
-include("canvas.jl")
+export triupdate!,  triplot!
+export axis3d!, axis2d!
+include("plutocanvasplot.jl")
 export polygon!,linecolor!, fillcolor!
 export textcolor!,textsize!,text!
 export polyline!,linecolor!
 export polygon!,fillcolor!
 export axis!
-export CanvasPlot
+export PlutoCanvasPlot
 
 
-export triupdate!,  triplot!
+
+
 
 end # module

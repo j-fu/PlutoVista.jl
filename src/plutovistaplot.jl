@@ -1,6 +1,42 @@
-abstract type AbstractVistaPlot end
+abstract type PlutoVistaPlot end
+
+
+function PlutoVistaPlot(;resolution=(300,300), datadim=1,backend=:default, kwargs...)
+    if backend==:default
+        if datadim==1
+            backend=:plotly
+        else
+            backend=:vtk
+        end
+    end
+    
+    if backend == :plotly
+        return PlutoPlotlyPlot(;resolution=resolution)
+    elseif backend == :vtk
+        return  PlutoVTKPlot(;resolution=resolution)
+    else
+        error("No valid backend: $(backend). Valid backends: :default, :vtk, :plotly")
+    end
+end
+
+
+function plot(x,y; kwargs...)
+    p=PlutoVistaPlot(;datadim=1, kwargs...)
+    plot!(p,x,y;kwargs...)
+end
+
+function contour(X,Y,f; kwargs...)
+    p=PlutoVistaPlot(;datadim=2, kwargs...)
+    contour!(p,X,Y,f; kwargs...)
+end
+
+function tricontour(pts,tris,f; kwargs...)
+    p=PlutoVistaPlot(;datadim=2, kwargs...)
+    tricontour!(p,pts,tris,f; kwargs...)
+end
+
 """
-    command!(p<: AbstractVistaPlot,cmd)
+    command!(p<: PlutoVistaPlot,cmd)
 
 Enter new command named `cmd`.
 
@@ -28,7 +64,7 @@ E.g. for a polyline as command number 5, we create the entries
 "5x" => Vector of x coordinates in canvas coordinate system
 "5y" => Vector of y coordinates in canvas coordinate system
 """
-function command!(p::T,cmd) where {T <: AbstractVistaPlot}
+function command!(p::T,cmd) where {T <: PlutoVistaPlot}
     p.jsdict["cmdcount"]=p.jsdict["cmdcount"]+1
     pfx=string(p.jsdict["cmdcount"])
     p.jsdict[pfx]=cmd
@@ -37,23 +73,14 @@ end
 
 
 """
-    parameter!(p<: AbstractVistaPlot,name, value)
+    parameter!(p<: PlutoVistaPlot,name, value)
 
 After [`command!`](@ref), create a parameter entry
 """
-function parameter!(p::T,name,value) where {T <: AbstractVistaPlot}
+function parameter!(p::T,name,value) where {T <: PlutoVistaPlot}
     pfx=string(p.jsdict["cmdcount"])
     p.jsdict[pfx*name]=value
     p
-end
-
-
-function plutovista(;resolution=(300,300), datadim=1, kwargs...)
-    if datadim==1
-        PlotlyPlot(;resolution=resolution)
-    else
-        VTKPlot(;resolution=resolution)
-    end
 end
 
 
@@ -100,3 +127,4 @@ function triang(X,Y)
     @assert(itri==num_tris)
     pts, tris
 end
+

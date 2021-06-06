@@ -1,7 +1,7 @@
 ###############################
 # All experimental code here.
 
-mutable struct CanvasPlot <:AbstractVistaPlot
+mutable struct PlutoCanvasPlot <:PlutoVistaPlot
     # command list passed to javascript
     jsdict::Dict{String,Any}
 
@@ -24,12 +24,12 @@ mutable struct CanvasPlot <:AbstractVistaPlot
     # unique identifier of html entity
     uuid::UUID
 
-    CanvasPlot(::Nothing)=new()
+    PlutoCanvasPlot(::Nothing)=new()
 end
 
 """
 ````
- CanvasPlot(;resolution=(300,300),
+ PlutoCanvasPlot(;resolution=(300,300),
              xrange::AbstractVector=0:1,
              yrange::AbstractVector=0:1)
 ````
@@ -37,11 +37,11 @@ end
 Create a canvas plot with given resolution in the notebook
 and given "world coordinate" range.
 """
-function CanvasPlot(;resolution=(300,300),
+function PlutoCanvasPlot(;resolution=(300,300),
                     xrange::AbstractVector=0:1,
                     yrange::AbstractVector=0:1)
     
-    p=CanvasPlot(nothing)
+    p=PlutoCanvasPlot(nothing)
     p.uuid=uuid1()
     p.jsdict=Dict{String,Any}("cmdcount" => 0)
     p.w=resolution[1]
@@ -75,7 +75,7 @@ Transform a pair of coordinates from world to canvas
 """
 Pass pair of coordinate arrays for `lines!`,`polyline!`,`polygon!`  
 """
-function _poly!(p::CanvasPlot,cmd,x,y)
+function _poly!(p::PlutoCanvasPlot,cmd,x,y)
     command!(p,cmd)
     
     tx=Vector{Float32}(undef,length(x))
@@ -95,13 +95,13 @@ end
 """
 Show plot
 """
-function Base.show(io::IO, ::MIME"text/html", p::CanvasPlot)
-    canvasplot = read(joinpath(@__DIR__, "..", "assets", "canvasplot.js"), String)
+function Base.show(io::IO, ::MIME"text/html", p::PlutoCanvasPlot)
+    plutocanvasplot = read(joinpath(@__DIR__, "..", "assets", "plutocanvasplot.js"), String)
     result="""
     <script>
-    $(canvasplot)
+    $(plutocanvasplot)
     const jsdict = $(Main.PlutoRunner.publish_to_js(p.jsdict))
-    canvasplot("$(p.uuid)",jsdict)        
+    plutocanvasplot("$(p.uuid)",jsdict)        
     </script>
     <canvas id="$(p.uuid)" width="$(p.w)" height="$(p.h)"></canvas>
     """
@@ -109,82 +109,82 @@ function Base.show(io::IO, ::MIME"text/html", p::CanvasPlot)
 end
 
 """
-     lines!(p::CanvasPlot,x,y)
+     lines!(p::PlutoCanvasPlot,x,y)
 
 Plot lines. Every two coordinates define a line.
 """
-function lines!(p::CanvasPlot,x,y)
+function lines!(p::PlutoCanvasPlot,x,y)
     _poly!(p,"lines",x,y)
 end
 
 """
-      polyline!(p::CanvasPlot,x,y)
+      polyline!(p::PlutoCanvasPlot,x,y)
 
 Plot a polyline.
 """
-function polyline!(p::CanvasPlot,x,y)
+function polyline!(p::PlutoCanvasPlot,x,y)
     _poly!(p,"polyline",x,y)
 end
 
 """
-      polygon!(p::CanvasPlot,x,y)
+      polygon!(p::PlutoCanvasPlot,x,y)
 
 Plot a polygon and fill it.
 """
-function polygon!(p::CanvasPlot,x,y)
+function polygon!(p::PlutoCanvasPlot,x,y)
     _poly!(p,"polygon",x,y)
 end
 
 
 """
-     linecolor!(p::CanvasPlot,r,g,b)
+     linecolor!(p::PlutoCanvasPlot,r,g,b)
 
 Set line color.
 """
-function linecolor!(p::CanvasPlot,r,g,b)
+function linecolor!(p::PlutoCanvasPlot,r,g,b)
     command!(p,"linecolor")
     parameter!(p,"rgb",255*Float32[r,g,b])
 end
 
 
 """
-      linewidth!(p::CanvasPlot,w)
+      linewidth!(p::PlutoCanvasPlot,w)
 
 Set line width in pixels
 """
-function linewidth!(p::CanvasPlot,w)
+function linewidth!(p::PlutoCanvasPlot,w)
     command!(p,"linewidth")
     parameter!(p,"w",w)
 end
 
 """
-     fillcolor!(p::CanvasPlot,r,g,b)
+     fillcolor!(p::PlutoCanvasPlot,r,g,b)
 
 Set polygon fill color.
 """
-function fillcolor!(p::CanvasPlot,r,g,b)
+function fillcolor!(p::PlutoCanvasPlot,r,g,b)
     command!(p,"fillcolor")
     parameter!(p,"rgb",255*Float32[r,g,b])
 end
 
 
 """
-     textcolor!(p::CanvasPlot,r,g,b)
+     textcolor!(p::PlutoCanvasPlot,r,g,b)
 
 Set text color
 """
-function textcolor!(p::CanvasPlot,r,g,b)
+function textcolor!(p::PlutoCanvasPlot,r,g,b)
     command!(p,"textcolor")
     parameter!(p,"rgb",255*Float32[r,g,b])
 end
 
 
 """
-      textsize!(p::CanvasPlot,px)
+      textsize!(p::PlutoCanvasPlot,px)
 
 Set text size in pixels
 """
-function textsize!(p::CanvasPlot,px)
+function textsize!(p::PlutoCanvasPlot,px)
     command!(p,"textsize")
     parameter!(p,"pt",px)
 end
@@ -200,13 +200,13 @@ const valign=Dict("b"=>"bottom",
 
 
 """
-    textalign!(p::CanvasPlot,align)
+    textalign!(p::PlutoCanvasPlot,align)
 
 Set text alignment.
 
 `align:` one of `[:lt,:lc,lb,:ct,:cc,:cb,:rt,:rc,:rb]`
 """
-function textalign!(p::CanvasPlot,align)
+function textalign!(p::PlutoCanvasPlot,align)
     a=String(align)
 
     command!(p,"textalign")
@@ -218,11 +218,11 @@ end
 
 
 """
-    text!(p::CanvasPlot,txt,x,y)
+    text!(p::PlutoCanvasPlot,txt,x,y)
 
 Draw text at position x,y.
 """
-function text!(p::CanvasPlot,txt,x,y)
+function text!(p::PlutoCanvasPlot,txt,x,y)
     command!(p,"text")
     tx,ty=_tran2d(p,x,y)
     parameter!(p,"x",tx)
@@ -231,7 +231,7 @@ function text!(p::CanvasPlot,txt,x,y)
 end
 
 """
-         axis!(p::CanvasPlot;
+         axis!(p::PlutoCanvasPlot;
                xtics=0:1,
                ytics=0:1,
                axislinewidth=2,
@@ -244,7 +244,7 @@ end
 Draw an axis with grid and tics, set new
 world coordinates according to tics.
 """
-function axis!(p::CanvasPlot;
+function axis!(p::PlutoCanvasPlot;
                xtics=0:1,
                ytics=0:1,
                axislinewidth=2,

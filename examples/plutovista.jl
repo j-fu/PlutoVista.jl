@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.14.7
+# v0.14.5
 
 using Markdown
 using InteractiveUtils
@@ -13,31 +13,32 @@ macro bind(def, element)
     end
 end
 
-# ╔═╡ d6c0fb79-4129-444a-978a-bd2222b53df6
+# ╔═╡ 93ca4fd0-8f61-4174-b459-55f5395c0f56
+md"""
+# Test Notebook for [PlutoVista](https://github.com/j-fu/PlutoVista.jl)
+"""
+
+# ╔═╡ 1cb8eb7c-a763-479f-b15c-ff128fac2f75
+develop=true
+
+# ╔═╡ c102e87a-b570-4d86-b087-3506396fc065
 begin
 	using Pkg
     Pkg.activate(mktempdir())
 	Pkg.add("Revise"); using Revise
     Pkg.add(["PlutoUI","Triangulate"])
-    if haskey(ENV,"PLUTO_DEVEL")	
+    if develop	
 	    Pkg.develop("PlutoVista")
     else
 	    Pkg.add(name="PlutoVista",url="https://github.com/j-fu/PlutoVista.jl")
     end	
-end
+	use=true
 
-# ╔═╡ c102e87a-b570-4d86-b087-3506396fc065
-begin
 	using PlutoUI
 	import Triangulate
     using PlutoVista
     using Printf
 end
-
-# ╔═╡ 93ca4fd0-8f61-4174-b459-55f5395c0f56
-md"""
-# Test Notebook for [PlutoVista](https://github.com/j-fu/PlutoVista.jl)
-"""
 
 # ╔═╡ 53f55db7-225f-4717-ab62-e024211e98a2
 md"""
@@ -71,7 +72,7 @@ Modify xscale $(@bind xscale Slider(1:0.1:10,show_value=true)), yscale: $(@bind 
 
 # ╔═╡ 60dcfcf5-391e-418f-8e7c-3a0fe94f1e0d
 let
-	p=PlotlyPlot(resolution=(500,300))
+	p=PlutoVistaPlot(resolution=(500,300))
 	plot!(p,X,yscale*sin.(X*xscale);label="sin",color=:red,linestyle=:dashdot)
 	plot!(p,X,cos.(X*xscale);label="cos",color=:green,linewidth=1,markertype=:star5)
 	plot!(p,X,X./X[end];color=:blue,linestyle=:dash)
@@ -134,6 +135,14 @@ Above, we have shown  three ways to specify isolines:
 Colormaps can be chosen from [ColorSchemes.jl](https://juliagraphics.github.io/ColorSchemes.jl/stable/basics/#Pre-defined-schemes)
 """
 
+# ╔═╡ 387bbdee-0175-4a25-9a97-49fdb8afb7fc
+md"""
+Alternatively, we can use the Plotly backend:
+"""
+
+# ╔═╡ d21cc8b8-ae5e-42e4-8d1f-ca84241aa45d
+tricontour(pts,tris,func;colormap=:hot,isolines=-0.5:0.2:0.5,backend=:plotly)
+
 # ╔═╡ 06fb9e66-c7c0-4028-80d9-2a7e36a6626d
 md"""
 ### contour
@@ -157,6 +166,15 @@ Y1=0:0.1:10
 # ╔═╡ 2eadced9-9e4a-4fa3-aea4-5f163933cb02
 contour(X1,Y1,[f(x,y) for x∈X1, y∈Y1],resolution=(600,300),isolines=-20:5:20 )
 
+# ╔═╡ d9c796df-4b92-47ba-9007-ceeed78616b7
+md"""
+Alternatively, we can use the Plotly backend here as well. In this case we can map
+to the native contour plot widget of Plotly.js.
+"""
+
+# ╔═╡ b8d504dd-d056-4e28-989e-b07259acd5d6
+contour(X1,Y1,[f(x,y) for x∈X1, y∈Y1],resolution=(600,300),isolines=-20:5:20, backend=:plotly )
+
 # ╔═╡ d1e13f8c-7cb8-4cb5-9dda-1a9b5d6142b6
 md"""
 ## 3D Data
@@ -164,14 +182,12 @@ md"""
 Work in progress, based on vtk.js.
 """
 
-# ╔═╡ dcda0fee-0614-4e9d-9be8-5ad04e4f22d8
-html"""<hr size="5" noshade>"""
-
 # ╔═╡ 6af0b5d7-5324-43b5-8f99-6f5d35d5deba
 TableOfContents()
 
 # ╔═╡ Cell order:
 # ╟─93ca4fd0-8f61-4174-b459-55f5395c0f56
+# ╠═1cb8eb7c-a763-479f-b15c-ff128fac2f75
 # ╠═c102e87a-b570-4d86-b087-3506396fc065
 # ╟─53f55db7-225f-4717-ab62-e024211e98a2
 # ╟─b8a976e3-7fef-4527-ae6a-4da31c93a04f
@@ -190,13 +206,15 @@ TableOfContents()
 # ╠═c6d700ec-91a1-4ef7-a104-8574cc162b9a
 # ╠═8b25e922-12db-4fae-8f28-65fe4faf40f3
 # ╟─dce20465-d227-4273-82b7-c6a4621942b9
+# ╟─387bbdee-0175-4a25-9a97-49fdb8afb7fc
+# ╠═d21cc8b8-ae5e-42e4-8d1f-ca84241aa45d
 # ╟─06fb9e66-c7c0-4028-80d9-2a7e36a6626d
 # ╟─732b8e6a-68e0-4229-a2f9-52abe3ee5a40
 # ╠═2eadced9-9e4a-4fa3-aea4-5f163933cb02
 # ╠═fe7fdb00-88a1-4d24-aedd-cedb6e50120b
 # ╠═5745f449-abc7-4f9a-a439-645698b781ea
 # ╠═595539f8-f14e-418f-90d6-b6040292a9b6
+# ╟─d9c796df-4b92-47ba-9007-ceeed78616b7
+# ╠═b8d504dd-d056-4e28-989e-b07259acd5d6
 # ╟─d1e13f8c-7cb8-4cb5-9dda-1a9b5d6142b6
-# ╟─dcda0fee-0614-4e9d-9be8-5ad04e4f22d8
-# ╠═d6c0fb79-4129-444a-978a-bd2222b53df6
 # ╟─6af0b5d7-5324-43b5-8f99-6f5d35d5deba
