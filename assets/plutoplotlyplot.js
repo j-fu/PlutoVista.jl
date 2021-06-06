@@ -141,13 +141,15 @@ function plutoplotlyplot(uuid,jsdict,w,h)
             layout.scene={
                 dragmode : 'pan',
                 camera : {
-                    eye: {x:0, y:0, z:2},
-                    projection: {                hoverinfo: "x+y+text",
-
+                    // dirty trick to get axis directions right (turntable rotation 180deg around z...)
+                    up: {x:0.0, y:0.0001, z:-2},
+                    eye: {x:-0.00000001, y:0.0, z:-2},
+                    projection: {
+                        hoverinfo: "x+y+text",
                         type: 'orthographic'
                     },
                 },
-                xaxis: { tickangle: 0,showspikes: false},
+                xaxis: { tickangle: 0,showspikes: false, autorange: "reversed"},
                 yaxis: { tickangle: 0,showspikes: false},
                 zaxis: { visible: false, showgrid: false,showspikes: false}
             }

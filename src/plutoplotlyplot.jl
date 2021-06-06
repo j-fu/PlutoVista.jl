@@ -116,14 +116,17 @@ Plot piecewise linear function on  triangular grid given as "heatmap" and
 with isolines using Plotly's mesh3d.
 """
 function tricontour!(p::PlutoPlotlyPlot,pts, tris,f;colormap=:viridis, isolines=0, kwargs...)
+    zval=0.0
+
     command!(p,"tricontour")
     (fmin,fmax)=extrema(f)
     p.update=false
     parameter!(p,"x",pts[1,:])
     parameter!(p,"y",pts[2,:])
-    parameter!(p,"z",zeros(length(f)))
+    parameter!(p,"z",fill(zval,length(f)))
     parameter!(p,"f",f)
 
+    
     stops=collect(0:0.01:1)
     rgb=reinterpret(Float64,get(colorschemes[colormap],stops,(0,1)))
     rgb=UInt8.(floor.(rgb*255))
@@ -164,8 +167,8 @@ function tricontour!(p::PlutoPlotlyPlot,pts, tris,f;colormap=:viridis, isolines=
             push!(iso_y,iso_pts[2,ipt+1])
             push!(iso_y,iso_pts[2,ipt+2])
             push!(iso_y,NaN32)
-            push!(iso_z,0)
-            push!(iso_z,0)
+            push!(iso_z,zval)
+            push!(iso_z,zval)
             push!(iso_z,NaN32)
             ipt+=2
         end
