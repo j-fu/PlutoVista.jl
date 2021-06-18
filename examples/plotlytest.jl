@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.14.5
+# v0.14.8
 
 using Markdown
 using InteractiveUtils
@@ -30,7 +30,7 @@ begin
     if develop	
 	    Pkg.develop("PlutoVista")
     else
-	    Pkg.add(name="PlutoVista",url="https://github.com/j-fu/PlutoVista.jl")
+	    Pkg.add("PlutoVista")
     end	
     using PlutoUI
     using PlutoVista

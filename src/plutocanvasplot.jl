@@ -1,7 +1,7 @@
 ###############################
 # All experimental code here.
 
-mutable struct PlutoCanvasPlot <:PlutoVistaPlot
+mutable struct PlutoCanvasPlot <:AbstractPlutoVistaBackend
     # command list passed to javascript
     jsdict::Dict{String,Any}
 

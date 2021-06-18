@@ -2,7 +2,7 @@
 Structure containig plot information. 
 In particular it contains dict of data sent to javascript.
 """
-mutable struct PlutoVTKPlot  <: PlutoVistaPlot
+mutable struct PlutoVTKPlot  <: AbstractPlutoVistaBackend
     # command list passed to javascript
     jsdict::Dict{String,Any}
 
@@ -177,7 +177,7 @@ end
 
 
 contour!(p::PlutoVTKPlot,X,Y,f; kwargs...)=tricontour!(p,triang(X,Y)...,vec(f);kwargs...)
-contour!(p::PlutoVTKPlot,X,Y,f)=tricontour!(p,triang(X,Y)...,vec(f))
+#contour!(p::PlutoVTKPlot,X,Y,f)=tricontour!(p,triang(X,Y)...,vec(f))
 
 
 

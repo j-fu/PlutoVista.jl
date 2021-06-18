@@ -2,7 +2,7 @@
 Structure containig plot information. 
 In particular it contains dict of data sent to javascript.
 """
-mutable struct PlutoPlotlyPlot  <: PlutoVistaPlot
+mutable struct PlutoPlotlyPlot  <: AbstractPlutoVistaBackend
     # command list passed to javascript
     jsdict::Dict{String,Any}
 
