@@ -78,6 +78,21 @@ function plutoplotlyplot(uuid,jsdict,w,h)
                     dash:  jsdict[cmd+"linestyle"],
                 }
             };
+
+            var yrange=jsdict[cmd+"flimits"]
+            if (yrange[1]>yrange[0])
+            {
+                layout.yaxis.range=[yrange[0],yrange[1]]
+                layout.yaxis.autorange=false
+            }
+            
+            var xrange=jsdict[cmd+"xlimits"]
+            if (xrange[1]>xrange[0])
+            {
+                layout.xaxis.range=[xrange[0],xrange[1]]
+                layout.xaxis.autorange=false
+            }
+            
             data.push(trace)
         }
         else if (jsdict[cmd]=="contour")

@@ -73,7 +73,7 @@ begin
 end
 
 # ╔═╡ fd7c959b-94d6-43ff-b535-49b0883874d5
-let 
+let  
 	p=PlutoCanvasPlot(resolution=(300,300),xrange=-1:1,yrange=-1:1)
 	time=0.005*clock_t
 	dt=0.01
@@ -92,5 +92,5 @@ end
 # ╠═825f6068-0f02-44e4-b083-1be3eb4c764d
 # ╠═2a5510d3-7355-4095-ab43-ad6d75bba090
 # ╠═405b81de-3fd9-48f7-81a7-dc8f06dfda9c
-# ╟─83c16003-8196-4f2c-a602-c298f27475fb
+# ╠═83c16003-8196-4f2c-a602-c298f27475fb
 # ╠═fd7c959b-94d6-43ff-b535-49b0883874d5

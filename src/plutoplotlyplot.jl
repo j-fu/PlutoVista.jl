@@ -83,7 +83,9 @@ function plot!(p::PlutoPlotlyPlot,x,y;
                linestyle=:solid,
                markersize=6,
                markercount=10,
-               markertype=:none)
+               markertype=:none,
+               flimits=(1,-1),
+               xlimits=(1,-1))
 
     p.update=false
 
@@ -96,7 +98,9 @@ function plot!(p::PlutoPlotlyPlot,x,y;
     parameter!(p,"markertype",mshapes[markertype])
     parameter!(p,"markersize",markersize)
     parameter!(p,"linestyle",String(linestyle))
-
+    parameter!(p,"flimits",collect(Float32,flimits))
+    parameter!(p,"xlimits",collect(Float32,xlimits))
+    
 
     if color == :auto
         parameter!(p,"color","auto")
