@@ -84,8 +84,11 @@ function plot!(p::PlutoPlotlyPlot,x,y;
                markersize=6,
                markercount=10,
                markertype=:none,
-               flimits=(1,-1),
-               xlimits=(1,-1))
+               ylimits=(1,-1),
+               xlimits=(1,-1),
+               xlabel="",
+               ylabel="",
+               legend=:none)
 
     p.update=false
 
@@ -98,10 +101,19 @@ function plot!(p::PlutoPlotlyPlot,x,y;
     parameter!(p,"markertype",mshapes[markertype])
     parameter!(p,"markersize",markersize)
     parameter!(p,"linestyle",String(linestyle))
-    parameter!(p,"flimits",collect(Float32,flimits))
+    parameter!(p,"ylimits",collect(Float32,ylimits))
     parameter!(p,"xlimits",collect(Float32,xlimits))
-    
+    parameter!(p,"xlabel",xlabel)
+    parameter!(p,"ylabel",ylabel)
 
+    parameter!(p,"showlegend",legend == :none ? 0 : 1)
+
+    slegend=String(legend)
+    parameter!(p,"legendxpos",slegend[1:1])
+    parameter!(p,"legendypos",slegend[2:2])
+
+   
+    
     if color == :auto
         parameter!(p,"color","auto")
     else
