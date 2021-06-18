@@ -30,7 +30,7 @@ begin
     if develop	
 	    Pkg.develop("PlutoVista")
     else
-	    Pkg.add(name="PlutoVista",url="https://github.com/j-fu/PlutoVista.jl")
+	    Pkg.add("PlutoVista")
     end	
 	use=true
 
