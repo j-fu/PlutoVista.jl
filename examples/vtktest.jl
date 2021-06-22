@@ -49,6 +49,9 @@ function maketriangulation(maxarea)
     triout.pointlist, triout.trianglelist
 end
 
+# ╔═╡ 60dcfcf5-391e-418f-8e7c-3a0fe94f1e0d
+p=PlutoVTKPlot(resolution=(300,300))
+
 # ╔═╡ db2823d9-aa6d-4be3-af5c-873c072cfd2b
 md"""
 Change grid resolution: $(@bind resolution Slider(5:200))
@@ -60,23 +63,16 @@ Change grid resolution: $(@bind resolution Slider(5:200))
 # ╔═╡ b8a976e3-7fef-4527-ae6a-4da31c93a04f
 func=0.5*[sin(10*pts[1,i])*cos(10*pts[2,i]) for i=1:size(pts,2)]
 
-# ╔═╡ 60dcfcf5-391e-418f-8e7c-3a0fe94f1e0d
-p=let
-	p=PlutoVTKPlot(resolution=(300,300))
-	triplot!(p,pts,tris,func)
-	axis3d!(p)
-end
-
 # ╔═╡ 401b36bd-fa8f-4a9c-9556-bbc82c3ddbca
  md"""
 Change time: $(@bind time Slider(0:0.1:10,show_value=true))
 """
 
 # ╔═╡ 6fd4a1ee-7a4a-405b-8e1f-5819eababe10
-ft=0.5*[sin(10*pts[1,i]-time)*cos(10*pts[2,i]-time) for i=1:size(pts,2)]
+ft=0.5*[sin(10*pts[1,i]-time)*cos(10*pts[2,i]-time) for i=1:size(pts,2)];
 
 # ╔═╡ e76f8a6a-ab91-454a-b200-cfc8b57eb331
-triupdate!(p,pts,tris,ft)
+triplot!(p,pts,tris,ft)
 
 # ╔═╡ bce0cfe7-4112-4bb8-aac6-43885f3746a9
 md"""Number of gridpoints: $(size(pts,2)) """
@@ -95,8 +91,8 @@ end
 # ╠═890710fe-dac0-4256-b1ba-79776f1ea7e5
 # ╠═b8a976e3-7fef-4527-ae6a-4da31c93a04f
 # ╠═60dcfcf5-391e-418f-8e7c-3a0fe94f1e0d
-# ╠═db2823d9-aa6d-4be3-af5c-873c072cfd2b
-# ╠═401b36bd-fa8f-4a9c-9556-bbc82c3ddbca
+# ╟─db2823d9-aa6d-4be3-af5c-873c072cfd2b
+# ╟─401b36bd-fa8f-4a9c-9556-bbc82c3ddbca
 # ╠═6fd4a1ee-7a4a-405b-8e1f-5819eababe10
 # ╠═e76f8a6a-ab91-454a-b200-cfc8b57eb331
 # ╟─bce0cfe7-4112-4bb8-aac6-43885f3746a9

@@ -31,6 +31,8 @@ function backend!(p::PlutoVistaPlot; datadim=1, backend=:default)
     p.backend
 end
 
+
+Base.show(io::IO, mime::MIME"text/html", p::Nothing)=nothing
 Base.show(io::IO, mime::MIME"text/html", p::PlutoVistaPlot)=Base.show(io,mime,p.backend)
 
 plot(x,y; kwargs...)=plot!(PlutoVistaPlot(;kwargs...),x,y;kwargs...)
@@ -38,14 +40,31 @@ plot!(p::PlutoVistaPlot,x,y; backend=:plotly, kwargs...)=plot!(backend!(p,datadi
                                                                x,y;kwargs...)
 
 
+function plot(;kwargs...)
+    p=PlutoVistaPlot(;kwargs...)
+    backend!(p,datadim=1)
+end
+
+
+
 tricontour(pts,tris,f; kwargs...)=tricontour!(PlutoVistaPlot(;kwargs...),pts,tris,f; kwargs...)
 tricontour!(p::PlutoVistaPlot,pts,tris,f;backend=:vtk, kwargs...)=tricontour!(backend!(p,datadim=2,backend=backend),
                                                                               pts,tris,f; kwargs...)
+
+function tricontour(;kwargs...)
+    p=PlutoVistaPlot(;kwargs...)
+    backend!(p,datadim=2)
+end
+
 
 
 contour(X,Y,f; kwargs...)=contour!(PlutoVistaPlot(;kwargs...),X,Y,f; kwargs...)
 contour!(p::PlutoVistaPlot,X,Y,f; backend=:vtk, kwargs...)=contour!(backend!(p,datadim=2,backend=backend),
                                                                     X,Y,f; kwargs...)
+function contour(;kwargs...)
+    p=PlutoVistaPlot(;kwargs...)
+    backend!(p,datadim=2)
+end
 
 
 """

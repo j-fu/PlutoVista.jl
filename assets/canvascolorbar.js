@@ -12,7 +12,8 @@ function canvascolorbar(uuid,w,h,cbdict)
         var canvas = document.getElementById(uuid);
         var ctx = canvas.getContext("2d");
 
-        
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
         var cstops=cbdict["cstops"]
         var colors=cbdict["colors"]
         var levels=cbdict["levels"]

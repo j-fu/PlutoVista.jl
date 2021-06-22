@@ -59,18 +59,19 @@ function Base.show(io::IO, ::MIME"text/html", p::PlutoVTKPlot)
     plutovtkplot = read(joinpath(@__DIR__, "..", "assets", "plutovtkplot.js"), String)
     canvascolorbar = read(joinpath(@__DIR__, "..", "assets", "canvascolorbar.js"), String)
     uuidcbar="$(p.uuid)"*"cbar"
-    result=" "
-    if p.update
-        result="""
-        <script type="text/javascript" src="https://unpkg.com/vtk.js@18"></script>
-        <script>
-        $(plutovtkplot)
-        const jsdict = $(Main.PlutoRunner.publish_to_js(p.jsdict))
-        vtkupdate("$(p.uuid)",jsdict,invalidation)        
-        </script>
-        """
-    else
-        result="""
+    div=""
+
+    if !p.update
+    div="""
+        <p>
+        <div style="white-space:nowrap;">
+        <div id="$(p.uuid)" style= "width: $(p.w)px; height: $(p.h)px; display: inline-block; "></div>
+        <canvas id="$(uuidcbar)" width=60, height="$(p.h)"  style="display: inline-block; "></canvas>
+        </div>
+        </p>
+    """
+    end
+    result="""
         <script type="text/javascript" src="https://unpkg.com/vtk.js@18"></script>
         <script>
         $(plutovtkplot)
@@ -79,15 +80,10 @@ function Base.show(io::IO, ::MIME"text/html", p::PlutoVTKPlot)
         plutovtkplot("$(p.uuid)",jsdict,invalidation)
         canvascolorbar("$(uuidcbar)",20,$(p.h),jsdict)        
         </script>
-        <p>
-        <div style="white-space:nowrap;">
-        <div id="$(p.uuid)" style= "width: $(p.w)px; height: $(p.h)px; display: inline-block; "></div>
-        <canvas id="$(uuidcbar)" width=60, height="$(p.h)"  style="display: inline-block; "></canvas>
-        </div>
-    </p>
+        $(div)
         """
-    end
-    write(io,result)
+     p.update=true
+     write(io,result)
 end
 
 
@@ -118,13 +114,19 @@ end
 Plot piecewise linear function on  triangular grid given as "heatmap" 
 """
 function tricontour!(p::PlutoVTKPlot, pts, tris,f;colormap=:viridis, isolines=0, kwargs...)
+
+    p.jsdict=Dict{String,Any}("cmdcount" => 0)
+
+
     command!(p,"tricontour")
+
 
     if isa(isolines,Number)
         (fmin,fmax)=extrema(f)
     else
         (fmin,fmax)=extrema(isolines)
     end        
+
     parameter!(p,"points",vec(vcat(pts,zeros(eltype(pts),length(f))')))
     parameter!(p,"polys",vtkpolys(tris))
 
@@ -171,7 +173,6 @@ function tricontour!(p::PlutoVTKPlot, pts, tris,f;colormap=:viridis, isolines=0,
     p.jsdict["levels"]=collect(xisolines)
 
     axis2d!(p)
-
     p
 end
 
@@ -203,28 +204,14 @@ Plot piecewise linear function on  triangular grid given by points and triangles
 as matrices
 """
 function triplot!(p::PlutoVTKPlot,pts, tris,f)
+    p.jsdict=Dict{String,Any}("cmdcount" => 0)
     command!(p,"triplot")
-    p.update=false
     # make 3D points from 2D points by adding function value as
     # z coordinate
     p.jsdict["cbar"]=0
     parameter!(p,"points",vec(vcat(pts,f')))
     parameter!(p,"polys",vtkpolys(tris))
-    parameter!(p,"cam","3D")
-end
-
-
-
-
-
-
-
-
-function triupdate!(p::PlutoVTKPlot,pts,tris,f)
-    command!(p,"triplot")
-    # make 3D points from 2D points by adding function value as
-    # z coordinate
-    p.jsdict["xpoints"]=vec(vcat(pts,f'))
-    p.update=true
+    axis3d!(p)
     p
 end
+
