@@ -2,7 +2,7 @@
 Structure containig plot information. 
 In particular it contains dict of data sent to javascript.
 """
-mutable struct PlutoPlotlyPlot  <: PlutoVistaPlot
+mutable struct PlutoPlotlyPlot  <: AbstractPlutoVistaBackend
     # command list passed to javascript
     jsdict::Dict{String,Any}
 
@@ -46,10 +46,15 @@ function Base.show(io::IO, ::MIME"text/html", p::PlutoPlotlyPlot)
         plutoplotlyplot("$(p.uuid)",jsdict,$(p.w), $(p.h))        
         </script>
         """
-
     if !p.update
-        result=result*"""<div id="$(p.uuid)" style= "width: $(p.w)px; height: $(p.h)px;"></div>"""
+        result=result*"""
+        <p>
+        <div style="white-space:nowrap;">
+        <div id="$(p.uuid)" style= "width: $(p.w)px; height: $(p.h)px; ; display: inline-block; "></div>
+        </div>
+        </p>"""
     end
+    p.update=true
     write(io,result)
 end
 
@@ -84,11 +89,18 @@ function plot!(p::PlutoPlotlyPlot,x,y;
                markersize=6,
                markercount=10,
                markertype=:none,
-               flimits=(1,-1),
-               xlimits=(1,-1))
+               ylimits=(1,-1),
+               xlimits=(1,-1),
+               xlabel="",
+               ylabel="",
+               legend=:none,
+               clear=false)
 
-    p.update=false
 
+    if clear
+        p.jsdict=Dict{String,Any}("cmdcount" => 0)
+    end
+    
     command!(p,"plot")
     parameter!(p,"x",collect(x))
     parameter!(p,"y",collect(y))
@@ -98,10 +110,20 @@ function plot!(p::PlutoPlotlyPlot,x,y;
     parameter!(p,"markertype",mshapes[markertype])
     parameter!(p,"markersize",markersize)
     parameter!(p,"linestyle",String(linestyle))
-    parameter!(p,"flimits",collect(Float32,flimits))
+    parameter!(p,"ylimits",collect(Float32,ylimits))
     parameter!(p,"xlimits",collect(Float32,xlimits))
-    
+    parameter!(p,"xlabel",xlabel)
+    parameter!(p,"ylabel",ylabel)
 
+    parameter!(p,"showlegend",legend == :none ? 0 : 1)
+
+    slegend=String(legend)
+    parameter!(p,"legendxpos",slegend[1:1])
+    parameter!(p,"legendypos",slegend[2:2])
+
+    parameter!(p,"clear",clear ? 1 : 0)
+   
+    
     if color == :auto
         parameter!(p,"color","auto")
     else
@@ -121,10 +143,11 @@ with isolines using Plotly's mesh3d.
 """
 function tricontour!(p::PlutoPlotlyPlot,pts, tris,f;colormap=:viridis, isolines=0, kwargs...)
     zval=0.0
+    p.jsdict=Dict{String,Any}("cmdcount" => 0)
 
     command!(p,"tricontour")
     (fmin,fmax)=extrema(f)
-    p.update=false
+
     parameter!(p,"x",pts[1,:])
     parameter!(p,"y",pts[2,:])
     parameter!(p,"z",fill(zval,length(f)))
@@ -191,6 +214,7 @@ Plot heatmap and isolines on rectangular grid defined by X and Y
 using Plotly's native contour plot.
 """
 function contour!(p::PlutoPlotlyPlot,X,Y,f; colormap=:viridis, isolines=0 , kwargs...)
+    p.jsdict=Dict{String,Any}("cmdcount" => 0)
     command!(p,"contour")
     parameter!(p,"x",collect(X))
     parameter!(p,"y",collect(Y))
@@ -227,8 +251,9 @@ Plot piecewise linear function on  triangular grid given by points and triangles
 as matrices
 """
 function triplot!(p::PlutoPlotlyPlot,pts, tris,f)
+    p.jsdict=Dict{String,Any}("cmdcount" => 0)
     command!(p,"triplot")
-    p.update=false
+
     parameter!(p,"x",pts[1,:])
     parameter!(p,"y",pts[2,:])
     parameter!(p,"z",f)
@@ -239,8 +264,9 @@ function triplot!(p::PlutoPlotlyPlot,pts, tris,f)
 end
 
 function triupdate!(p::PlutoPlotlyPlot,pts,tris,f)
+    p.jsdict=Dict{String,Any}("cmdcount" => 0)
     command!(p,"triupdate")
-    p.update=true
+
     # make 3D points from 2D points by adding function value as
     # z coordinate
     parameter!(p,"x",pts[1,:])

@@ -26,18 +26,18 @@ function make_colorscale(cstops,colors)
 
 function plutoplotlyplot(uuid,jsdict,w,h)
 {
-    var data=[]
+
+    var graphDiv = document.getElementById(uuid)
     
     var layout = {
         autosize: false,
         width: w,
         height:h,
-        
         xaxis: {
-            title: 'x'
+            title: ''
         },
         yaxis: {
-            title: 'y'
+            title: ''
         },
         
         
@@ -50,12 +50,27 @@ function plutoplotlyplot(uuid,jsdict,w,h)
         },
     };
             
+    var data=[]
     
     for (var cmd = 1 ; cmd <= jsdict.cmdcount ; cmd++)
     {  
 
         if (jsdict[cmd]=="plot")
         {
+            if (graphDiv.data!=undefined && jsdict[cmd+"clear"] == 1)
+            {
+
+                while(graphDiv.data.length>0)
+                {
+                    Plotly.deleteTraces(graphDiv, [0]);
+                }
+            }
+
+            if (graphDiv.data!=undefined )
+            {
+                data=graphDiv.data
+            }
+            
             
             var mode  = jsdict[cmd+"markertype"] == "none" ? "lines" : "lines+markers"
             var color=jsdict[cmd+"color"] 
@@ -78,8 +93,9 @@ function plutoplotlyplot(uuid,jsdict,w,h)
                     dash:  jsdict[cmd+"linestyle"],
                 }
             };
-
-            var yrange=jsdict[cmd+"flimits"]
+            
+            
+            var yrange=jsdict[cmd+"ylimits"]
             if (yrange[1]>yrange[0])
             {
                 layout.yaxis.range=[yrange[0],yrange[1]]
@@ -92,8 +108,57 @@ function plutoplotlyplot(uuid,jsdict,w,h)
                 layout.xaxis.range=[xrange[0],xrange[1]]
                 layout.xaxis.autorange=false
             }
+
+
+            layout.showlegend=jsdict[cmd+"showlegend"] == 1 ? true : false
+
+            var lxpos=jsdict[cmd+"legendxpos"]
+            var lypos=jsdict[cmd+"legendypos"]
+
+            layout.legend={
+                bgcolor: 'rgba(255,255,255,0.8)'
+            }
+
+            if (lxpos=='r')
+            {
+              layout.legend.xanchor='right'
+              layout.legend.x=0.9
+            }
+            else if (lxpos=='c')
+            {
+              layout.legend.xanchor='center'
+              layout.legend.x=0.5
+            }
+            else if (lxpos=='l')
+            {
+              layout.legend.xanchor='left'
+              layout.legend.x=0
+            }
+
+            if (lypos=='t')
+            {
+              layout.legend.xanchor='top'
+              layout.legend.y=1
+            }
+            else if (lypos=='c')
+            {
+              layout.legend.xanchor='center'
+              layout.legend.y=0.5
+            }
+            else if (lypos=='b')
+            {
+              layout.legend.xanchor='bottom'
+              layout.legend.y=0
+            }
+
+            
+            layout.xaxis.title=jsdict[cmd+"xlabel"]
+            layout.yaxis.title=jsdict[cmd+"ylabel"]
+
+
             
             data.push(trace)
+            
         }
         else if (jsdict[cmd]=="contour")
         {
@@ -123,6 +188,7 @@ function plutoplotlyplot(uuid,jsdict,w,h)
         }
         else if (jsdict[cmd]=="tricontour")
         {
+            var data=[]
             // this is slower than vtk, but has hover and
             // stays interactive in html
             var cstops=jsdict[cmd+"cstops"]
@@ -192,9 +258,10 @@ function plutoplotlyplot(uuid,jsdict,w,h)
                 };
                 data.push(line)
             }
+            Plotly.newPlot(uuid, data,layout)
         }
         else if (jsdict[cmd]=="triplot"|| jsdict[cmd]=="triupdate")
-        { //  Experimental, slower than js
+        { //  Experimental, slower than vtk
 
             
             var data = {
@@ -218,15 +285,25 @@ function plutoplotlyplot(uuid,jsdict,w,h)
             layout.scene={
                 aspectmode : 'cube',
             }
-
-
+            
+            
 
             //            if (jsdict[cmd]=="triplot")
                 Plotly.newPlot(uuid, [data],layout)
-//            else
-//                Plotly.react(uuid, [data],layout)
+            //            else
+            //                Plotly.react(uuid, [data],layout)
             return
         }
     }
-    Plotly.newPlot(uuid, data,layout)
+    
+    // after all plot commands
+    if (graphDiv.data==undefined)
+    {
+        Plotly.newPlot(uuid, data,layout)
+    }
+    else
+    {
+        Plotly.react(uuid, graphDiv.data,layout)
+    }
+    
 }

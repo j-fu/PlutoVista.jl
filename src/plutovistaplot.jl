@@ -1,42 +1,74 @@
-abstract type PlutoVistaPlot end
+mutable struct PlutoVistaPlot
+    backend::Union{PlutoPlotlyPlot,PlutoCanvasPlot,PlutoVTKPlot,Nothing}
+    resolution
+    PlutoVistaPlot(::Nothing)=new(nothing, (0,0))
+end
 
+function PlutoVistaPlot(;resolution=(300,300),kwargs...)
+    p=PlutoVistaPlot(nothing)
+    p.resolution=resolution
+    p
+end
 
-function PlutoVistaPlot(;resolution=(300,300), datadim=1,backend=:default, kwargs...)
-    if backend==:default
-        if datadim==1
-            backend=:plotly
+function backend!(p::PlutoVistaPlot; datadim=1, backend=:default)
+    if isnothing(p.backend)
+        if backend==:default
+            if datadim == 1
+                backend=:plotly
+            else
+                backend=:vtk
+            end
+        end
+        
+        if backend == :plotly
+            p.backend=PlutoPlotlyPlot(;resolution=p.resolution)
+        elseif backend == :vtk
+            p.backend=PlutoVTKPlot(;resolution=p.resolution)
         else
-            backend=:vtk
+            error("No valid backend: $(backend). Valid backends: :default, :vtk, :plotly")
         end
     end
-    
-    if backend == :plotly
-        return PlutoPlotlyPlot(;resolution=resolution)
-    elseif backend == :vtk
-        return  PlutoVTKPlot(;resolution=resolution)
-    else
-        error("No valid backend: $(backend). Valid backends: :default, :vtk, :plotly")
-    end
+    p.backend
 end
 
 
-function plot(x,y; kwargs...)
-    p=PlutoVistaPlot(;datadim=1, kwargs...)
-    plot!(p,x,y;kwargs...)
+Base.show(io::IO, mime::MIME"text/html", p::Nothing)=nothing
+Base.show(io::IO, mime::MIME"text/html", p::PlutoVistaPlot)=Base.show(io,mime,p.backend)
+
+plot(x,y; kwargs...)=plot!(PlutoVistaPlot(;kwargs...),x,y;kwargs...)
+plot!(p::PlutoVistaPlot,x,y; backend=:plotly, kwargs...)=plot!(backend!(p,datadim=1,backend=backend),
+                                                               x,y;kwargs...)
+
+
+function plot(;kwargs...)
+    p=PlutoVistaPlot(;kwargs...)
+    backend!(p,datadim=1)
 end
 
-function contour(X,Y,f; kwargs...)
-    p=PlutoVistaPlot(;datadim=2, kwargs...)
-    contour!(p,X,Y,f; kwargs...)
+
+
+tricontour(pts,tris,f; kwargs...)=tricontour!(PlutoVistaPlot(;kwargs...),pts,tris,f; kwargs...)
+tricontour!(p::PlutoVistaPlot,pts,tris,f;backend=:vtk, kwargs...)=tricontour!(backend!(p,datadim=2,backend=backend),
+                                                                              pts,tris,f; kwargs...)
+
+function tricontour(;kwargs...)
+    p=PlutoVistaPlot(;kwargs...)
+    backend!(p,datadim=2)
 end
 
-function tricontour(pts,tris,f; kwargs...)
-    p=PlutoVistaPlot(;datadim=2, kwargs...)
-    tricontour!(p,pts,tris,f; kwargs...)
+
+
+contour(X,Y,f; kwargs...)=contour!(PlutoVistaPlot(;kwargs...),X,Y,f; kwargs...)
+contour!(p::PlutoVistaPlot,X,Y,f; backend=:vtk, kwargs...)=contour!(backend!(p,datadim=2,backend=backend),
+                                                                    X,Y,f; kwargs...)
+function contour(;kwargs...)
+    p=PlutoVistaPlot(;kwargs...)
+    backend!(p,datadim=2)
 end
+
 
 """
-    command!(p<: PlutoVistaPlot,cmd)
+    command!(p<: AbstractPlutoVistaBackend,cmd)
 
 Enter new command named `cmd`.
 
@@ -64,7 +96,7 @@ E.g. for a polyline as command number 5, we create the entries
 "5x" => Vector of x coordinates in canvas coordinate system
 "5y" => Vector of y coordinates in canvas coordinate system
 """
-function command!(p::T,cmd) where {T <: PlutoVistaPlot}
+function command!(p::T,cmd) where {T <: AbstractPlutoVistaBackend}
     p.jsdict["cmdcount"]=p.jsdict["cmdcount"]+1
     pfx=string(p.jsdict["cmdcount"])
     p.jsdict[pfx]=cmd
@@ -73,11 +105,11 @@ end
 
 
 """
-    parameter!(p<: PlutoVistaPlot,name, value)
+    parameter!(p<: AbstractPlutoVistaBackend,name, value)
 
 After [`command!`](@ref), create a parameter entry
 """
-function parameter!(p::T,name,value) where {T <: PlutoVistaPlot}
+function parameter!(p::T,name,value) where {T <: AbstractPlutoVistaBackend}
     pfx=string(p.jsdict["cmdcount"])
     p.jsdict[pfx*name]=value
     p

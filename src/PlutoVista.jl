@@ -4,10 +4,8 @@ using Colors
 using ColorSchemes
 using GridVisualize
 
+abstract type AbstractPlutoVistaBackend end
 
-include("plutovistaplot.jl")
-export PlutoVistaPlot
-export  tricontour, contour
 
 
 include("plutovtkplot.jl")
@@ -32,7 +30,10 @@ export axis!
 export PlutoCanvasPlot
 
 
-
+# API
+include("plutovistaplot.jl")
+export PlutoVistaPlot
+export  tricontour, contour
 
 
 end # module
