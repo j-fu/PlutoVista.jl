@@ -75,7 +75,7 @@ let
 	p=PlutoVistaPlot(resolution=(500,300))
 	plot!(p,X,yscale*sin.(X*xscale);label="sin",color=:red,linestyle=:dashdot)
 	plot!(p,X,cos.(X*xscale);label="cos",color=:green,linewidth=1,markertype=:star5)
-	plot!(p,X,X./X[end];color=:blue,linestyle=:dash)
+	plot!(p,X,X./X[end];color=:blue,linestyle=:dash,title="test",legend=:rt,xlabel="x")
 end
 
 # ╔═╡ 76d7a50d-40da-4367-a84f-3e2324e0c78d

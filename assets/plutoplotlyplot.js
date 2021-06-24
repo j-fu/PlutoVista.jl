@@ -28,25 +28,57 @@ function plutoplotlyplot(uuid,jsdict,w,h)
 {
 
     var graphDiv = document.getElementById(uuid)
-    
+
+//    https://www.somesolvedproblems.com/2018/10/how-to-customize-plotlys-modebar.html
+    var buttons=[["resetScale2d", "toImage","toggleHover"]]
+
     var layout = {
         autosize: false,
         width: w,
         height:h,
-        xaxis: {
-            title: ''
-        },
-        yaxis: {
-            title: ''
+        title: {
+            text: '',
+            font: {
+                size: 14
+            }
         },
         
+        modebar: {
+            orientation: 'h',
+        },
+        
+        hovermode: false,
+        xaxis: {
+            title: '',
+            mirror: true,
+            ticks: "outside",
+            showline: true,
+            zeroline: false,
+            linewidth: 2,
+            gridcolor: '#bdbdbd',
+        },
+
+        yaxis: {
+            title: '',
+            mirror: true,
+            ticks: "outside",
+            showline: true,
+            zeroline: false,
+            linewidth: 2,
+            gridcolor: '#bdbdbd',
+        },
+
+        showlegend: false,
+        legend:{
+                bgcolor: 'rgba(255,255,255,0.8)',
+        },
         
         margin: {
             l: 40,
-            r: 0,
+            r: 10,
             b: 40,
             t: 30,
-            pad: 4
+            pad: 0
         },
     };
             
@@ -69,6 +101,7 @@ function plutoplotlyplot(uuid,jsdict,w,h)
             if (graphDiv.data!=undefined )
             {
                 data=graphDiv.data
+                layout=graphDiv.layout
             }
             
             
@@ -93,6 +126,8 @@ function plutoplotlyplot(uuid,jsdict,w,h)
                     dash:  jsdict[cmd+"linestyle"],
                 }
             };
+
+
             
             
             var yrange=jsdict[cmd+"ylimits"]
@@ -109,20 +144,18 @@ function plutoplotlyplot(uuid,jsdict,w,h)
                 layout.xaxis.autorange=false
             }
 
+            layout.title.text=jsdict[cmd+"title"]
 
-            layout.showlegend=jsdict[cmd+"showlegend"] == 1 ? true : false
+            layout.showlegend= layout.showlegend || (jsdict[cmd+"showlegend"] == 1 ? true : false)
 
             var lxpos=jsdict[cmd+"legendxpos"]
             var lypos=jsdict[cmd+"legendypos"]
 
-            layout.legend={
-                bgcolor: 'rgba(255,255,255,0.8)'
-            }
 
             if (lxpos=='r')
             {
-              layout.legend.xanchor='right'
-              layout.legend.x=0.9
+                layout.legend.xanchor="right"
+                layout.legend.x=1
             }
             else if (lxpos=='c')
             {
@@ -137,25 +170,24 @@ function plutoplotlyplot(uuid,jsdict,w,h)
 
             if (lypos=='t')
             {
-              layout.legend.xanchor='top'
+              layout.legend.yanchor='top'
               layout.legend.y=1
             }
             else if (lypos=='c')
             {
-              layout.legend.xanchor='center'
+              layout.legend.yanchor='center'
               layout.legend.y=0.5
             }
             else if (lypos=='b')
             {
-              layout.legend.xanchor='bottom'
+              layout.legend.yanchor='bottom'
               layout.legend.y=0
             }
 
             
             layout.xaxis.title=jsdict[cmd+"xlabel"]
             layout.yaxis.title=jsdict[cmd+"ylabel"]
-
-
+            
             
             data.push(trace)
             
@@ -295,15 +327,16 @@ function plutoplotlyplot(uuid,jsdict,w,h)
             return
         }
     }
-    
+    //,{displayModeBar: false,}
     // after all plot commands
     if (graphDiv.data==undefined)
     {
-        Plotly.newPlot(uuid, data,layout)
+        Plotly.newPlot(uuid, data,layout, {modeBarButtons: buttons,})
     }
     else
     {
-        Plotly.react(uuid, graphDiv.data,layout)
+        Plotly.react(uuid, graphDiv.data,layout, {modeBarButtons: buttons,})
     }
+
     
 }
