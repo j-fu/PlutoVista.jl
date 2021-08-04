@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.14.8
+# v0.15.1
 
 using Markdown
 using InteractiveUtils
@@ -19,7 +19,7 @@ md"""
 """
 
 # ╔═╡ 1cb8eb7c-a763-479f-b15c-ff128fac2f75
-develop=false
+develop=true
 
 # ╔═╡ c102e87a-b570-4d86-b087-3506396fc065
 begin
@@ -56,7 +56,7 @@ The simplest way to plot 1D data is to just plot:
 """
 
 # ╔═╡ 2e92c42c-2923-4f35-9d43-6e38eee3f8f6
-plot(X,cos.(X))
+PlutoVista.plot(X,cos.(X))
 
 # ╔═╡ 09cfb361-b897-40b1-8792-23b00151b995
 md"""
@@ -83,7 +83,7 @@ md"""
 For changing data, we can create the plot first and fill it afterwards.
 """
 
-# ╔═╡ 2bc4ff42-3981-46fa-86f2-8d32ab8bc9ce
+# ╔═╡ c3b719cd-5134-4395-8f36-4daab6ee3bf0
 p1=plot(resolution=(600,300))
 
 # ╔═╡ bdde2452-cf28-4d56-935c-693e6a1ca8a9
@@ -92,7 +92,27 @@ md"""
 """
 
 # ╔═╡ cf9f4d1a-ebcd-4b59-bb0c-cc0d6b3239ca
-plot!(p1,X,sin.(X*xscale1);label="sin",color=:red,linestyle=:dashdot,clear=true)
+begin
+	plot!(p1,X,sin.(X*xscale1);label="sin",color=:red,linestyle=:dashdot,clear=true)
+	plot!(p1,X,cos.(X*xscale1);label="cos",color=:green,linestyle=:dot,clear=false)
+end
+
+# ╔═╡ d5240960-7759-48b8-94fd-3436f7b1573d
+md"""
+### Discontinuous function
+"""
+
+# ╔═╡ b4afef75-450c-45a9-af8b-87224c3591e9
+begin 
+	Xm=collect(-1:0.01:0)
+	Xp=collect(0:0.01:1)
+	Xpm=vcat(Xp,[NaN],Xm)
+	F=vcat(map(x->sin(4π*x),Xm),[NaN],map(x->cos(4π*x),Xp))
+
+end
+
+# ╔═╡ 0c8bc23a-cee1-4d6b-a63e-8f2391fc3f3c
+PlutoVista.plot(Xpm,F,markertype=:star5,markercount=20)
 
 # ╔═╡ d0ea4e21-9d8c-416e-bf68-d7522e2ece20
 md"""
@@ -215,6 +235,15 @@ Work in progress, based on vtk.js.
 # ╔═╡ 6af0b5d7-5324-43b5-8f99-6f5d35d5deba
 TableOfContents()
 
+# ╔═╡ 1151d52b-f82c-4cff-8e30-7c9a5ab2f3c2
+
+
+# ╔═╡ 332805c1-fb48-4cf2-b373-42a36eef2490
+
+
+# ╔═╡ ee1b98b8-e6fc-42fa-88c5-30af1050fd8f
+
+
 # ╔═╡ Cell order:
 # ╟─93ca4fd0-8f61-4174-b459-55f5395c0f56
 # ╠═1cb8eb7c-a763-479f-b15c-ff128fac2f75
@@ -225,11 +254,14 @@ TableOfContents()
 # ╠═2e92c42c-2923-4f35-9d43-6e38eee3f8f6
 # ╟─09cfb361-b897-40b1-8792-23b00151b995
 # ╠═60dcfcf5-391e-418f-8e7c-3a0fe94f1e0d
-# ╠═f44deb76-e715-477c-9e8a-dcf5cd68577f
+# ╟─f44deb76-e715-477c-9e8a-dcf5cd68577f
 # ╟─76d7a50d-40da-4367-a84f-3e2324e0c78d
-# ╠═2bc4ff42-3981-46fa-86f2-8d32ab8bc9ce
+# ╠═c3b719cd-5134-4395-8f36-4daab6ee3bf0
 # ╠═cf9f4d1a-ebcd-4b59-bb0c-cc0d6b3239ca
 # ╟─bdde2452-cf28-4d56-935c-693e6a1ca8a9
+# ╟─d5240960-7759-48b8-94fd-3436f7b1573d
+# ╠═b4afef75-450c-45a9-af8b-87224c3591e9
+# ╠═0c8bc23a-cee1-4d6b-a63e-8f2391fc3f3c
 # ╟─d0ea4e21-9d8c-416e-bf68-d7522e2ece20
 # ╟─f15a91a4-a03b-4125-ba58-e44d9792a7e3
 # ╠═ab232244-4fe2-4ab0-a0bf-d1d9510802d2
@@ -256,3 +288,6 @@ TableOfContents()
 # ╠═b8d504dd-d056-4e28-989e-b07259acd5d6
 # ╟─d1e13f8c-7cb8-4cb5-9dda-1a9b5d6142b6
 # ╟─6af0b5d7-5324-43b5-8f99-6f5d35d5deba
+# ╠═1151d52b-f82c-4cff-8e30-7c9a5ab2f3c2
+# ╠═332805c1-fb48-4cf2-b373-42a36eef2490
+# ╠═ee1b98b8-e6fc-42fa-88c5-30af1050fd8f

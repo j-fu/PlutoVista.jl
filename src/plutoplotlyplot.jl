@@ -46,6 +46,8 @@ function Base.show(io::IO, ::MIME"text/html", p::PlutoPlotlyPlot)
         plutoplotlyplot("$(p.uuid)",jsdict,$(p.w), $(p.h))        
         </script>
         """
+    # updating only works when the div remains as output from another cell
+    # so we can't create a plot and update it in the cell with the draing commands
     if !p.update
         result=result*"""
         <p>

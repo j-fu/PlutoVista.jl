@@ -10,23 +10,30 @@ function PlutoVistaPlot(;resolution=(300,300),kwargs...)
     p
 end
 
-function backend!(p::PlutoVistaPlot; datadim=1, backend=:default)
-    if isnothing(p.backend)
-        if backend==:default
-            if datadim == 1
-                backend=:plotly
-            else
-                backend=:vtk
-            end
-        end
-        
-        if backend == :plotly
-            p.backend=PlutoPlotlyPlot(;resolution=p.resolution)
-        elseif backend == :vtk
-            p.backend=PlutoVTKPlot(;resolution=p.resolution)
+"""
+    backend!(p::PlutoVistaPlot; datadim=1, backend=:default, clear=true)
+
+Overwrite backend if clear is true.
+"""
+function backend!(p::PlutoVistaPlot; datadim=1, backend=:default, clear=true)
+    if backend==:default
+        if datadim == 1
+            backend=:plotly
         else
-            error("No valid backend: $(backend). Valid backends: :default, :vtk, :plotly")
+            backend=:vtk
         end
+    end
+    
+    if backend == :plotly
+        if isnothing(p.backend)  || clear
+            p.backend=PlutoPlotlyPlot(;resolution=p.resolution)
+        end
+    elseif backend == :vtk 
+        if isnothing(p.backend)  || clear
+            p.backend=PlutoVTKPlot(;resolution=p.resolution)
+        end
+    else
+        error("No valid backend: $(backend). Valid backends: :default, :vtk, :plotly")
     end
     p.backend
 end
@@ -36,13 +43,13 @@ Base.show(io::IO, mime::MIME"text/html", p::Nothing)=nothing
 Base.show(io::IO, mime::MIME"text/html", p::PlutoVistaPlot)=Base.show(io,mime,p.backend)
 
 plot(x,y; kwargs...)=plot!(PlutoVistaPlot(;kwargs...),x,y;kwargs...)
-plot!(p::PlutoVistaPlot,x,y; backend=:plotly, kwargs...)=plot!(backend!(p,datadim=1,backend=backend),
-                                                               x,y;kwargs...)
+plot!(p::PlutoVistaPlot,x,y; backend=:plotly, clear=true, kwargs...)=plot!(backend!(p,datadim=1,backend=backend,clear=clear),
+                                                               x,y;clear=clear,kwargs...)
 
 
-function plot(;kwargs...)
+function plot(;datadim=1,backend=:default,kwargs...)
     p=PlutoVistaPlot(;kwargs...)
-    backend!(p,datadim=1)
+    backend!(p,datadim=datadim,backend=backend)
 end
 
 
