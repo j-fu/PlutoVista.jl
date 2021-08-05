@@ -19,7 +19,7 @@ md"""
 """
 
 # ╔═╡ 1cb8eb7c-a763-479f-b15c-ff128fac2f75
-develop=true
+develop=false
 
 # ╔═╡ c102e87a-b570-4d86-b087-3506396fc065
 begin
@@ -235,15 +235,6 @@ Work in progress, based on vtk.js.
 # ╔═╡ 6af0b5d7-5324-43b5-8f99-6f5d35d5deba
 TableOfContents()
 
-# ╔═╡ 1151d52b-f82c-4cff-8e30-7c9a5ab2f3c2
-
-
-# ╔═╡ 332805c1-fb48-4cf2-b373-42a36eef2490
-
-
-# ╔═╡ ee1b98b8-e6fc-42fa-88c5-30af1050fd8f
-
-
 # ╔═╡ Cell order:
 # ╟─93ca4fd0-8f61-4174-b459-55f5395c0f56
 # ╠═1cb8eb7c-a763-479f-b15c-ff128fac2f75
@@ -288,6 +279,3 @@ TableOfContents()
 # ╠═b8d504dd-d056-4e28-989e-b07259acd5d6
 # ╟─d1e13f8c-7cb8-4cb5-9dda-1a9b5d6142b6
 # ╟─6af0b5d7-5324-43b5-8f99-6f5d35d5deba
-# ╠═1151d52b-f82c-4cff-8e30-7c9a5ab2f3c2
-# ╠═332805c1-fb48-4cf2-b373-42a36eef2490
-# ╠═ee1b98b8-e6fc-42fa-88c5-30af1050fd8f
