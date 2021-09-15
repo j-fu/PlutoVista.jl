@@ -65,7 +65,7 @@ end
 
 
 trimesh(pts,tris; kwargs...)=trimesh!(PlutoVistaPlot(;kwargs...),pts,tris; kwargs...)
-trimesh!(p::PlutoVistaPlot,pts,tris,f;backend=:vtk, kwargs...)=trimesh!(backend!(p,datadim=2,backend=backend),
+trimesh!(p::PlutoVistaPlot,pts,tris; backend=:vtk, kwargs...)=trimesh!(backend!(p,datadim=2,backend=backend),
                                                                         pts,tris; kwargs...)
 
 function trimesh(;kwargs...)

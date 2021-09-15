@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.15.1
+# v0.16.0
 
 using Markdown
 using InteractiveUtils
@@ -19,7 +19,7 @@ md"""
 """
 
 # ╔═╡ 1cb8eb7c-a763-479f-b15c-ff128fac2f75
-develop=false
+develop=true
 
 # ╔═╡ c102e87a-b570-4d86-b087-3506396fc065
 begin
@@ -130,14 +130,14 @@ Let us make a triangulation using the Triangulate.jl package, define a piecewise
 
 # ╔═╡ ab232244-4fe2-4ab0-a0bf-d1d9510802d2
 function maketriangulation(maxarea)
-    triin=Triangulate.TriangulateIO()
+     triin=Triangulate.TriangulateIO()
     triin.pointlist=Matrix{Cdouble}([-1.0 -1.0 ; 1.0 -1.0 ; 1.0 2 ; -1.0 1.0]')
-    triin.segmentlist=Matrix{Cint}([1 2 ; 2 3 ; 3 4 ; 4 1 ]')
-    triin.segmentmarkerlist=Vector{Int32}([1, 2, 3, 4])
-    area=@sprintf("%.15f",maxarea)
-    (triout, vorout)=Triangulate.triangulate("pa$(area)DQ", triin)
-    triout.pointlist, triout.trianglelist
-end
+    triin.segmentlist=Matrix{Cint}([1 2 ; 2 3 ; 3 4 ; 4 1; 4 2 ]')
+    triin.segmentmarkerlist=Vector{Int32}([1, 2, 3, 4, 6])
+    triin.regionlist=Matrix{Cdouble}([-0.9 0.9; -0.9 0.9; 1 2 ; 2.0*maxarea maxarea])
+    (triout, vorout)=Triangulate.triangulate("paADQ", triin)
+    triout.pointlist, triout.trianglelist,Int.(vec(triout.triangleattributelist)),triout.segmentlist,triout.segmentmarkerlist
+end;
 
 # ╔═╡ 724495e1-d501-4a03-be88-16b644938afd
 md"""
@@ -145,12 +145,15 @@ Change grid resolution: $(@bind resolution Slider(10:200))
 """
 
 # ╔═╡ d3ad0d4f-859d-44ac-a387-aac8d465cc6d
-(pts,tris)=maketriangulation(1/resolution^2)
+(pts,tris,markers,edges,edgemarkers)=maketriangulation(1/resolution^2)
 
 # ╔═╡ 83c7bffd-16c6-4cc7-8a68-87cbd739f3f4
 md"""
 The grid has $(size(pts,2)) points and $(size(tris,2))  triangles.
 """
+
+# ╔═╡ 83be4a71-4f01-4f70-9cbe-f4e9b9222428
+trimesh(pts,tris;markers=markers,edges=edges,edgemarkers=edgemarkers)
 
 # ╔═╡ ee9a6fb2-3978-40f4-803b-7cb8d50b4fac
 func=0.5*[sin(10*pts[1,i])*cos(10*pts[2,i]) for i=1:size(pts,2)];
@@ -258,8 +261,9 @@ TableOfContents()
 # ╠═ab232244-4fe2-4ab0-a0bf-d1d9510802d2
 # ╠═d3ad0d4f-859d-44ac-a387-aac8d465cc6d
 # ╟─83c7bffd-16c6-4cc7-8a68-87cbd739f3f4
-# ╠═ee9a6fb2-3978-40f4-803b-7cb8d50b4fac
 # ╟─724495e1-d501-4a03-be88-16b644938afd
+# ╠═83be4a71-4f01-4f70-9cbe-f4e9b9222428
+# ╠═ee9a6fb2-3978-40f4-803b-7cb8d50b4fac
 # ╠═c6d700ec-91a1-4ef7-a104-8574cc162b9a
 # ╠═8b25e922-12db-4fae-8f28-65fe4faf40f3
 # ╟─dce20465-d227-4273-82b7-c6a4621942b9
