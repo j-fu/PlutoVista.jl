@@ -177,25 +177,69 @@ function tricontour!(p::PlutoVTKPlot, pts, tris,f;colormap=:viridis, isolines=0,
 end
 
 
-contour!(p::PlutoVTKPlot,X,Y,f; kwargs...)=tricontour!(p,triang(X,Y)...,vec(f);kwargs...)
-#contour!(p::PlutoVTKPlot,X,Y,f)=tricontour!(p,triang(X,Y)...,vec(f))
 
+"""
+     tetcontour!(p::PlutoVTKPlot,pts, tets,f; colormap, isolevels, xplane, yplane, zplane)
 
+Plot piecewise linear function on  tetrahedral mesh.
+"""
+function tetcontour!(p::PlutoVTKPlot, pts, tets,func;colormap=:viridis,
+                     flevel=prevfloat(Inf), flimits=(1.0,-1.0),
+                     xplane=prevfloat(Inf), yplane=prevfloat(Inf), zplane=prevfloat(Inf))
 
-function plot!(p::PlutoVTKPlot,x,y; kwargs...)
-    command!(p,"plot")
-    n=length(x)
-    points=vec(vcat(x',y',zeros(n)'))
-    lines=collect(UInt16,0:n)
-    lines[1]=n
-    parameter!(p,"points",points)
-    parameter!(p,"lines",lines)
-    parameter!(p,"cam","2D")
+    p.jsdict=Dict{String,Any}("cmdcount" => 0)
+    command!(p,"tetcontour")
+
+    xyzmin=zeros(3)
+    xyzmax=ones(3)
+
+    @views for idim=1:3
+        xyzmin[idim]=minimum(pts[idim,:])
+        xyzmax[idim]=maximum(pts[idim,:])
+    end
+    xyzcut=[xplane,yplane,zplane]
+    fminmax=extrema(func)
+    if flimits[1]<flimits[2]
+        fminmax[1]=flimits[1]
+        fminmax[2]=flimits[2]
+    end
+
+    
+    xplane=max(xyzmin[1],min(xyzmax[1],xplane ))
+    yplane=max(xyzmin[2],min(xyzmax[2],yplane ))
+    zplane=max(xyzmin[3],min(xyzmax[3],zplane ))
+    flevel=max(fminmax[1],min(fminmax[2],flevel))
+
+    cpts0,faces0,values=GridVisualize.marching_tetrahedra(pts,tets,func,
+                                                          primepoints=hcat(xyzmin,xyzmax),
+                                                          primevalues=fminmax,
+                                                          GridVisualize.makeplanes(xyzmin,xyzmax,xplane,yplane,zplane),
+                                                          [flevel])
+
+    faces=reshape(reinterpret(Int32,faces0),(3,length(faces0)))
+    cpts=copy(reinterpret(Float32,cpts0))
+    parameter!(p,"points",cpts)
+    parameter!(p,"polys",vtkpolys(faces))
+    rgb=reinterpret(Float64,get(colorschemes[colormap],values,fminmax))
+    parameter!(p,"colors",UInt8.(floor.(rgb*255)))
+    axis3d!(p)
     p
 end
 
 
 
+
+contour!(p::PlutoVTKPlot,X,Y,f; kwargs...)=tricontour!(p,triang(X,Y)...,vec(f);kwargs...)
+#contour!(p::PlutoVTKPlot,X,Y,f)=tricontour!(p,triang(X,Y)...,vec(f))
+
+
+
+
+"""
+     tetmesh!(p::PlutoVTKPlot,pts, tris;markers, colormap, edges, edgemarkers, edgecolormap)
+
+Plot piecewise linear function on  triangular grid given as "heatmap" 
+"""
 function trimesh!(p::PlutoVTKPlot,pts, tris;
                   markers=nothing,  colormap=:glasbey_hv_n256,
                   edges=nothing, edgemarkers=nothing, edgecolormap=:glasbey_hv_n256)
@@ -252,6 +296,24 @@ function trimesh!(p::PlutoVTKPlot,pts, tris;
     axis2d!(p)
     p
 end
+
+
+
+
+
+function plot!(p::PlutoVTKPlot,x,y; kwargs...)
+    command!(p,"plot")
+    n=length(x)
+    points=vec(vcat(x',y',zeros(n)'))
+    lines=collect(UInt16,0:n)
+    lines[1]=n
+    parameter!(p,"points",points)
+    parameter!(p,"lines",lines)
+    parameter!(p,"cam","2D")
+    p
+end
+
+
 
 
 

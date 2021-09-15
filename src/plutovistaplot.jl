@@ -64,6 +64,17 @@ function tricontour(;kwargs...)
 end
 
 
+
+tetcontour(pts,tets,f; kwargs...)=tetcontour!(PlutoVistaPlot(;kwargs...),pts,tets,f; kwargs...)
+tetcontour!(p::PlutoVistaPlot,pts,tets,f;backend=:vtk, kwargs...)=tetcontour!(backend!(p,datadim=2,backend=backend),
+                                                                              pts,tets,f; kwargs...)
+function tetcontour(;kwargs...)
+    p=PlutoVistaPlot(;kwargs...)
+    backend!(p,datadim=3)
+end
+
+
+
 trimesh(pts,tris; kwargs...)=trimesh!(PlutoVistaPlot(;kwargs...),pts,tris; kwargs...)
 trimesh!(p::PlutoVistaPlot,pts,tris; backend=:vtk, kwargs...)=trimesh!(backend!(p,datadim=2,backend=backend),
                                                                         pts,tris; kwargs...)
@@ -72,7 +83,6 @@ function trimesh(;kwargs...)
     p=PlutoVistaPlot(;kwargs...)
     backend!(p,datadim=2)
 end
-
 
 
 

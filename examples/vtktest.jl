@@ -25,7 +25,7 @@ develop=true
 begin
     using Pkg
     Pkg.activate(mktempdir())
-    Pkg.add(["PlutoUI","Triangulate"])
+    Pkg.add(["PlutoUI","Triangulate","ExtendableGrids"])
 	Pkg.add("Revise");using Revise
     if develop	
 	    Pkg.develop("PlutoVista")
@@ -36,6 +36,7 @@ begin
     using PlutoVista
     using Printf
     using Triangulate
+	using ExtendableGrids
 end
 
 # ╔═╡ 7c06fcf0-8c98-49f7-add8-435f57a9c9da
@@ -92,6 +93,37 @@ end
 # ╔═╡ 1d19e6a0-118f-4b94-b9fb-3b16f98e31fc
 markers
 
+# ╔═╡ 2e3546f6-eb47-4693-aa00-902570fab7b5
+function grid3d(;n=15)
+    X=collect(0:1/n:1)
+    g=simplexgrid(X,X,X)
+end
+
+# ╔═╡ bd0a59a2-564d-42bd-ab6f-a50b26f9241f
+function func3d(;n=15)
+    g=grid3d(n=n)
+    g, map((x,y,z)->sinpi(2*x)*sinpi(3.5*y)*sinpi(1.5*z),g)
+end
+
+# ╔═╡ 368b8cf5-fabd-4b84-b33c-b15c4452393b
+	g,f=func3d(;n=49)
+
+# ╔═╡ f64729e4-d2b4-40d3-acbb-1395dbe0337d
+p3d=PlutoVTKPlot(resolution=(500,500))
+
+# ╔═╡ 7be35f33-5f7a-4765-8bb6-1487e209efc8
+md"""
+f: $(@bind flevel Slider(0:0.01:1,show_value=true,default=0.45))
+
+x: $(@bind xplane Slider(0:0.01:1,show_value=true,default=0.45))
+y: $(@bind yplane Slider(0:0.01:1,show_value=true,default=0.45))
+z: $(@bind zplane Slider(0:0.01:1,show_value=true,default=0.45))
+"""
+
+# ╔═╡ 3681ef5b-c794-44da-9fe7-cedcd68b426c
+tetcontour!(p3d,g[Coordinates],g[CellNodes],f;flevel=flevel,
+	xplane=xplane,yplane=yplane,zplane=zplane)
+
 # ╔═╡ Cell order:
 # ╟─93ca4fd0-8f61-4174-b459-55f5395c0f56
 # ╠═2acd1978-03b1-4e8f-ba9f-2b3d58123613
@@ -108,3 +140,9 @@ markers
 # ╠═81046dcd-3cfb-4133-943f-61b9b3cdb183
 # ╠═7019ce3f-f2db-4581-8bd9-64f76231a62a
 # ╠═1d19e6a0-118f-4b94-b9fb-3b16f98e31fc
+# ╠═2e3546f6-eb47-4693-aa00-902570fab7b5
+# ╠═bd0a59a2-564d-42bd-ab6f-a50b26f9241f
+# ╠═368b8cf5-fabd-4b84-b33c-b15c4452393b
+# ╠═f64729e4-d2b4-40d3-acbb-1395dbe0337d
+# ╠═7be35f33-5f7a-4765-8bb6-1487e209efc8
+# ╠═3681ef5b-c794-44da-9fe7-cedcd68b426c

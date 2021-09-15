@@ -105,6 +105,45 @@ function plutovtkplot(uuid,jsdict,invalidation)
             }
             win.renderWindow.render();
         }
+        if (jsdict[cmd]=="tetcontour")
+        {
+
+            var win=window[uuid+"data"]
+            // see https://discourse.vtk.org/t/manually-create-polydata-in-vtk-js/885/15
+            if (win.dataset==undefined)
+            {
+                update=false
+            }
+    	    var points=jsdict[cmd+"points"]
+ 	    var polys=jsdict[cmd+"polys"]
+            var colors=jsdict[cmd+"colors"]
+
+            /// need to use LUT here!
+            var colorData = vtk.Common.Core.vtkDataArray.newInstance({
+                name: 'Colors',
+                values: colors,
+                numberOfComponents: 3,
+            });
+
+            
+            if (!update)
+            {
+                win.dataset = vtk.Common.DataModel.vtkPolyData.newInstance();
+                win.actor = vtk.Rendering.Core.vtkActor.newInstance();
+                var mapper = vtk.Rendering.Core.vtkMapper.newInstance();
+                mapper.setInputData(win.dataset);
+                mapper.setColorModeToDirectScalars()
+                win.actor.setMapper(mapper);
+                win.renderer.addActor(win.actor);
+            }
+            
+            win.dataset.getPoints().setData(points, 3);
+            win.dataset.getPolys().setData(polys,1);
+            win.dataset.getPointData().setActiveScalars('Colors');
+            win.dataset.getPointData().setScalars(colorData);        
+            win.dataset.modified()
+            win.renderWindow.render();
+        }
         else if (jsdict[cmd]=="trimesh")
         {
             var win=window[uuid+"data"]
