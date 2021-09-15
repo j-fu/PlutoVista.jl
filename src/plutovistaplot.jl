@@ -64,6 +64,17 @@ function tricontour(;kwargs...)
 end
 
 
+trimesh(pts,tris; kwargs...)=trimesh!(PlutoVistaPlot(;kwargs...),pts,tris; kwargs...)
+trimesh!(p::PlutoVistaPlot,pts,tris,f;backend=:vtk, kwargs...)=trimesh!(backend!(p,datadim=2,backend=backend),
+                                                                        pts,tris; kwargs...)
+
+function trimesh(;kwargs...)
+    p=PlutoVistaPlot(;kwargs...)
+    backend!(p,datadim=2)
+end
+
+
+
 
 contour(X,Y,f; kwargs...)=contour!(PlutoVistaPlot(;kwargs...),X,Y,f; kwargs...)
 contour!(p::PlutoVistaPlot,X,Y,f; backend=:vtk, kwargs...)=contour!(backend!(p,datadim=2,backend=backend),

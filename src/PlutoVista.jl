@@ -10,7 +10,8 @@ abstract type AbstractPlutoVistaBackend end
 
 include("plutovtkplot.jl")
 export PlutoVTKPlot
-export tricontour!,contour,contour!
+export tricontour!,contour!
+export trimesh!
 
 
 include("plutoplotlyplot.jl")
@@ -21,6 +22,7 @@ export PlutoPlotlyPlot
 # Experimental:
 export triupdate!,  triplot!
 export axis3d!, axis2d!
+
 include("plutocanvasplot.jl")
 export polygon!,linecolor!, fillcolor!
 export textcolor!,textsize!,text!
@@ -33,7 +35,7 @@ export PlutoCanvasPlot
 # API
 include("plutovistaplot.jl")
 export PlutoVistaPlot
-export  tricontour, contour
+export  tricontour,trimesh,contour
 
 
 end # module

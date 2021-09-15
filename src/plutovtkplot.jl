@@ -195,6 +195,56 @@ function plot!(p::PlutoVTKPlot,x,y; kwargs...)
 end
 
 
+
+function trimesh!(p::PlutoVTKPlot,pts, tris;
+                  markers=nothing,  colormap=:glasbey_hv_n256,
+                  edges=nothing, edgemarkers=nothing, edgecolormap=:glasbey_hv_n256)
+
+
+    ntri=size(tris,2)
+    command!(p,"trimesh")
+    zcoord=zeros(size(pts,2))
+    ntri=size(tris,2)
+    parameter!(p,"points",vec(vcat(pts,zcoord')))
+    parameter!(p,"polys",vtkpolys(tris))
+
+    
+    if markers!=nothing
+        (fmin,fmax)=extrema(markers)
+        rgb=reinterpret(Float64,get(colorschemes[colormap],markers,(1,fmax)))
+        parameter!(p,"colors",UInt8.(floor.(rgb*255)))
+    else
+        parameter!(p,"colors","none")
+    end
+
+    if edges!=nothing
+        nedges=size(edges,2)
+        lines=Vector{UInt32}(undef,3*nedges)
+        iline=0
+        for i=1:nedges
+            lines[iline+1]=2
+            lines[iline+2]=edges[1,i]-1  #  0-1 discrepancy between jl and js...
+            lines[iline+3]=edges[2,i]-1
+            iline=iline+3
+        end
+        parameter!(p,"lines",lines)
+
+        if edgemarkers!=nothing
+            (fmin,fmax)=Int64.(extrema(edgemarkers))
+            edgergb=reinterpret(Float64,get(colorschemes[edgecolormap],edgemarkers,(1,fmax)))
+            parameter!(p,"linecolors",UInt8.(floor.(edgergb*255)))
+        else
+            parameter!(p,"linecolors","none")
+        end
+    else
+        parameter!(p,"lines","none")
+    end
+    axis2d!(p)
+    p
+end
+
+
+
 #####################################
 # Experimental part
 """
