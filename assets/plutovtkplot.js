@@ -66,7 +66,7 @@ function plutovtkplot(uuid,jsdict,invalidation)
                 numberOfComponents: 3,
             });
 
-
+            
             if (!update)
             {
                 win.dataset = vtk.Common.DataModel.vtkPolyData.newInstance();
@@ -120,7 +120,6 @@ function plutovtkplot(uuid,jsdict,invalidation)
             var lines=jsdict[cmd+"lines"]
             var linecolors=jsdict[cmd+"linecolors"]
 
-
             if (colors!="none")
             {
                 /// need to use LUT here!
@@ -164,8 +163,8 @@ function plutovtkplot(uuid,jsdict,invalidation)
                 win.celldataset.getPolys().setData(polys,1);
                 win.celldataset.getCellData().setActiveScalars('Colors');
                 win.celldataset.getCellData().setScalars(colorData);        
+                win.celldataset.modified()
             }
-            win.dataset.modified()
             win.dataset.getPoints().setData(points, 3);
             win.dataset.getPolys().setData(polys,1);
             win.dataset.modified()

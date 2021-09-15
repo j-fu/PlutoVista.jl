@@ -208,10 +208,14 @@ function trimesh!(p::PlutoVTKPlot,pts, tris;
     parameter!(p,"points",vec(vcat(pts,zcoord')))
     parameter!(p,"polys",vtkpolys(tris))
 
-    
     if markers!=nothing
         (fmin,fmax)=extrema(markers)
-        rgb=reinterpret(Float64,get(colorschemes[colormap],markers,(1,fmax)))
+        if typeof(colormap)==Symbol
+            cmap=colorschemes[colormap]
+        else
+            cmap=ColorScheme(colormap)
+        end
+        rgb=reinterpret(Float64,get(cmap,markers,(1,fmax+1)))
         parameter!(p,"colors",UInt8.(floor.(rgb*255)))
     else
         parameter!(p,"colors","none")
@@ -231,13 +235,19 @@ function trimesh!(p::PlutoVTKPlot,pts, tris;
 
         if edgemarkers!=nothing
             (fmin,fmax)=Int64.(extrema(edgemarkers))
-            edgergb=reinterpret(Float64,get(colorschemes[edgecolormap],edgemarkers,(1,fmax)))
+            if typeof(edgecolormap)==Symbol
+                ecmap=colorschemes[edgecolormap]
+            else
+                ecmap=ColorScheme(edgecolormap)
+            end
+            edgergb=reinterpret(Float64,get(ecmap,edgemarkers,(1,fmax+1)))
             parameter!(p,"linecolors",UInt8.(floor.(edgergb*255)))
         else
             parameter!(p,"linecolors","none")
         end
     else
         parameter!(p,"lines","none")
+        parameter!(p,"linecolors","none")
     end
     axis2d!(p)
     p

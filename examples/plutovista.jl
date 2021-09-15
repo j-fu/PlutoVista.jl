@@ -124,8 +124,7 @@ as a backend and ths us uses GPU acceleration via the WebGL interface.
 
 # ╔═╡ f15a91a4-a03b-4125-ba58-e44d9792a7e3
 md"""
-### tricontour
-Let us make a triangulation using the Triangulate.jl package, define a piecewise linear function on it and plot this function
+Let us make a triangulation using the Triangulate.jl package, plot it, define a piecewise linear function on it and plot this function.
 """
 
 # ╔═╡ ab232244-4fe2-4ab0-a0bf-d1d9510802d2
@@ -152,8 +151,18 @@ md"""
 The grid has $(size(pts,2)) points and $(size(tris,2))  triangles.
 """
 
+# ╔═╡ da3bdabb-b81c-4c05-90cd-aee7b209e605
+md"""
+### trimesh
+"""
+
 # ╔═╡ 83be4a71-4f01-4f70-9cbe-f4e9b9222428
 trimesh(pts,tris;markers=markers,edges=edges,edgemarkers=edgemarkers)
+
+# ╔═╡ 8186bd23-5727-4d87-805c-5e5c6a092535
+md"""
+### tricontour
+"""
 
 # ╔═╡ ee9a6fb2-3978-40f4-803b-7cb8d50b4fac
 func=0.5*[sin(10*pts[1,i])*cos(10*pts[2,i]) for i=1:size(pts,2)];
@@ -262,7 +271,9 @@ TableOfContents()
 # ╠═d3ad0d4f-859d-44ac-a387-aac8d465cc6d
 # ╟─83c7bffd-16c6-4cc7-8a68-87cbd739f3f4
 # ╟─724495e1-d501-4a03-be88-16b644938afd
+# ╟─da3bdabb-b81c-4c05-90cd-aee7b209e605
 # ╠═83be4a71-4f01-4f70-9cbe-f4e9b9222428
+# ╟─8186bd23-5727-4d87-805c-5e5c6a092535
 # ╠═ee9a6fb2-3978-40f4-803b-7cb8d50b4fac
 # ╠═c6d700ec-91a1-4ef7-a104-8574cc162b9a
 # ╠═8b25e922-12db-4fae-8f28-65fe4faf40f3

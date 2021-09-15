@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.14.8
+# v0.16.0
 
 using Markdown
 using InteractiveUtils
@@ -42,11 +42,11 @@ end
 function maketriangulation(maxarea)
     triin=Triangulate.TriangulateIO()
     triin.pointlist=Matrix{Cdouble}([-1.0 -1.0 ; 1.0 -1.0 ; 1.0 2 ; -1.0 1.0]')
-    triin.segmentlist=Matrix{Cint}([1 2 ; 2 3 ; 3 4 ; 4 1 ]')
-    triin.segmentmarkerlist=Vector{Int32}([1, 2, 3, 4])
-    area=@sprintf("%.15f",maxarea)
-    (triout, vorout)=triangulate("pa$(area)DQ", triin)
-    triout.pointlist, triout.trianglelist
+    triin.segmentlist=Matrix{Cint}([1 2 ; 2 3 ; 3 4 ; 4 1; 4 2 ]')
+    triin.segmentmarkerlist=Vector{Int32}([1, 2, 3, 4, 6])
+    triin.regionlist=Matrix{Cdouble}([-0.9 0.9; -0.9 0.9; 1 2 ; 2.0*maxarea maxarea])
+    (triout, vorout)=triangulate("paADQ", triin)
+    triout.pointlist, triout.trianglelist,Int.(vec(triout.triangleattributelist)),triout.segmentlist,triout.segmentmarkerlist
 end
 
 # ╔═╡ 60dcfcf5-391e-418f-8e7c-3a0fe94f1e0d
@@ -58,7 +58,7 @@ Change grid resolution: $(@bind resolution Slider(5:200))
 """
 
 # ╔═╡ 890710fe-dac0-4256-b1ba-79776f1ea7e5
-(pts,tris)=maketriangulation(1/resolution^2)
+(pts,tris,markers,edges,edgemarkers)=maketriangulation(1/resolution^2)
 
 # ╔═╡ b8a976e3-7fef-4527-ae6a-4da31c93a04f
 func=0.5*[sin(10*pts[1,i])*cos(10*pts[2,i]) for i=1:size(pts,2)]
@@ -83,6 +83,15 @@ let
 	tricontour!(p,pts,tris,func;cmap=:spring,isolines=-0.5:0.1:0.5)
 end
 
+# ╔═╡ 7019ce3f-f2db-4581-8bd9-64f76231a62a
+let
+	p=PlutoVTKPlot(resolution=(300,300))
+	trimesh!(p,pts,tris;markers=markers,edges=edges,edgemarkers=edgemarkers)
+end
+
+# ╔═╡ 1d19e6a0-118f-4b94-b9fb-3b16f98e31fc
+markers
+
 # ╔═╡ Cell order:
 # ╟─93ca4fd0-8f61-4174-b459-55f5395c0f56
 # ╠═2acd1978-03b1-4e8f-ba9f-2b3d58123613
@@ -97,3 +106,5 @@ end
 # ╠═e76f8a6a-ab91-454a-b200-cfc8b57eb331
 # ╟─bce0cfe7-4112-4bb8-aac6-43885f3746a9
 # ╠═81046dcd-3cfb-4133-943f-61b9b3cdb183
+# ╠═7019ce3f-f2db-4581-8bd9-64f76231a62a
+# ╠═1d19e6a0-118f-4b94-b9fb-3b16f98e31fc
