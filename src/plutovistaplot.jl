@@ -15,7 +15,7 @@ end
 
 Overwrite backend if clear is true.
 """
-function backend!(p::PlutoVistaPlot; datadim=1, backend=:default, clear=true)
+function backend!(p::PlutoVistaPlot; datadim=1, backend=:default, clear=false)
     if backend==:default
         if datadim == 1
             backend=:plotly
@@ -25,11 +25,11 @@ function backend!(p::PlutoVistaPlot; datadim=1, backend=:default, clear=true)
     end
     
     if backend == :plotly
-        if isnothing(p.backend)  || clear
+        if isnothing(p.backend)  || typeof(p.backend)!=PlutoPlotlyPlot || clear
             p.backend=PlutoPlotlyPlot(;resolution=p.resolution)
         end
     elseif backend == :vtk 
-        if isnothing(p.backend)  || clear
+        if isnothing(p.backend)  || typeof(p.backend)!=PlutoVTKPlot || clear
             p.backend=PlutoVTKPlot(;resolution=p.resolution)
         end
     else
