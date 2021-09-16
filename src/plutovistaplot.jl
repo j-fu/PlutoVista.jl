@@ -11,7 +11,7 @@ function PlutoVistaPlot(;resolution=(300,300),kwargs...)
 end
 
 """
-    backend!(p::PlutoVistaPlot; datadim=1, backend=:default, clear=true)
+    backend!(p::PlutoVistaPlot; datadim=1, backend=:default, clear=false)
 
 Overwrite backend if clear is true.
 """
@@ -43,7 +43,7 @@ Base.show(io::IO, mime::MIME"text/html", p::Nothing)=nothing
 Base.show(io::IO, mime::MIME"text/html", p::PlutoVistaPlot)=Base.show(io,mime,p.backend)
 
 plot(x,y; kwargs...)=plot!(PlutoVistaPlot(;kwargs...),x,y;kwargs...)
-plot!(p::PlutoVistaPlot,x,y; backend=:plotly, clear=true, kwargs...)=plot!(backend!(p,datadim=1,backend=backend,clear=clear),
+plot!(p::PlutoVistaPlot,x,y; backend=:plotly, clear=false, kwargs...)=plot!(backend!(p,datadim=1,backend=backend,clear=clear),
                                                                x,y;clear=clear,kwargs...)
 
 

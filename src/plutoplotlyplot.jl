@@ -119,12 +119,13 @@ function plot!(p::PlutoPlotlyPlot,x,y;
     parameter!(p,"ylabel",ylabel)
     parameter!(p,"title",title)
 
-    parameter!(p,"showlegend",legend == :none ? 0 : 1)
-
-    slegend=String(legend)
-    parameter!(p,"legendxpos",slegend[1:1])
-    parameter!(p,"legendypos",slegend[2:2])
-
+    if legend==:none
+        parameter!(p,"showlegend",0)
+        slegend=String(legend)
+        parameter!(p,"legendxpos",slegend[1:1])
+        parameter!(p,"legendypos",slegend[2:2])
+    end
+    
     parameter!(p,"clear",clear ? 1 : 0)
    
     
