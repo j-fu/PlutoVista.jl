@@ -118,7 +118,7 @@ function plot!(p::PlutoPlotlyPlot,x,y;
     parameter!(p,"xlabel",xlabel)
     parameter!(p,"ylabel",ylabel)
     parameter!(p,"title",title)
-
+    
     if legend==:none
         parameter!(p,"showlegend",0)
         slegend=String(legend)
@@ -137,6 +137,7 @@ function plot!(p::PlutoPlotlyPlot,x,y;
         rgb=UInt8.(floor.(rgb*255))
         parameter!(p,"color",rgb)
     end
+    p
 end
 
 
