@@ -121,6 +121,8 @@ function plot!(p::PlutoPlotlyPlot,x,y;
     
     if legend==:none
         parameter!(p,"showlegend",0)
+    else
+        parameter!(p,"showlegend",1)
         slegend=String(legend)
         parameter!(p,"legendxpos",slegend[1:1])
         parameter!(p,"legendypos",slegend[2:2])
