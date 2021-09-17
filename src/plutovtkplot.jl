@@ -88,20 +88,21 @@ end
 
 
 """
-       vtkpolys(tris)
+       vtkpolys(tris; offset=0)
 Set up  polygon data for vtk. 
 Coding is   [3, i11, i12, i13,   3 , i21, i22 ,i23, ...]
 Careful: js indexing counts from zero
 """
-function vtkpolys(tris)
+function vtkpolys(tris; offset=0)
     ipoly=1
     ntri=size(tris,2)
+    off=offset-1
     polys=Vector{Int32}(undef,4*ntri)
     for itri=1:ntri
         polys[ipoly] = 3
-        polys[ipoly+1] = tris[1,itri]-1
-        polys[ipoly+2] = tris[2,itri]-1
-        polys[ipoly+3] = tris[3,itri]-1
+        polys[ipoly+1] = tris[1,itri]+off
+        polys[ipoly+2] = tris[2,itri]+off
+        polys[ipoly+3] = tris[3,itri]+off
         ipoly+=4
     end
     polys
@@ -236,24 +237,29 @@ contour!(p::PlutoVTKPlot,X,Y,f; kwargs...)=tricontour!(p,triang(X,Y)...,vec(f);k
 
 
 """
-     tetmesh!(p::PlutoVTKPlot,pts, tris;markers, colormap, edges, edgemarkers, edgecolormap)
+     trimesh!(p::PlutoVTKPlot,pts, tris;markers, colormap, edges, edgemarkers, edgecolormap)
 
 Plot piecewise linear function on  triangular grid given as "heatmap" 
 """
 function trimesh!(p::PlutoVTKPlot,pts, tris;
-                  markers=nothing,  colormap=:glasbey_hv_n256,
-                  edges=nothing, edgemarkers=nothing, edgecolormap=:glasbey_hv_n256)
+                  markers=nothing,  colormap=nothing,
+                  edges=nothing, edgemarkers=nothing, edgecolormap=nothing)
 
 
     ntri=size(tris,2)
     command!(p,"trimesh")
     zcoord=zeros(size(pts,2))
-    ntri=size(tris,2)
     parameter!(p,"points",vec(vcat(pts,zcoord')))
     parameter!(p,"polys",vtkpolys(tris))
 
+
+
+    
     if markers!=nothing
         (fmin,fmax)=extrema(markers)
+        if colormap==nothing
+            colormap=GridVisualize.region_cmap(fmax)
+        end
         if typeof(colormap)==Symbol
             cmap=colorschemes[colormap]
         else
@@ -279,6 +285,9 @@ function trimesh!(p::PlutoVTKPlot,pts, tris;
 
         if edgemarkers!=nothing
             (fmin,fmax)=Int64.(extrema(edgemarkers))
+            if edgecolormap==nothing
+                edgecolormap=GridVisualize.bregion_cmap(fmax)
+            end
             if typeof(edgecolormap)==Symbol
                 ecmap=colorschemes[edgecolormap]
             else
@@ -299,6 +308,103 @@ end
 
 
 
+"""
+     tetmesh!(p::PlutoVTKPlot,pts, tris;markers, colormap, faces, facemarkers, facecolormap)
+
+Plot piecewise linear function on  triangular grid given as "heatmap" 
+"""
+function tetmesh!(p::PlutoVTKPlot, pts, tets;
+                  markers=nothing,  colormap=nothing,
+                  faces=nothing, facemarkers=nothing, facecolormap=nothing,
+                  xplane=prevfloat(Inf), yplane=prevfloat(Inf), zplane=prevfloat(Inf))
+    
+
+    ntet=size(tets,2)
+    command!(p,"tetmesh")
+    nregions=  markers==nothing  ? 0 : maximum(markers)
+    nbregions= facemarkers==nothing ? 0 :  maximum(facemarkers)
+
+        
+    if nregions==0
+        nregions=1
+        markers=fill(Int32(1),ntet)
+    end
+
+    if faces!=nothing && nbregions==0
+        nbregions=1
+        facemarkers=fill(Int32(1),size(faces,2))
+    end
+
+
+    if colormap==nothing
+        colormap=GridVisualize.region_cmap(nregions)
+    end
+
+    if facecolormap==nothing
+        facecolormap=GridVisualize.bregion_cmap(nbregions)
+    end
+
+
+    
+    xyzmin=zeros(3)
+    xyzmax=ones(3)
+
+    @views for idim=1:3
+        xyzmin[idim]=minimum(pts[idim,:])
+        xyzmax[idim]=maximum(pts[idim,:])
+    end
+
+    
+    xyzcut=[xplane,yplane,zplane]
+    regpoints0,regfacets0=GridVisualize.extract_visible_cells3D(pts,tets,markers,nregions,
+                                                                xyzcut,
+                                                                primepoints=hcat(xyzmin,xyzmax)
+                                                                )
+    
+    points=hcat([reshape(reinterpret(Float32,regpoints0[i] ),(3,length(regpoints0[i] ))) for i=1:nregions]...)
+    facets=vcat([vtkpolys(reshape(reinterpret(Int32,regfacets0[i]),(3,length(regfacets0[i])))) for i=1:nregions]...)
+
+    
+    
+    regmarkers=vcat([fill(i,length(regfacets0[i])) for i=1:nregions]...)
+
+    if typeof(colormap)==Symbol
+        cmap=colorschemes[colormap]
+    else
+        cmap=ColorScheme(colormap)
+    end
+    rgb=reinterpret(Float64,get(cmap,regmarkers,(1,nregions+1)))
+    
+    
+    if faces!=nothing
+        bregpoints0,bregfacets0=GridVisualize.extract_visible_bfaces3D(pts,faces,facemarkers,nbregions,
+                                                                       xyzcut,
+                                                                       primepoints=hcat(xyzmin,xyzmax)
+                                                                       )
+        bregpoints=hcat([reshape(reinterpret(Float32,bregpoints0[i]),(3,length(bregpoints0[i]))) for i=1:nbregions]...)
+        bregfacets=vcat([vtkpolys(reshape(reinterpret(Int32,bregfacets0[i]),(3,length(bregfacets0[i]))),
+                                  offset= size(points,2) + ( i==1 ? 0 : sum(k->length(bregpoints0[k]),1:i-1) ) )
+                                  for i=1:nbregions]...)
+        bfacemarkers=vcat([fill(i,length(bregfacets0[i])) for i=1:nbregions]...)
+
+        if typeof(facecolormap)==Symbol
+            facecmap=colorschemes[facecolormap]
+        else
+            facecmap=ColorScheme(facecolormap)
+        end
+        facergb=reinterpret(Float64,get(facecmap,bfacemarkers,(1,nbregions+1)))
+        facets=vcat(facets,bregfacets)
+        points=hcat(points,bregpoints)
+        rgb=vcat(rgb,facergb)
+    end
+        
+    parameter!(p,"polys",facets)
+    parameter!(p,"points",vec(points))
+    parameter!(p,"colors",UInt8.(floor.(rgb*255)))
+
+    axis3d!(p)
+    p
+end
 
 
 function plot!(p::PlutoVTKPlot,x,y; kwargs...)

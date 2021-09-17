@@ -1,7 +1,7 @@
 name = "PlutoVista"
 uuid = "646e1f28-b900-46d7-9d87-d554eb38a413"
 authors = ["Juergen Fuhrmann <juergen.fuhrmann@wias-berlin.de>"]
-version = "0.5.0"
+version = "0.5.1"
 
 [deps]
 ColorSchemes = "35d6a980-a343-548e-a6ea-1d62b119f2f4"
@@ -12,5 +12,5 @@ UUIDs = "cf7118a7-6976-5b1a-9a39-7adc72f591a4"
 [compat]
 ColorSchemes = "3"
 Colors = "0.12,1"
+GridVisualize = "0.2.20, 0.3"
 julia = "1.5"
-GridVisualize = "0.2.18, 0.3"

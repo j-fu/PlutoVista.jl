@@ -274,6 +274,23 @@ z: $(@bind zplane Slider(0:0.01:1,show_value=true,default=0.45))
 tetcontour!(p3d,g3[Coordinates],g3[CellNodes],f3;flevel=flevel,
 	xplane=xplane,yplane=yplane,zplane=zplane)
 
+# ╔═╡ 0a363d31-5a48-49ad-aba2-bc0058ce1225
+p3dgrid=tetmesh(resolution=(500,500))
+
+# ╔═╡ da36cf26-8105-4569-9d09-6f16383000a0
+md"""
+x: $(@bind gxplane Slider(0:0.01:1,show_value=true,default=0.45))
+y: $(@bind gyplane Slider(0:0.01:1,show_value=true,default=0.45))
+z: $(@bind gzplane Slider(0:0.01:1,show_value=true,default=0.45))
+"""
+
+# ╔═╡ d009c4cb-9ef6-45bd-960f-0213880f662a
+ tetmesh!(p3dgrid,g3[Coordinates],g3[CellNodes];
+		markers=g3[CellRegions],
+	faces=g3[BFaceNodes],
+	facemarkers=g3[BFaceRegions],
+	xplane=gxplane,yplane=gyplane,zplane=gzplane)
+
 # ╔═╡ Cell order:
 # ╟─93ca4fd0-8f61-4174-b459-55f5395c0f56
 # ╠═1cb8eb7c-a763-479f-b15c-ff128fac2f75
@@ -326,3 +343,6 @@ tetcontour!(p3d,g3[Coordinates],g3[CellNodes],f3;flevel=flevel,
 # ╠═809ceb74-8201-4cc1-8cdc-656dc070e020
 # ╟─c222b16b-0ddc-4287-a029-779bdd77dd7b
 # ╠═36e48e9c-9452-4b07-bce4-c1cfe3c19409
+# ╠═0a363d31-5a48-49ad-aba2-bc0058ce1225
+# ╠═d009c4cb-9ef6-45bd-960f-0213880f662a
+# ╟─da36cf26-8105-4569-9d09-6f16383000a0

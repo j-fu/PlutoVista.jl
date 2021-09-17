@@ -86,6 +86,19 @@ end
 
 
 
+tetmesh(pts,tets; kwargs...)=tetmesh!(PlutoVistaPlot(;kwargs...),pts,tets; kwargs...)
+tetmesh!(p::PlutoVistaPlot,pts,tets; backend=:vtk, kwargs...)=tetmesh!(backend!(p,datadim=3,backend=backend),
+                                                                        pts,tets; kwargs...)
+
+function tetmesh(;kwargs...)
+    p=PlutoVistaPlot(;kwargs...)
+    backend!(p,datadim=2)
+end
+
+
+
+
+
 contour(X,Y,f; kwargs...)=contour!(PlutoVistaPlot(;kwargs...),X,Y,f; kwargs...)
 contour!(p::PlutoVistaPlot,X,Y,f; backend=:vtk, kwargs...)=contour!(backend!(p,datadim=2,backend=backend),
                                                                     X,Y,f; kwargs...)

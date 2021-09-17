@@ -250,6 +250,70 @@ function plutovtkplot(uuid,jsdict,invalidation)
             win.renderWindow.render();
 
         }
+        else if (jsdict[cmd]=="tetmesh")
+        {
+            var win=window[uuid+"data"]
+            // see https://discourse.vtk.org/t/manually-create-polydata-in-vtk-js/885/15
+            if (win.dataset==undefined)
+            {
+                update=false
+            }
+    	    var points=jsdict[cmd+"points"]
+ 	    var polys=jsdict[cmd+"polys"]
+            var colors=jsdict[cmd+"colors"]
+
+            if (colors!="none")
+            {
+                /// need to use LUT here!
+                var colorData = vtk.Common.Core.vtkDataArray.newInstance({
+                    name: 'Colors',
+                    values: colors,
+                    numberOfComponents: 3,
+                });
+            }
+            
+            if (!update)
+            {
+                if (colors!="none")
+                {
+                    win.celldataset = vtk.Common.DataModel.vtkPolyData.newInstance();
+                    win.cellactor = vtk.Rendering.Core.vtkActor.newInstance();
+		    var cellmapper = vtk.Rendering.Core.vtkMapper.newInstance();
+		    cellmapper.setInputData(win.celldataset);
+                    cellmapper.setColorModeToDirectScalars()
+		    win.cellactor.setMapper(cellmapper);
+                    win.renderer.addActor(win.cellactor);
+                }
+
+                
+                win.dataset = vtk.Common.DataModel.vtkPolyData.newInstance();
+                win.actor = vtk.Rendering.Core.vtkActor.newInstance();
+		var mapper = vtk.Rendering.Core.vtkMapper.newInstance();
+                mapper.setColorModeToDefault()
+		win.actor.getProperty().setRepresentation(1);
+		win.actor.getProperty().setColor(0, 0, 0);
+		win.actor.getProperty().setLineWidth(1.5);
+		mapper.setInputData(win.dataset);
+		win.actor.setMapper(mapper);
+		win.renderer.addActor(win.actor);
+            }
+            
+
+            if (colors !="none")
+            {
+                win.celldataset.getPoints().setData(points, 3);
+                win.celldataset.getPolys().setData(polys,1);
+                win.celldataset.getCellData().setActiveScalars('Colors');
+                win.celldataset.getCellData().setScalars(colorData);        
+                win.celldataset.modified()
+            }
+            win.dataset.getPoints().setData(points, 3);
+            win.dataset.getPolys().setData(polys,1);
+            win.dataset.modified()
+
+            win.renderWindow.render();
+
+        }
         else if (jsdict[cmd]=="axis")
         {
 
