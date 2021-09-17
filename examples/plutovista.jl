@@ -19,7 +19,7 @@ md"""
 """
 
 # ╔═╡ 1cb8eb7c-a763-479f-b15c-ff128fac2f75
-develop=true
+develop=false
 
 # ╔═╡ c102e87a-b570-4d86-b087-3506396fc065
 begin
@@ -141,11 +141,11 @@ end;
 
 # ╔═╡ 724495e1-d501-4a03-be88-16b644938afd
 md"""
-Change grid resolution: $(@bind resolution Slider(10:200))
+Change grid resolution: $(@bind resolution Slider(10:1:20))
 """
 
 # ╔═╡ d3ad0d4f-859d-44ac-a387-aac8d465cc6d
-(pts,tris,markers,edges,edgemarkers)=maketriangulation(1/resolution^2)
+(pts,tris,markers,edges,edgemarkers)=maketriangulation(1/resolution^2);
 
 # ╔═╡ 83c7bffd-16c6-4cc7-8a68-87cbd739f3f4
 md"""
@@ -259,7 +259,7 @@ g3,f3=func3d(;n=49)
 TableOfContents()
 
 # ╔═╡ 809ceb74-8201-4cc1-8cdc-656dc070e020
-p3d=tetcontour(resolution=(500,500))
+p3d=tetcontour(resolution=(300,300))
 
 # ╔═╡ c222b16b-0ddc-4287-a029-779bdd77dd7b
 md"""
@@ -275,7 +275,7 @@ tetcontour!(p3d,g3[Coordinates],g3[CellNodes],f3;flevel=flevel,
 	xplane=xplane,yplane=yplane,zplane=zplane)
 
 # ╔═╡ 0a363d31-5a48-49ad-aba2-bc0058ce1225
-p3dgrid=tetmesh(resolution=(500,500))
+p3dgrid=tetmesh(resolution=(300,300))
 
 # ╔═╡ da36cf26-8105-4569-9d09-6f16383000a0
 md"""
@@ -314,7 +314,7 @@ z: $(@bind gzplane Slider(0:0.01:1,show_value=true,default=0.45))
 # ╠═ab232244-4fe2-4ab0-a0bf-d1d9510802d2
 # ╠═d3ad0d4f-859d-44ac-a387-aac8d465cc6d
 # ╟─83c7bffd-16c6-4cc7-8a68-87cbd739f3f4
-# ╟─724495e1-d501-4a03-be88-16b644938afd
+# ╠═724495e1-d501-4a03-be88-16b644938afd
 # ╟─da3bdabb-b81c-4c05-90cd-aee7b209e605
 # ╠═83be4a71-4f01-4f70-9cbe-f4e9b9222428
 # ╟─8186bd23-5727-4d87-805c-5e5c6a092535
@@ -324,8 +324,8 @@ z: $(@bind gzplane Slider(0:0.01:1,show_value=true,default=0.45))
 # ╟─dce20465-d227-4273-82b7-c6a4621942b9
 # ╠═20a88415-f2b4-4806-9ffc-6be979d12d0a
 # ╠═39412087-3ee3-41fb-818f-23e5396abba3
-# ╠═d3055a1a-5b55-4c43-ac09-7704186e714a
 # ╟─68cba79c-2577-4250-b045-08e954bde4e5
+# ╠═d3055a1a-5b55-4c43-ac09-7704186e714a
 # ╟─387bbdee-0175-4a25-9a97-49fdb8afb7fc
 # ╠═d21cc8b8-ae5e-42e4-8d1f-ca84241aa45d
 # ╟─06fb9e66-c7c0-4028-80d9-2a7e36a6626d
@@ -336,7 +336,7 @@ z: $(@bind gzplane Slider(0:0.01:1,show_value=true,default=0.45))
 # ╠═595539f8-f14e-418f-90d6-b6040292a9b6
 # ╟─d9c796df-4b92-47ba-9007-ceeed78616b7
 # ╠═b8d504dd-d056-4e28-989e-b07259acd5d6
-# ╠═d1e13f8c-7cb8-4cb5-9dda-1a9b5d6142b6
+# ╟─d1e13f8c-7cb8-4cb5-9dda-1a9b5d6142b6
 # ╠═0c75ef0f-9477-4ed2-ae40-71553aed41c1
 # ╠═da3ba65b-71c0-4da5-b792-f57e0905aab7
 # ╟─6af0b5d7-5324-43b5-8f99-6f5d35d5deba
@@ -344,5 +344,5 @@ z: $(@bind gzplane Slider(0:0.01:1,show_value=true,default=0.45))
 # ╟─c222b16b-0ddc-4287-a029-779bdd77dd7b
 # ╠═36e48e9c-9452-4b07-bce4-c1cfe3c19409
 # ╠═0a363d31-5a48-49ad-aba2-bc0058ce1225
-# ╠═d009c4cb-9ef6-45bd-960f-0213880f662a
 # ╟─da36cf26-8105-4569-9d09-6f16383000a0
+# ╠═d009c4cb-9ef6-45bd-960f-0213880f662a
