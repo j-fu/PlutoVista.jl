@@ -29,8 +29,8 @@ begin
 	using Revise
     Pkg.add(["PlutoUI","Triangulate","ExtendableGrids"])
     if develop	
-	    Pkg.develop("PlutoVista")
 		Pkg.develop("GridVisualize")
+	    Pkg.develop("PlutoVista")
     else
 	    Pkg.add("PlutoVista")
     end	

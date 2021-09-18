@@ -72,7 +72,7 @@ function Base.show(io::IO, ::MIME"text/html", p::PlutoVTKPlot)
     """
     end
     result="""
-        <script type="text/javascript" src="https://unpkg.com/vtk.js@18"></script>
+        <script type="text/javascript" src="https://unpkg.com/vtk.js@19"></script>
         <script>
         $(plutovtkplot)
         $(canvascolorbar)
