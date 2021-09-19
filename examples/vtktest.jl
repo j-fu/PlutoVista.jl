@@ -47,7 +47,7 @@ function maketriangulation(maxarea)
     triin=Triangulate.TriangulateIO()
     triin.pointlist=Matrix{Cdouble}([-1.0 -1.0 ; 1.0 -1.0 ; 1.0 2 ; -1.0 1.0]')
     triin.segmentlist=Matrix{Cint}([1 2 ; 2 3 ; 3 4 ; 4 1; 4 2 ]')
-    triin.segmentmarkerlist=Vector{Int32}([1, 2, 3, 4, 6])
+    triin.segmentmarkerlist=Vector{Int32}([1, 2, 3, 4, 5])
     triin.regionlist=Matrix{Cdouble}([-0.9 0.9; -0.9 0.9; 1 2 ; 2.0*maxarea maxarea])
     (triout, vorout)=triangulate("paADQ", triin)
     triout.pointlist, triout.trianglelist,Int.(vec(triout.triangleattributelist)),triout.segmentlist,triout.segmentmarkerlist
@@ -175,5 +175,5 @@ tetmesh!(p3dx,g3x[Coordinates],g3x[CellNodes];
 # ╠═3681ef5b-c794-44da-9fe7-cedcd68b426c
 # ╠═606f6837-f3b7-4a52-b9c3-034799c7bf93
 # ╠═ecb3bb5e-6ae5-4d6e-9834-d52ce977b3fc
-# ╠═90ff6ffc-84dc-45fd-8d09-9eb916397630
+# ╟─90ff6ffc-84dc-45fd-8d09-9eb916397630
 # ╠═519d106f-3f6f-4db1-b4e4-c5e7ef176857

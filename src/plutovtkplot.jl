@@ -223,6 +223,20 @@ function tetcontour!(p::PlutoVTKPlot, pts, tets,func;colormap=:viridis,
     parameter!(p,"polys",vtkpolys(faces))
     rgb=reinterpret(Float64,get(colorschemes[colormap],values,fminmax))
     parameter!(p,"colors",UInt8.(floor.(rgb*255)))
+
+
+    # It seems a colorbar is best drawn via canvas...
+    # https://github.com/Kitware/vtk-js/issues/1621
+    bar_stops=collect(0:0.01:1)
+    bar_rgb=reinterpret(Float64,get(colorschemes[colormap],bar_stops,(0,1)))
+    bar_rgb=UInt8.(floor.(bar_rgb*255))
+    p.jsdict["cbar"]=1
+    p.jsdict["cstops"]=bar_stops
+    p.jsdict["colors"]=bar_rgb
+    p.jsdict["levels"]=[fminmax[1],flevel,fminmax[2]]
+
+
+
     axis3d!(p)
     p
 end
@@ -256,21 +270,30 @@ function trimesh!(p::PlutoVTKPlot,pts, tris;
 
     
     if markers!=nothing
-        (fmin,fmax)=extrema(markers)
+        nregions=maximum(markers)
         if colormap==nothing
-            colormap=GridVisualize.region_cmap(fmax)
+            colormap=GridVisualize.region_cmap(nregions)
         end
         if typeof(colormap)==Symbol
             cmap=colorschemes[colormap]
         else
             cmap=ColorScheme(colormap)
         end
-        rgb=reinterpret(Float64,get(cmap,markers,(1,fmax+1)))
+        rgb=reinterpret(Float64,get(cmap,markers,(1,size(cmap))))
         parameter!(p,"colors",UInt8.(floor.(rgb*255)))
+
+        bar_stops=collect(1:size(cmap))
+        bar_rgb=reinterpret(Float64,get(cmap,bar_stops,(1,size(cmap))))
+        bar_rgb=UInt8.(floor.(bar_rgb*255))
+        p.jsdict["cbar"]=2
+        p.jsdict["cstops"]=bar_stops
+        p.jsdict["colors"]=bar_rgb
+        p.jsdict["levels"]=collect(1:size(cmap))
+        
     else
         parameter!(p,"colors","none")
     end
-
+    
     if edges!=nothing
         nedges=size(edges,2)
         lines=Vector{UInt32}(undef,3*nedges)
@@ -282,19 +305,26 @@ function trimesh!(p::PlutoVTKPlot,pts, tris;
             iline=iline+3
         end
         parameter!(p,"lines",lines)
-
+        
         if edgemarkers!=nothing
-            (fmin,fmax)=Int64.(extrema(edgemarkers))
+            (fmin,nbregions)=Int64.(extrema(edgemarkers))
             if edgecolormap==nothing
-                edgecolormap=GridVisualize.bregion_cmap(fmax)
+                edgecolormap=GridVisualize.bregion_cmap(nbregions)
             end
             if typeof(edgecolormap)==Symbol
                 ecmap=colorschemes[edgecolormap]
             else
                 ecmap=ColorScheme(edgecolormap)
             end
-            edgergb=reinterpret(Float64,get(ecmap,edgemarkers,(1,fmax+1)))
+            edgergb=reinterpret(Float64,get(ecmap,edgemarkers,(1,size(ecmap))))
             parameter!(p,"linecolors",UInt8.(floor.(edgergb*255)))
+
+            ebar_stops=collect(1:size(ecmap))
+            ebar_rgb=reinterpret(Float64,get(ecmap,ebar_stops,(1,size(ecmap))))
+            ebar_rgb=UInt8.(floor.(ebar_rgb*255))
+            p.jsdict["ecstops"]=ebar_stops
+            p.jsdict["ecolors"]=ebar_rgb
+            p.jsdict["elevels"]=collect(1:size(ecmap))
         else
             parameter!(p,"linecolors","none")
         end
@@ -302,6 +332,10 @@ function trimesh!(p::PlutoVTKPlot,pts, tris;
         parameter!(p,"lines","none")
         parameter!(p,"linecolors","none")
     end
+    
+    
+    
+    
     axis2d!(p)
     p
 end
@@ -365,7 +399,6 @@ function tetmesh!(p::PlutoVTKPlot, pts, tets;
     facets=vcat([vtkpolys(reshape(reinterpret(Int32,regfacets0[i]),(3,length(regfacets0[i])))) for i=1:nregions]...)
 
     
-    
     regmarkers=vcat([fill(i,length(regfacets0[i])) for i=1:nregions]...)
 
     if typeof(colormap)==Symbol
@@ -373,7 +406,15 @@ function tetmesh!(p::PlutoVTKPlot, pts, tets;
     else
         cmap=ColorScheme(colormap)
     end
-    rgb=reinterpret(Float64,get(cmap,regmarkers,(1,nregions+1)))
+    rgb=reinterpret(Float64,get(cmap,regmarkers,(1,size(cmap))))
+    
+    bar_stops=collect(1:size(cmap))
+    bar_rgb=reinterpret(Float64,get(cmap,bar_stops,(1,size(cmap))))
+    bar_rgb=UInt8.(floor.(bar_rgb*255))
+    p.jsdict["cbar"]=2
+    p.jsdict["cstops"]=bar_stops
+    p.jsdict["colors"]=bar_rgb
+    p.jsdict["levels"]=collect(1:size(cmap))
     
     
     if faces!=nothing
@@ -392,10 +433,18 @@ function tetmesh!(p::PlutoVTKPlot, pts, tets;
         else
             facecmap=ColorScheme(facecolormap)
         end
-        facergb=reinterpret(Float64,get(facecmap,bfacemarkers,(1,nbregions+1)))
+        facergb=reinterpret(Float64,get(facecmap,bfacemarkers,(1,size(facecmap))))
         facets=vcat(facets,bregfacets)
         points=hcat(points,bregpoints)
         rgb=vcat(rgb,facergb)
+
+        ecmap=facecmap
+        ebar_stops=collect(1:size(ecmap))
+        ebar_rgb=reinterpret(Float64,get(ecmap,ebar_stops,(1,size(ecmap))))
+        ebar_rgb=UInt8.(floor.(ebar_rgb*255))
+        p.jsdict["ecstops"]=ebar_stops
+        p.jsdict["ecolors"]=ebar_rgb
+        p.jsdict["elevels"]=collect(1:size(ecmap))
     end
         
     parameter!(p,"polys",facets)

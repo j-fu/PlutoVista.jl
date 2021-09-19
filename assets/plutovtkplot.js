@@ -411,6 +411,8 @@ function plutovtkplot(uuid,jsdict,invalidation)
     win.renderWindow.render();
 
 
+    
+
     // The invalidation promise is resolved when the cell starts rendering a newer output.
     // We use it to release the WebGL context.
     // (More info at https://plutocon2021-demos.netlify.app/fonsp%20%E2%80%94%20javascript%20inside%20pluto or https://observablehq.com/@observablehq/invalidation )
