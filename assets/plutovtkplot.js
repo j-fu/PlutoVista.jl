@@ -10,7 +10,6 @@ function setinteractorstyle(interactor, cam)
 function plutovtkplot(uuid,jsdict,invalidation)
 {
 
-    var update=true
 
     if (window[uuid+"data"]==undefined)
     {
@@ -18,6 +17,7 @@ function plutovtkplot(uuid,jsdict,invalidation)
         var win=window[uuid+"data"]
         win.renderWindow = vtk.Rendering.Core.vtkRenderWindow.newInstance();
         win.renderer = vtk.Rendering.Core.vtkRenderer.newInstance();
+        win.update=false
         
         // OpenGlRenderWindow
         win.openGlRenderWindow = vtk.Rendering.OpenGL.vtkRenderWindow.newInstance();
@@ -38,19 +38,19 @@ function plutovtkplot(uuid,jsdict,invalidation)
         win.openGlRenderWindow.setSize(dims.width, dims.height);
         win.interactor.bindEvents(rootContainer);
         win.renderWindow.addRenderer(win.renderer)
-        update=false
     }
+    var win=window[uuid+"data"]
+    win.update=true
     
     // Loop over content of jsdict
     for (var cmd = 1 ; cmd <= jsdict.cmdcount ; cmd++)
     {  
         if (jsdict[cmd]=="tricontour")
         {
-            var win=window[uuid+"data"]
             // see https://discourse.vtk.org/t/manually-create-polydata-in-vtk-js/885/15
             if (win.dataset==undefined)
             {
-                update=false
+                win.update=false
             }
 
     	    var points=jsdict[cmd+"points"]
@@ -67,7 +67,7 @@ function plutovtkplot(uuid,jsdict,invalidation)
             });
 
             
-            if (!update)
+            if (!win.update)
             {
                 win.dataset = vtk.Common.DataModel.vtkPolyData.newInstance();
                 win.actor = vtk.Rendering.Core.vtkActor.newInstance();
@@ -88,7 +88,7 @@ function plutovtkplot(uuid,jsdict,invalidation)
             {
                 //https://discourse.vtk.org/t/manually-create-polydata-in-vtk-js/885/4
                 
-                if (!update)
+                if (!win.update)
                 {
                     var isomapper = vtk.Rendering.Core.vtkMapper.newInstance();
                     var isoactor = vtk.Rendering.Core.vtkActor.newInstance();
@@ -108,11 +108,10 @@ function plutovtkplot(uuid,jsdict,invalidation)
         if (jsdict[cmd]=="tetcontour")
         {
 
-            var win=window[uuid+"data"]
             // see https://discourse.vtk.org/t/manually-create-polydata-in-vtk-js/885/15
             if (win.dataset==undefined)
             {
-                update=false
+                win.update=false
             }
     	    var points=jsdict[cmd+"points"]
  	    var polys=jsdict[cmd+"polys"]
@@ -126,7 +125,7 @@ function plutovtkplot(uuid,jsdict,invalidation)
             });
 
             
-            if (!update)
+            if (!win.update)
             {
                 win.dataset = vtk.Common.DataModel.vtkPolyData.newInstance();
                 win.actor = vtk.Rendering.Core.vtkActor.newInstance();
@@ -146,11 +145,10 @@ function plutovtkplot(uuid,jsdict,invalidation)
         }
         else if (jsdict[cmd]=="trimesh")
         {
-            var win=window[uuid+"data"]
             // see https://discourse.vtk.org/t/manually-create-polydata-in-vtk-js/885/15
             if (win.dataset==undefined)
             {
-                update=false
+                win.update=false
             }
 
     	    var points=jsdict[cmd+"points"]
@@ -169,7 +167,7 @@ function plutovtkplot(uuid,jsdict,invalidation)
                 });
             }
             
-            if (!update)
+            if (!win.update)
             {
                 if (colors!="none")
                 {
@@ -224,7 +222,7 @@ function plutovtkplot(uuid,jsdict,invalidation)
             {
                 //https://discourse.vtk.org/t/manually-create-polydata-in-vtk-js/885/4
                 
-                if (!update)
+                if (!win.update)
                 {
                     var linemapper = vtk.Rendering.Core.vtkMapper.newInstance();
                     var lineactor = vtk.Rendering.Core.vtkActor.newInstance();
@@ -252,11 +250,10 @@ function plutovtkplot(uuid,jsdict,invalidation)
         }
         else if (jsdict[cmd]=="tetmesh")
         {
-            var win=window[uuid+"data"]
             // see https://discourse.vtk.org/t/manually-create-polydata-in-vtk-js/885/15
             if (win.dataset==undefined)
             {
-                update=false
+                win.update=false
             }
     	    var points=jsdict[cmd+"points"]
  	    var polys=jsdict[cmd+"polys"]
@@ -272,7 +269,7 @@ function plutovtkplot(uuid,jsdict,invalidation)
                 });
             }
             
-            if (!update)
+            if (!win.update)
             {
                 if (colors!="none")
                 {
@@ -317,9 +314,8 @@ function plutovtkplot(uuid,jsdict,invalidation)
         else if (jsdict[cmd]=="axis")
         {
 
-            if (!update)
+            if (!win.update)
             {
-                var win=window[uuid+"data"]
  	        var cam=jsdict[cmd+"cam"]
                 var cubeAxes = vtk.Rendering.Core.vtkCubeAxesActor.newInstance();
                 var camera=win.renderer.getActiveCamera()
@@ -347,7 +343,6 @@ function plutovtkplot(uuid,jsdict,invalidation)
         }
         else if (jsdict[cmd]=="triplot")
         {// Experimental
-            var win=window[uuid+"data"]
 
     	    var points=jsdict[cmd+"points"]
  	    var polys=jsdict[cmd+"polys"]
@@ -355,11 +350,11 @@ function plutovtkplot(uuid,jsdict,invalidation)
 
             if (win.dataset==undefined)
             {
-                update=false
+                win.update=false
             }
             
 
-            if (!update)
+            if (!win.update)
             {
                 win.actor = vtk.Rendering.Core.vtkActor.newInstance();
                 var mapper = vtk.Rendering.Core.vtkMapper.newInstance();
@@ -384,7 +379,6 @@ function plutovtkplot(uuid,jsdict,invalidation)
         }
         else if (jsdict[cmd]=="plot")
         {// Experimental
-            var win=window[uuid+"data"]
     	    var points=jsdict[cmd+"points"]
  	    var lines=jsdict[cmd+"lines"]
 
@@ -405,22 +399,21 @@ function plutovtkplot(uuid,jsdict,invalidation)
     
     //renderer.setLayer(0);
 
-            
-    var win=window[uuid+"data"]
 //    win.renderer.resetCamera();
     win.renderWindow.render();
 
 
-    
-
     // The invalidation promise is resolved when the cell starts rendering a newer output.
     // We use it to release the WebGL context.
     // (More info at https://plutocon2021-demos.netlify.app/fonsp%20%E2%80%94%20javascript%20inside%20pluto or https://observablehq.com/@observablehq/invalidation )
-    // invalidation.then(() => {
-    //     win.renderWindow.delete();
-    //     win.openGlRenderWindow.delete();
-    //     win.interactor.delete();
-    //  });
+    invalidation.then(() => {
+        if (!win.update) // run this only if called from original cell
+        {
+            win.renderWindow.delete();
+            win.openGlRenderWindow.delete();
+            win.interactor.delete();
+        }
+    });
 }
 
     
