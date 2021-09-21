@@ -194,6 +194,8 @@ function tetcontour!(p::PlutoVTKPlot, pts, tets,func;colormap=:viridis,
     xyzmin=zeros(3)
     xyzmax=ones(3)
 
+
+    
     @views for idim=1:3
         xyzmin[idim]=minimum(pts[idim,:])
         xyzmax[idim]=maximum(pts[idim,:])
@@ -205,22 +207,33 @@ function tetcontour!(p::PlutoVTKPlot, pts, tets,func;colormap=:viridis,
         fminmax[2]=flimits[2]
     end
 
-    
-    xplane=max(xyzmin[1],min(xyzmax[1],xplane ))
-    yplane=max(xyzmin[2],min(xyzmax[2],yplane ))
-    zplane=max(xyzmin[3],min(xyzmax[3],zplane ))
+
+    xplane=max(xyzmin[1],min(xyzmax[1],xplane))
+    yplane=max(xyzmin[2],min(xyzmax[2],yplane))
+    zplane=max(xyzmin[3],min(xyzmax[3],zplane))
     flevel=max(fminmax[1],min(fminmax[2],flevel))
 
+        
     cpts0,faces0,values=GridVisualize.marching_tetrahedra(pts,tets,func,
                                                           primepoints=hcat(xyzmin,xyzmax),
                                                           primevalues=fminmax,
                                                           GridVisualize.makeplanes(xyzmin,xyzmax,xplane,yplane,zplane),
-                                                          [flevel])
+                                                          [flevel]
+                                                          )
 
     faces=reshape(reinterpret(Int32,faces0),(3,length(faces0)))
     cpts=copy(reinterpret(Float32,cpts0))
     parameter!(p,"points",cpts)
     parameter!(p,"polys",vtkpolys(faces))
+    nan_replacement=0.5*(fminmax[1]+fminmax[2])
+    for i=1:length(values)
+        if isnan(values[i])
+            values[i]=nan_replacement
+        end
+    end
+
+
+    
     rgb=reinterpret(Float64,get(colorschemes[colormap],values,fminmax))
     parameter!(p,"colors",UInt8.(floor.(rgb*255)))
 

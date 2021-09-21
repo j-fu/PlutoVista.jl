@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.16.0
+# v0.16.1
 
 using Markdown
 using InteractiveUtils
@@ -109,10 +109,10 @@ function func3d(;n=15)
 end
 
 # ╔═╡ 368b8cf5-fabd-4b84-b33c-b15c4452393b
-	g,f=func3d(;n=49)
+	g,f=func3d(;n=50)
 
 # ╔═╡ f64729e4-d2b4-40d3-acbb-1395dbe0337d
-p3d=PlutoVTKPlot(resolution=(500,500))
+p3d=PlutoVTKPlot(resolution=(300,300))
 
 # ╔═╡ 7be35f33-5f7a-4765-8bb6-1487e209efc8
 md"""
@@ -171,7 +171,7 @@ tetmesh!(p3dx,g3x[Coordinates],g3x[CellNodes];
 # ╠═bd0a59a2-564d-42bd-ab6f-a50b26f9241f
 # ╠═368b8cf5-fabd-4b84-b33c-b15c4452393b
 # ╠═f64729e4-d2b4-40d3-acbb-1395dbe0337d
-# ╠═7be35f33-5f7a-4765-8bb6-1487e209efc8
+# ╟─7be35f33-5f7a-4765-8bb6-1487e209efc8
 # ╠═3681ef5b-c794-44da-9fe7-cedcd68b426c
 # ╠═606f6837-f3b7-4a52-b9c3-034799c7bf93
 # ╠═ecb3bb5e-6ae5-4d6e-9834-d52ce977b3fc

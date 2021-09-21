@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.16.0
+# v0.16.1
 
 using Markdown
 using InteractiveUtils
@@ -246,7 +246,7 @@ md"""
 """
 
 # ╔═╡ 0c75ef0f-9477-4ed2-ae40-71553aed41c1
-function func3d(;n=15)
+function func3d(;n=20)
     X=collect(0:1/n:1)
     g=simplexgrid(X,X,X)
     g, map((x,y,z)->sinpi(2*x)*sinpi(3.5*y)*sinpi(1.5*z),g)
@@ -273,6 +273,11 @@ z: $(@bind zplane Slider(0:0.01:1,show_value=true,default=0.45))
 # ╔═╡ 36e48e9c-9452-4b07-bce4-c1cfe3c19409
 tetcontour!(p3d,g3[Coordinates],g3[CellNodes],f3;flevel=flevel,
 	xplane=xplane,yplane=yplane,zplane=zplane)
+
+# ╔═╡ a2bb8861-493d-4003-8a4e-e0ea051fbb72
+md"""
+### tetmesh
+"""
 
 # ╔═╡ 0a363d31-5a48-49ad-aba2-bc0058ce1225
 p3dgrid=tetmesh(resolution=(300,300))
@@ -343,6 +348,7 @@ z: $(@bind gzplane Slider(0:0.01:1,show_value=true,default=0.45))
 # ╠═809ceb74-8201-4cc1-8cdc-656dc070e020
 # ╟─c222b16b-0ddc-4287-a029-779bdd77dd7b
 # ╠═36e48e9c-9452-4b07-bce4-c1cfe3c19409
+# ╟─a2bb8861-493d-4003-8a4e-e0ea051fbb72
 # ╠═0a363d31-5a48-49ad-aba2-bc0058ce1225
 # ╟─da36cf26-8105-4569-9d09-6f16383000a0
 # ╠═d009c4cb-9ef6-45bd-960f-0213880f662a
