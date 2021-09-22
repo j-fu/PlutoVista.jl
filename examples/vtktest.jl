@@ -125,7 +125,12 @@ z: $(@bind zplane Slider(0:0.01:1,show_value=true,default=0.45))
 
 # ╔═╡ 3681ef5b-c794-44da-9fe7-cedcd68b426c
 tetcontour!(p3d,g[Coordinates],g[CellNodes],f;flevel=flevel,
-	xplane=xplane,yplane=yplane,zplane=zplane)
+	faces=g[BFaceNodes],
+	facemarkers=g[BFaceRegions],
+	xplane=xplane,yplane=yplane,zplane=zplane,outline=true,alpha=0.1)
+
+# ╔═╡ 0f440c27-7ff1-4db5-b4eb-8ce1e9018ef1
+g[BFaceNodes]
 
 # ╔═╡ 606f6837-f3b7-4a52-b9c3-034799c7bf93
 g3x=let
@@ -144,12 +149,15 @@ y: $(@bind gyplane Slider(0:0.01:1,show_value=true,default=0.45))
 z: $(@bind gzplane Slider(0:0.01:1,show_value=true,default=0.45))
 """
 
+# ╔═╡ ae5707d9-41b7-4937-924a-fb54b83c31db
+alpha=0.15
+
 # ╔═╡ 519d106f-3f6f-4db1-b4e4-c5e7ef176857
 tetmesh!(p3dx,g3x[Coordinates],g3x[CellNodes];
 		markers=g3x[CellRegions],
 	faces=g3x[BFaceNodes],
 	facemarkers=g3x[BFaceRegions],
-	xplane=gxplane,yplane=gyplane,zplane=gzplane)
+	xplane=gxplane,yplane=gyplane,zplane=gzplane,alpha=alpha,outline=true)
 
 # ╔═╡ Cell order:
 # ╟─93ca4fd0-8f61-4174-b459-55f5395c0f56
@@ -173,7 +181,9 @@ tetmesh!(p3dx,g3x[Coordinates],g3x[CellNodes];
 # ╠═f64729e4-d2b4-40d3-acbb-1395dbe0337d
 # ╟─7be35f33-5f7a-4765-8bb6-1487e209efc8
 # ╠═3681ef5b-c794-44da-9fe7-cedcd68b426c
+# ╠═0f440c27-7ff1-4db5-b4eb-8ce1e9018ef1
 # ╠═606f6837-f3b7-4a52-b9c3-034799c7bf93
 # ╠═ecb3bb5e-6ae5-4d6e-9834-d52ce977b3fc
 # ╟─90ff6ffc-84dc-45fd-8d09-9eb916397630
+# ╠═ae5707d9-41b7-4937-924a-fb54b83c31db
 # ╠═519d106f-3f6f-4db1-b4e4-c5e7ef176857

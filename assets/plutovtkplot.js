@@ -117,6 +117,23 @@ function plutovtkplot(uuid,jsdict,invalidation)
  	    var polys=jsdict[cmd+"polys"]
             var colors=jsdict[cmd+"colors"]
 
+
+            var outline=jsdict[cmd+"outline"]
+    	    var opoints=jsdict[cmd+"opoints"]
+ 	    var opolys=jsdict[cmd+"opolys"]
+            var ocolors=jsdict[cmd+"ocolors"]
+
+            if (outline==1)
+            {
+                var ocolorData = vtk.Common.Core.vtkDataArray.newInstance({
+                    name: 'Colors',
+                    values: ocolors,
+                    numberOfComponents: 4,
+                });
+
+            }
+
+            
             /// need to use LUT here!
             var colorData = vtk.Common.Core.vtkDataArray.newInstance({
                 name: 'Colors',
@@ -134,8 +151,34 @@ function plutovtkplot(uuid,jsdict,invalidation)
                 mapper.setColorModeToDirectScalars()
                 win.actor.setMapper(mapper);
                 win.renderer.addActor(win.actor);
+
+                if (outline==1)
+                {
+                    win.odataset = vtk.Common.DataModel.vtkPolyData.newInstance();
+                    win.oactor = vtk.Rendering.Core.vtkActor.newInstance();
+		    var omapper = vtk.Rendering.Core.vtkMapper.newInstance();
+		    omapper.setInputData(win.odataset);
+                    omapper.setColorModeToDirectScalars()
+                    win.oactor.setForceTranslucent(true) //  https://discourse.vtk.org/t/wireframe-not-visible-behind-transparent-surfaces/6671
+		    win.oactor.setMapper(omapper);
+                    win.renderer.addActor(win.oactor);
+                }
+
+
+
             }
             
+
+            if (outline==1)
+            {
+                win.odataset.getPoints().setData(opoints, 3);
+                win.odataset.getPolys().setData(opolys,1);
+                win.odataset.getCellData().setActiveScalars('Colors');
+                win.odataset.getCellData().setScalars(ocolorData);        
+                win.odataset.modified()
+            }
+
+
             win.dataset.getPoints().setData(points, 3);
             win.dataset.getPolys().setData(polys,1);
             win.dataset.getPointData().setActiveScalars('Colors');
@@ -268,6 +311,23 @@ function plutovtkplot(uuid,jsdict,invalidation)
                     numberOfComponents: 3,
                 });
             }
+
+            var outline=jsdict[cmd+"outline"]
+    	    var opoints=jsdict[cmd+"opoints"]
+ 	    var opolys=jsdict[cmd+"opolys"]
+            var ocolors=jsdict[cmd+"ocolors"]
+
+            if (outline==1)
+            {
+                var ocolorData = vtk.Common.Core.vtkDataArray.newInstance({
+                    name: 'Colors',
+                    values: ocolors,
+                    numberOfComponents: 4,
+                });
+
+            }
+
+
             
             if (!win.update)
             {
@@ -280,6 +340,18 @@ function plutovtkplot(uuid,jsdict,invalidation)
                     cellmapper.setColorModeToDirectScalars()
 		    win.cellactor.setMapper(cellmapper);
                     win.renderer.addActor(win.cellactor);
+                }
+
+                if (outline==1)
+                {
+                    win.odataset = vtk.Common.DataModel.vtkPolyData.newInstance();
+                    win.oactor = vtk.Rendering.Core.vtkActor.newInstance();
+		    var omapper = vtk.Rendering.Core.vtkMapper.newInstance();
+		    omapper.setInputData(win.odataset);
+                    omapper.setColorModeToDirectScalars()
+                    win.oactor.setForceTranslucent(true) //  https://discourse.vtk.org/t/wireframe-not-visible-behind-transparent-surfaces/6671
+		    win.oactor.setMapper(omapper);
+                    win.renderer.addActor(win.oactor);
                 }
 
                 
@@ -304,6 +376,18 @@ function plutovtkplot(uuid,jsdict,invalidation)
                 win.celldataset.getCellData().setScalars(colorData);        
                 win.celldataset.modified()
             }
+
+            if (outline==1)
+            {
+                win.odataset.getPoints().setData(opoints, 3);
+                win.odataset.getPolys().setData(opolys,1);
+                win.odataset.getCellData().setActiveScalars('Colors');
+                win.odataset.getCellData().setScalars(ocolorData);        
+                win.odataset.modified()
+            }
+
+
+            
             win.dataset.getPoints().setData(points, 3);
             win.dataset.getPolys().setData(polys,1);
             win.dataset.modified()

@@ -186,7 +186,9 @@ Plot piecewise linear function on  tetrahedral mesh.
 """
 function tetcontour!(p::PlutoVTKPlot, pts, tets,func;colormap=:viridis,
                      flevel=prevfloat(Inf), flimits=(1.0,-1.0),
-                     xplane=prevfloat(Inf), yplane=prevfloat(Inf), zplane=prevfloat(Inf))
+                     faces=nothing, facemarkers=nothing, facecolormap=nothing,
+                     xplane=prevfloat(Inf), yplane=prevfloat(Inf), zplane=prevfloat(Inf),
+                     outline=true,alpha=0.1)
 
     p.jsdict=Dict{String,Any}("cmdcount" => 0)
     command!(p,"tetcontour")
@@ -194,6 +196,17 @@ function tetcontour!(p::PlutoVTKPlot, pts, tets,func;colormap=:viridis,
     xyzmin=zeros(3)
     xyzmax=ones(3)
 
+    nbregions= facemarkers==nothing ? 0 :  maximum(facemarkers)
+
+    if faces!=nothing && nbregions==0
+        nbregions=1
+        facemarkers=fill(Int32(1),size(faces,2))
+    end
+
+    if facecolormap==nothing
+        facecolormap=GridVisualize.bregion_cmap(nbregions)
+    end
+    
 
     
     @views for idim=1:3
@@ -221,10 +234,10 @@ function tetcontour!(p::PlutoVTKPlot, pts, tets,func;colormap=:viridis,
                                                           [flevel]
                                                           )
 
-    faces=reshape(reinterpret(Int32,faces0),(3,length(faces0)))
+    cfaces=reshape(reinterpret(Int32,faces0),(3,length(faces0)))
     cpts=copy(reinterpret(Float32,cpts0))
     parameter!(p,"points",cpts)
-    parameter!(p,"polys",vtkpolys(faces))
+    parameter!(p,"polys",vtkpolys(cfaces))
     nan_replacement=0.5*(fminmax[1]+fminmax[2])
     for i=1:length(values)
         if isnan(values[i])
@@ -249,6 +262,12 @@ function tetcontour!(p::PlutoVTKPlot, pts, tets,func;colormap=:viridis,
     p.jsdict["levels"]=[fminmax[1],flevel,fminmax[2]]
 
 
+    if outline && faces!=nothing
+        parameter!(p,"outline",1)
+        outline!(p,pts,faces,facemarkers,facecolormap,nbregions,xyzmin,xyzmax;alpha=alpha)
+    else
+        parameter!(p,"outline",0)
+    end
 
     axis3d!(p)
     p
@@ -353,7 +372,40 @@ function trimesh!(p::PlutoVTKPlot,pts, tris;
     p
 end
 
-
+function outline!(p::PlutoVTKPlot,pts,faces,facemarkers,facecolormap,nbregions,xyzmin,xyzmax;alpha=0.1)
+    bregpoints0,bregfacets0=GridVisualize.extract_visible_bfaces3D(pts,faces,facemarkers,nbregions,
+                                                                   xyzmax,
+                                                                   primepoints=hcat(xyzmin,xyzmax)
+                                                                   )
+    bregpoints=hcat([reshape(reinterpret(Float32,bregpoints0[i]),(3,length(bregpoints0[i]))) for i=1:nbregions]...)
+    bregfacets=vcat([vtkpolys(reshape(reinterpret(Int32,bregfacets0[i]),(3,length(bregfacets0[i]))),
+                              offset= ( i==1 ? 0 : sum(k->length(bregpoints0[k]),1:i-1) ) )
+                     for i=1:nbregions]...)
+    bfacemarkers=vcat([fill(i,length(bregfacets0[i])) for i=1:nbregions]...)
+    
+    if typeof(facecolormap)==Symbol
+        facecmap=colorschemes[facecolormap]
+    else
+        facecmap=ColorScheme(facecolormap)
+    end
+    facergb=reinterpret(Float64,get(facecmap,bfacemarkers,(1,size(facecmap))))
+    nfaces=length(facergb)÷3
+    facergba=zeros(UInt8,nfaces*4)
+    irgb=0
+    irgba=0
+    for i=1:nfaces
+        facergba[irgba+1]=UInt8(floor(facergb[irgb+1]*255))
+        facergba[irgba+2]=UInt8(floor(facergb[irgb+2]*255))
+        facergba[irgba+3]=UInt8(floor(facergb[irgb+3]*255))
+        facergba[irgba+4]=UInt8(floor(alpha*255))
+        irgb+=3
+        irgba+=4
+    end
+    parameter!(p,"opolys",bregfacets)
+    parameter!(p,"opoints",vec(bregpoints))
+    parameter!(p,"ocolors",facergba)
+    
+end
 
 """
      tetmesh!(p::PlutoVTKPlot,pts, tris;markers, colormap, faces, facemarkers, facecolormap)
@@ -363,7 +415,8 @@ Plot piecewise linear function on  triangular grid given as "heatmap"
 function tetmesh!(p::PlutoVTKPlot, pts, tets;
                   markers=nothing,  colormap=nothing,
                   faces=nothing, facemarkers=nothing, facecolormap=nothing,
-                  xplane=prevfloat(Inf), yplane=prevfloat(Inf), zplane=prevfloat(Inf))
+                  xplane=prevfloat(Inf), yplane=prevfloat(Inf), zplane=prevfloat(Inf),
+                  outline=true, alpha=0.1)
     
 
     ntet=size(tets,2)
@@ -459,7 +512,14 @@ function tetmesh!(p::PlutoVTKPlot, pts, tets;
         p.jsdict["ecolors"]=ebar_rgb
         p.jsdict["elevels"]=collect(1:size(ecmap))
     end
-        
+
+    if outline && faces!=nothing
+        parameter!(p,"outline",1)
+        outline!(p,pts,faces,facemarkers,facecolormap,nbregions,xyzmin,xyzmax;alpha=alpha)
+    else
+        parameter!(p,"outline",0)
+    end
+    
     parameter!(p,"polys",facets)
     parameter!(p,"points",vec(points))
     parameter!(p,"colors",UInt8.(floor.(rgb*255)))
