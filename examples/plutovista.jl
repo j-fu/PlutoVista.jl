@@ -253,7 +253,7 @@ function func3d(;n=20)
 end;
 
 # ╔═╡ da3ba65b-71c0-4da5-b792-f57e0905aab7
-g3,f3=func3d(;n=49)
+g3,f3=func3d(;n=50)
 
 # ╔═╡ 6af0b5d7-5324-43b5-8f99-6f5d35d5deba
 TableOfContents()

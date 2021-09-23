@@ -6,11 +6,13 @@ mutable struct PlutoVTKPlot  <: AbstractPlutoVistaBackend
     # command list passed to javascript
     jsdict::Dict{String,Any}
 
-    # size in canvas coordinates
+    # size in screen coordinates
     w::Float64
     h::Float64
 
+    # update of a already created plot ?
     update::Bool
+    
     # uuid for identifying html element
     uuid::UUID
     PlutoVTKPlot(::Nothing)=new()
@@ -21,8 +23,7 @@ end
     PlutoVTKPlot(;resolution=(300,300))
 ````
 
-Create a canvas plot with given resolution in the notebook
-and given "world coordinate" range.
+Create a vtk plot with given resolution in the notebook.
 """
 function PlutoVTKPlot(;resolution=(300,300), kwargs...)
     p=PlutoVTKPlot(nothing)
@@ -34,27 +35,13 @@ function PlutoVTKPlot(;resolution=(300,300), kwargs...)
     p
 end
 
-"""
-    axis3d!(vtkplot)
-Add 3D coordinate system axes to the plot.
-Sets camera handling to 3D mode.
-"""
-function axis3d!(p::PlutoVTKPlot)
-    command!(p,"axis")
-    parameter!(p,"cam","3D")
-end
 
 """
-    axis2d!(vtkplot)
-Add 2D coordinate system axes to the plot.
-Sets camera handling to 2D mode.
+    Base.show(io::IO,::MIME"text/html",p::PlutoVTKPlot)
+
+Show plot in html. This creates a vtk.js based renderer along with a canvas
+for handling the colorbar.
 """
-function axis2d!(p::PlutoVTKPlot)
-    command!(p,"axis")
-    parameter!(p,"cam","2D")
-end
-
-
 function Base.show(io::IO, ::MIME"text/html", p::PlutoVTKPlot)
     plutovtkplot = read(joinpath(@__DIR__, "..", "assets", "plutovtkplot.js"), String)
     canvascolorbar = read(joinpath(@__DIR__, "..", "assets", "canvascolorbar.js"), String)
@@ -80,18 +67,38 @@ function Base.show(io::IO, ::MIME"text/html", p::PlutoVTKPlot)
         plutovtkplot("$(p.uuid)",jsdict,invalidation)
         canvascolorbar("$(uuidcbar)",20,$(p.h),jsdict)        
         </script>
-        $(div)
         """
      p.update=true
-     write(io,result)
+     write(io,result*div)
 end
 
 
+
+"""
+    axis3d!(vtkplot)
+Add 3D coordinate system axes to the plot.
+Sets camera handling to 3D mode.
+"""
+function axis3d!(p::PlutoVTKPlot)
+    command!(p,"axis")
+    parameter!(p,"cam","3D")
+end
+
+"""
+    axis2d!(vtkplot)
+Add 2D coordinate system axes to the plot.
+Sets camera handling to 2D mode.
+"""
+function axis2d!(p::PlutoVTKPlot)
+    command!(p,"axis")
+    parameter!(p,"cam","2D")
+end
+
 """
        vtkpolys(tris; offset=0)
-Set up  polygon data for vtk. 
+Set up  polygon (triangle) data for vtk. 
 Coding is   [3, i11, i12, i13,   3 , i21, i22 ,i23, ...]
-Careful: js indexing counts from zero
+Careful: js indexing counts from zero.
 """
 function vtkpolys(tris; offset=0)
     ipoly=1
@@ -112,7 +119,8 @@ end
 """
      tricontour!(p::PlutoVTKPlot,pts, tris,f; colormap, isolines)
 
-Plot piecewise linear function on  triangular grid given as "heatmap" 
+Plot piecewise linear function on  triangular grid given as "heatmap".
+Isolines can be given as a number or as a range.
 """
 function tricontour!(p::PlutoVTKPlot, pts, tris,f;colormap=:viridis, isolines=0, kwargs...)
 
@@ -177,12 +185,20 @@ function tricontour!(p::PlutoVTKPlot, pts, tris,f;colormap=:viridis, isolines=0,
     p
 end
 
+"""
+     contour!(p::PlutoVTKPlot,X,Y,f; colormap, isolines)
+
+Plot piecewise linear function on  triangular grid created from the tensor product of X and Y arrays as "heatmap".
+Isolines can be given as a number or as a range.
+"""
+contour!(p::PlutoVTKPlot,X,Y,f; kwargs...)=tricontour!(p,triang(X,Y)...,vec(f);kwargs...)
 
 
 """
-     tetcontour!(p::PlutoVTKPlot,pts, tets,f; colormap, isolevels, xplane, yplane, zplane)
+     tetcontour!(p::PlutoVTKPlot,pts, tets,f; colormap, flevel, xplane, yplane, zplane)
 
-Plot piecewise linear function on  tetrahedral mesh.
+Plot isosurface given by `flevel` and contour maps on planes given by the `*plane` parameters
+for piecewise linear function on  tetrahedral mesh. 
 """
 function tetcontour!(p::PlutoVTKPlot, pts, tets,func;colormap=:viridis,
                      flevel=prevfloat(Inf), flimits=(1.0,-1.0),
@@ -206,9 +222,7 @@ function tetcontour!(p::PlutoVTKPlot, pts, tets,func;colormap=:viridis,
     if facecolormap==nothing
         facecolormap=GridVisualize.bregion_cmap(nbregions)
     end
-    
-
-    
+        
     @views for idim=1:3
         xyzmin[idim]=minimum(pts[idim,:])
         xyzmax[idim]=maximum(pts[idim,:])
@@ -276,16 +290,10 @@ end
 
 
 
-contour!(p::PlutoVTKPlot,X,Y,f; kwargs...)=tricontour!(p,triang(X,Y)...,vec(f);kwargs...)
-#contour!(p::PlutoVTKPlot,X,Y,f)=tricontour!(p,triang(X,Y)...,vec(f))
-
-
-
-
 """
      trimesh!(p::PlutoVTKPlot,pts, tris;markers, colormap, edges, edgemarkers, edgecolormap)
 
-Plot piecewise linear function on  triangular grid given as "heatmap" 
+Plot  triangular grid with optional region and boundary markers.
 """
 function trimesh!(p::PlutoVTKPlot,pts, tris;
                   markers=nothing,  colormap=nothing,
@@ -372,6 +380,12 @@ function trimesh!(p::PlutoVTKPlot,pts, tris;
     p
 end
 
+
+"""
+    outline!(p::PlutoVTKPlot,pts,faces,facemarkers,facecolormap,nbregions,xyzmin,xyzmax;alpha=0.1)
+
+Plot transparent outline of grid boundaries.
+"""
 function outline!(p::PlutoVTKPlot,pts,faces,facemarkers,facecolormap,nbregions,xyzmin,xyzmax;alpha=0.1)
     bregpoints0,bregfacets0=GridVisualize.extract_visible_bfaces3D(pts,faces,facemarkers,nbregions,
                                                                    xyzmax,
@@ -408,9 +422,9 @@ function outline!(p::PlutoVTKPlot,pts,faces,facemarkers,facecolormap,nbregions,x
 end
 
 """
-     tetmesh!(p::PlutoVTKPlot,pts, tris;markers, colormap, faces, facemarkers, facecolormap)
+     tetmesh!(p::PlutoVTKPlot,pts, tris;markers, colormap, faces, facemarkers, facecolormap,xplane,yplane,zplane, outline, alpha)
 
-Plot piecewise linear function on  triangular grid given as "heatmap" 
+Plot parts of tetrahedral mesh below the planes given by the `*plane` parameters.
 """
 function tetmesh!(p::PlutoVTKPlot, pts, tets;
                   markers=nothing,  colormap=nothing,
@@ -529,18 +543,6 @@ function tetmesh!(p::PlutoVTKPlot, pts, tets;
 end
 
 
-function plot!(p::PlutoVTKPlot,x,y; kwargs...)
-    command!(p,"plot")
-    n=length(x)
-    points=vec(vcat(x',y',zeros(n)'))
-    lines=collect(UInt16,0:n)
-    lines[1]=n
-    parameter!(p,"points",points)
-    parameter!(p,"lines",lines)
-    parameter!(p,"cam","2D")
-    p
-end
-
 
 
 
@@ -565,3 +567,15 @@ function triplot!(p::PlutoVTKPlot,pts, tris,f)
     p
 end
 
+
+function plot!(p::PlutoVTKPlot,x,y; kwargs...)
+    command!(p,"plot")
+    n=length(x)
+    points=vec(vcat(x',y',zeros(n)'))
+    lines=collect(UInt16,0:n)
+    lines[1]=n
+    parameter!(p,"points",points)
+    parameter!(p,"lines",lines)
+    parameter!(p,"cam","2D")
+    p
+end

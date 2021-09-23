@@ -65,7 +65,7 @@ Change grid resolution: $(@bind resolution Slider(5:200))
 (pts,tris,markers,edges,edgemarkers)=maketriangulation(1/resolution^2)
 
 # ╔═╡ b8a976e3-7fef-4527-ae6a-4da31c93a04f
-func=0.5*[sin(10*pts[1,i])*cos(10*pts[2,i]) for i=1:size(pts,2)]
+func=0.5.+0.5*[sin(10*pts[1,i])*cos(10*pts[2,i]) for i=1:size(pts,2)]
 
 # ╔═╡ 401b36bd-fa8f-4a9c-9556-bbc82c3ddbca
  md"""
@@ -84,7 +84,7 @@ md"""Number of gridpoints: $(size(pts,2)) """
 # ╔═╡ 81046dcd-3cfb-4133-943f-61b9b3cdb183
 let
 	p=PlutoVTKPlot(resolution=(300,300))
-	tricontour!(p,pts,tris,func;cmap=:spring,isolines=-0.5:0.1:0.5)
+	tricontour!(p,pts,tris,func;cmap=:spring,isolines=-1.0e-16:0.1:1)
 end
 
 # ╔═╡ 7019ce3f-f2db-4581-8bd9-64f76231a62a

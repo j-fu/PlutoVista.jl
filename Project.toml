@@ -1,7 +1,7 @@
 name = "PlutoVista"
 uuid = "646e1f28-b900-46d7-9d87-d554eb38a413"
 authors = ["Juergen Fuhrmann <juergen.fuhrmann@wias-berlin.de>"]
-version = "0.5.5"
+version = "0.5.6"
 
 [deps]
 ColorSchemes = "35d6a980-a343-548e-a6ea-1d62b119f2f4"
