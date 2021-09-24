@@ -96,6 +96,8 @@ function plot!(p::PlutoPlotlyPlot,x,y;
                xlabel="",
                ylabel="",
                title="",
+               xaxis=:linear,
+               yaxis=:linear,
                legend=:none,
                clear=false)
 
@@ -117,6 +119,8 @@ function plot!(p::PlutoPlotlyPlot,x,y;
     parameter!(p,"xlimits",collect(Float32,xlimits))
     parameter!(p,"xlabel",xlabel)
     parameter!(p,"ylabel",ylabel)
+    parameter!(p,"xaxis",String(xaxis))
+    parameter!(p,"yaxis",String(yaxis))
     parameter!(p,"title",title)
     
     if legend==:none

@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.14.8
+# v0.16.1
 
 using Markdown
 using InteractiveUtils
@@ -26,7 +26,7 @@ begin
     using Pkg
     Pkg.activate(mktempdir())
 	Pkg.add("Revise"); using Revise
-    Pkg.add(["PlutoUI","Triangulate"])
+    Pkg.add(["PlutoUI","Triangulate","LaTeXStrings"])
     if develop	
 	    Pkg.develop("PlutoVista")
     else
@@ -35,11 +35,32 @@ begin
     using PlutoUI
     using PlutoVista
     using Printf
+	using LaTeXStrings
     import Triangulate
 end
 
 # ╔═╡ 9072dcea-e634-493e-ba1a-890220737683
-plot([1,2],[1,2])
+let X=collect(0:0.1:10); plot(X,sin.(X)) end
+
+# ╔═╡ 763bdefc-200e-4afb-a6c9-71fb5ee16f58
+let X=collect(0:0.1:10); plot(X,X.^2,xaxis=:log) end
+
+# ╔═╡ 4cd2182a-ea7c-49f6-a3f8-029b8727430f
+let X=collect(0:0.1:100); plot(X,X.^2,yaxis=:log) end
+
+# ╔═╡ b9e1184b-62db-41c9-9340-b9db0aff5b78
+ let X=collect(0:0.1:100); 
+	p=PlutoVistaPlot(dim=1)
+	plot!(p,X,X.^2,xaxis=:log,yaxis=:log,color=:red) 
+	plot!(p,X,X.^3,xaxis=:log,yaxis=:log) 
+	plot!(p,X,X.^4,xaxis=:log,yaxis=:log,ylabel="x",xlabel="ψ",title="title") 
+end
+
+# ╔═╡ e102affd-bf12-4e22-9990-54f7ee4ad067
+ xlabel=L"$x^3$"
+
+# ╔═╡ e7976441-9851-4f67-931b-abf76a9cc31b
+xlabel.s
 
 # ╔═╡ 7c06fcf0-8c98-49f7-add8-435f57a9c9da
 function maketriangulation(maxarea)
@@ -105,11 +126,22 @@ let
 	contour!(p,collect(X1),collect(Y1),ff; colormap=:hot,isolines=-10:2:10)
 end
 
+# ╔═╡ 5c23809b-9d92-43da-a85d-6c8531c3b547
+let X=collect(0:0.1:10); plot(X,sin.(X)) end
+
+# ╔═╡ edfe1dd2-94a5-403f-b589-53bfca839057
+"\$x^k\$"
+
 # ╔═╡ Cell order:
 # ╟─93ca4fd0-8f61-4174-b459-55f5395c0f56
 # ╠═2acd1978-03b1-4e8f-ba9f-2b3d58123613
 # ╠═d6c0fb79-4129-444a-978a-bd2222b53df6
 # ╠═9072dcea-e634-493e-ba1a-890220737683
+# ╠═763bdefc-200e-4afb-a6c9-71fb5ee16f58
+# ╠═4cd2182a-ea7c-49f6-a3f8-029b8727430f
+# ╠═b9e1184b-62db-41c9-9340-b9db0aff5b78
+# ╠═e102affd-bf12-4e22-9990-54f7ee4ad067
+# ╠═e7976441-9851-4f67-931b-abf76a9cc31b
 # ╠═7c06fcf0-8c98-49f7-add8-435f57a9c9da
 # ╠═890710fe-dac0-4256-b1ba-79776f1ea7e5
 # ╠═b8a976e3-7fef-4527-ae6a-4da31c93a04f
@@ -122,3 +154,5 @@ end
 # ╟─e900801e-2020-4aff-bfec-017ad6fcfdcf
 # ╠═5cb73674-c144-4fd9-8ff6-ac767548822e
 # ╠═34072263-1180-4bc0-a004-2f112ea4cbed
+# ╠═5c23809b-9d92-43da-a85d-6c8531c3b547
+# ╠═edfe1dd2-94a5-403f-b589-53bfca839057

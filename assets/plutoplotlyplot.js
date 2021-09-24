@@ -54,6 +54,7 @@ function plutoplotlyplot(uuid,jsdict,w,h)
             ticks: "outside",
             showline: true,
             zeroline: false,
+            exponentformat: 'e',
             linewidth: 2,
             gridcolor: '#bdbdbd',
         },
@@ -64,6 +65,7 @@ function plutoplotlyplot(uuid,jsdict,w,h)
             ticks: "outside",
             showline: true,
             zeroline: false,
+            exponentformat: 'e',
             linewidth: 2,
             gridcolor: '#bdbdbd',
         },
@@ -127,7 +129,7 @@ function plutoplotlyplot(uuid,jsdict,w,h)
                 }
             };
 
-
+            
             
             
             var yrange=jsdict[cmd+"ylimits"]
@@ -187,6 +189,9 @@ function plutoplotlyplot(uuid,jsdict,w,h)
             
             layout.xaxis.title=jsdict[cmd+"xlabel"]
             layout.yaxis.title=jsdict[cmd+"ylabel"]
+
+            layout.xaxis.type=jsdict[cmd+"xaxis"]
+            layout.yaxis.type=jsdict[cmd+"yaxis"]
             
             
             data.push(trace)
