@@ -1,12 +1,14 @@
 mutable struct PlutoVistaPlot
     backend::Union{PlutoPlotlyPlot,PlutoCanvasPlot,PlutoVTKPlot,Nothing}
     resolution
-    PlutoVistaPlot(::Nothing)=new(nothing, (0,0))
+    args
+    PlutoVistaPlot(::Nothing)=new(nothing, (0,0), nothing)
 end
 
 function PlutoVistaPlot(;resolution=(300,300),kwargs...)
     p=PlutoVistaPlot(nothing)
     p.resolution=resolution
+    p.args=kwargs
     p
 end
 
@@ -15,7 +17,7 @@ end
 
 Overwrite backend if clear is true.
 """
-function backend!(p::PlutoVistaPlot; datadim=1, backend=:default, clear=false)
+function backend!(p::PlutoVistaPlot; datadim=1, backend=:default, clear=false, kwargs...)
     if backend==:default
         if datadim == 1
             backend=:plotly
@@ -26,11 +28,11 @@ function backend!(p::PlutoVistaPlot; datadim=1, backend=:default, clear=false)
     
     if backend == :plotly
         if isnothing(p.backend)  || typeof(p.backend)!=PlutoPlotlyPlot || clear
-            p.backend=PlutoPlotlyPlot(;resolution=p.resolution)
+            p.backend=PlutoPlotlyPlot(;resolution=p.resolution, merge(p.args,kwargs)...)
         end
     elseif backend == :vtk 
         if isnothing(p.backend)  || typeof(p.backend)!=PlutoVTKPlot || clear
-            p.backend=PlutoVTKPlot(;resolution=p.resolution)
+            p.backend=PlutoVTKPlot(;resolution=p.resolution,merge(p.args,kwargs)...)
         end
     else
         error("No valid backend: $(backend). Valid backends: :default, :vtk, :plotly")
@@ -43,56 +45,57 @@ Base.show(io::IO, mime::MIME"text/html", p::Nothing)=nothing
 Base.show(io::IO, mime::MIME"text/html", p::PlutoVistaPlot)=Base.show(io,mime,p.backend)
 
 plot(x,y; kwargs...)=plot!(PlutoVistaPlot(;kwargs...),x,y;kwargs...)
-plot!(p::PlutoVistaPlot,x,y; backend=:plotly, clear=false, kwargs...)=plot!(backend!(p,datadim=1,backend=backend,clear=false),
-                                                               x,y;clear=clear,kwargs...)
+plot!(p::PlutoVistaPlot,x,y; backend=:plotly, clear=false, kwargs...) = plot!(backend!(p; datadim=1,backend=backend,clear=false, kwargs...),
+                                                                              x,y;
+                                                                              clear=clear,kwargs...)
 
 
 function plot(;datadim=1,backend=:default,kwargs...)
     p=PlutoVistaPlot(;kwargs...)
-    backend!(p,datadim=datadim,backend=backend)
+    backend!(p;datadim=datadim,backend=backend, kwargs...)
 end
 
 
 
 tricontour(pts,tris,f; kwargs...)=tricontour!(PlutoVistaPlot(;kwargs...),pts,tris,f; kwargs...)
-tricontour!(p::PlutoVistaPlot,pts,tris,f;backend=:vtk, kwargs...)=tricontour!(backend!(p,datadim=2,backend=backend),
+tricontour!(p::PlutoVistaPlot,pts,tris,f;backend=:vtk, kwargs...)=tricontour!(backend!(p; datadim=2,backend=backend, kwargs...),
                                                                               pts,tris,f; kwargs...)
 
 function tricontour(;kwargs...)
     p=PlutoVistaPlot(;kwargs...)
-    backend!(p,datadim=2)
+    backend!(p;datadim=2,kwargs...)
 end
 
 
 
 tetcontour(pts,tets,f; kwargs...)=tetcontour!(PlutoVistaPlot(;kwargs...),pts,tets,f; kwargs...)
-tetcontour!(p::PlutoVistaPlot,pts,tets,f;backend=:vtk, kwargs...)=tetcontour!(backend!(p,datadim=2,backend=backend),
+tetcontour!(p::PlutoVistaPlot,pts,tets,f;backend=:vtk, kwargs...)=tetcontour!(backend!(p; datadim=2,backend=backend, kwargs...),
                                                                               pts,tets,f; kwargs...)
 function tetcontour(;kwargs...)
     p=PlutoVistaPlot(;kwargs...)
-    backend!(p,datadim=3)
+    backend!(p;datadim=3,kwargs...)
 end
 
 
 
 trimesh(pts,tris; kwargs...)=trimesh!(PlutoVistaPlot(;kwargs...),pts,tris; kwargs...)
-trimesh!(p::PlutoVistaPlot,pts,tris; backend=:vtk, kwargs...)=trimesh!(backend!(p,datadim=2,backend=backend),
+trimesh!(p::PlutoVistaPlot,pts,tris; backend=:vtk, kwargs...)=trimesh!(backend!(p;datadim=2,backend=backend, kwargs...),
                                                                         pts,tris; kwargs...)
 
 function trimesh(;kwargs...)
     p=PlutoVistaPlot(;kwargs...)
-    backend!(p,datadim=2)
+    backend!(p;datadim=2,kwargs...)
 end
 
 
 
 tetmesh(pts,tets; kwargs...)=tetmesh!(PlutoVistaPlot(;kwargs...),pts,tets; kwargs...)
-tetmesh!(p::PlutoVistaPlot,pts,tets; backend=:vtk, kwargs...)=tetmesh!(backend!(p,datadim=3,backend=backend),
+tetmesh!(p::PlutoVistaPlot,pts,tets; backend=:vtk, kwargs...)=tetmesh!(backend!(p;datadim=3,backend=backend, kwargs...),
                                                                         pts,tets; kwargs...)
 
 function tetmesh(;kwargs...)
     p=PlutoVistaPlot(;kwargs...)
-    backend!(p,datadim=2)
+    backend!(p;datadim=2,kwargs...)
 end
 
 
@@ -100,11 +103,11 @@ end
 
 
 contour(X,Y,f; kwargs...)=contour!(PlutoVistaPlot(;kwargs...),X,Y,f; kwargs...)
-contour!(p::PlutoVistaPlot,X,Y,f; backend=:vtk, kwargs...)=contour!(backend!(p,datadim=2,backend=backend),
+contour!(p::PlutoVistaPlot,X,Y,f; backend=:vtk, kwargs...)=contour!(backend!(p;datadim=2,backend=backend, kwargs...),
                                                                     X,Y,f; kwargs...)
 function contour(;kwargs...)
     p=PlutoVistaPlot(;kwargs...)
-    backend!(p,datadim=2)
+    backend!(p;datadim=2,kwargs...)
 end
 
 

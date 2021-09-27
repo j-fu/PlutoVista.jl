@@ -11,7 +11,10 @@ mutable struct PlutoVTKPlot  <: AbstractPlutoVistaBackend
     h::Float64
 
     # update of a already created plot ?
+
     update::Bool
+
+    args
     
     # uuid for identifying html element
     uuid::UUID
@@ -31,6 +34,13 @@ function PlutoVTKPlot(;resolution=(300,300), kwargs...)
     p.jsdict=Dict{String,Any}("cmdcount" => 0,"cbar" => 0)
     p.w=resolution[1]
     p.h=resolution[2]
+
+    default_args=(title="",
+                  clear=false)
+
+    p.args=merge(default_args,kwargs)
+
+    
     p.update=false
     p
 end
@@ -122,8 +132,17 @@ end
 Plot piecewise linear function on  triangular grid given as "heatmap".
 Isolines can be given as a number or as a range.
 """
-function tricontour!(p::PlutoVTKPlot, pts, tris,f;colormap=:viridis, isolines=0, kwargs...)
+function tricontour!(p::PlutoVTKPlot, pts, tris,f;kwargs...)
 
+    default_args=(colormap=:viridis, isolines=0)
+    args=merge(p.args,default_args)
+    args=merge(args,kwargs)
+
+    isolines=args[:isolines]
+    colormap=args[:colormap]
+
+
+    
     p.jsdict=Dict{String,Any}("cmdcount" => 0)
 
 
@@ -200,12 +219,39 @@ contour!(p::PlutoVTKPlot,X,Y,f; kwargs...)=tricontour!(p,triang(X,Y)...,vec(f);k
 Plot isosurface given by `flevel` and contour maps on planes given by the `*plane` parameters
 for piecewise linear function on  tetrahedral mesh. 
 """
-function tetcontour!(p::PlutoVTKPlot, pts, tets,func;colormap=:viridis,
-                     flevel=prevfloat(Inf), flimits=(1.0,-1.0),
-                     faces=nothing, facemarkers=nothing, facecolormap=nothing,
-                     xplane=prevfloat(Inf), yplane=prevfloat(Inf), zplane=prevfloat(Inf),
-                     outline=true,alpha=0.1)
+function tetcontour!(p::PlutoVTKPlot, pts, tets,func; kwargs...)
 
+
+    default_args=(colormap=:viridis,
+                  flevel=prevfloat(Inf),
+                  flimits=(1.0,-1.0),
+                  faces=nothing,
+                  facemarkers=nothing,
+                  facecolormap=nothing,
+                  xplane=prevfloat(Inf),
+                  yplane=prevfloat(Inf),
+                  zplane=prevfloat(Inf),
+                  outline=true,
+                  alpha=0.1)
+
+    args=merge(p.args,default_args)
+    args=merge(args,kwargs)
+
+    colormap=args[:colormap]
+    flevel=args[:flevel]
+    flimits=args[:flimits]
+    faces=args[:faces]
+    facemarkers=args[:facemarkers]
+    facecolormap=args[:facecolormap]
+    xplane=args[:xplane]
+    yplane=args[:yplane]
+    zplane=args[:zplane]
+    outline=args[:outline]
+    alpha=args[:alpha]
+    
+
+
+    
     p.jsdict=Dict{String,Any}("cmdcount" => 0)
     command!(p,"tetcontour")
 
@@ -295,10 +341,22 @@ end
 
 Plot  triangular grid with optional region and boundary markers.
 """
-function trimesh!(p::PlutoVTKPlot,pts, tris;
-                  markers=nothing,  colormap=nothing,
-                  edges=nothing, edgemarkers=nothing, edgecolormap=nothing)
+function trimesh!(p::PlutoVTKPlot,pts, tris; kwargs...)
 
+    default_args=(markers=nothing,
+                  colormap=nothing,
+                  edges=nothing,
+                  edgemarkers=nothing,
+                  edgecolormap=nothing)
+    
+    args=merge(p.args,default_args)
+    args=merge(args,kwargs)
+    
+    colormap=args[:colormap]
+    markers=args[:markers]
+    edgemarkers=args[:edgemarkers]
+    edgecolormap=args[:edgecolormap]
+    edges=args[:edges]
 
     ntri=size(tris,2)
     command!(p,"trimesh")
@@ -426,11 +484,38 @@ end
 
 Plot parts of tetrahedral mesh below the planes given by the `*plane` parameters.
 """
-function tetmesh!(p::PlutoVTKPlot, pts, tets;
-                  markers=nothing,  colormap=nothing,
-                  faces=nothing, facemarkers=nothing, facecolormap=nothing,
-                  xplane=prevfloat(Inf), yplane=prevfloat(Inf), zplane=prevfloat(Inf),
-                  outline=true, alpha=0.1)
+function tetmesh!(p::PlutoVTKPlot, pts, tets;kwargs...)
+
+
+
+
+    default_args=(markers=nothing,
+                  colormap=nothing,
+                  faces=nothing,
+                  facemarkers=nothing,
+                  facecolormap=nothing,
+                  xplane=prevfloat(Inf),
+                  yplane=prevfloat(Inf),
+                  zplane=prevfloat(Inf),
+                  outline=true,
+                  alpha=0.1)
+    
+    args=merge(p.args,default_args)
+    args=merge(args,kwargs)
+    
+    markers=args[:markers]
+    colormap=args[:colormap]
+    faces=args[:faces]
+    facemarkers=args[:facemarkers]
+    facecolormap=args[:facecolormap]
+    xplane=args[:xplane]
+    yplane=args[:yplane]
+    zplane=args[:zplane]
+    outline=args[:outline]
+    alpha=args[:alpha]
+    
+    
+    
     
 
     ntet=size(tets,2)

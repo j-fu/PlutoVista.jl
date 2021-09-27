@@ -5,7 +5,8 @@ In particular it contains dict of data sent to javascript.
 mutable struct PlutoPlotlyPlot  <: AbstractPlutoVistaBackend
     # command list passed to javascript
     jsdict::Dict{String,Any}
-
+    args
+    
     # size in canvas coordinates
     w::Float64
     h::Float64
@@ -29,6 +30,16 @@ function PlutoPlotlyPlot(;resolution=(300,300), kwargs...)
     p.jsdict=Dict{String,Any}("cmdcount" => 0)
     p.w=resolution[1]
     p.h=resolution[2]
+    default_args=(ylimits=(1,-1),
+                  xlimits=(1,-1),
+                  xlabel="",
+                  ylabel="",
+                  title="",
+                  xaxis=:linear,
+                  yaxis=:linear,
+                  legend=:none,
+                  clear=false)
+    p.args=merge(default_args,kwargs)
     p.update=false
     p
 end
@@ -83,62 +94,56 @@ const mshapes=Dict(
 )
 
 
-function plot!(p::PlutoPlotlyPlot,x,y;
-               label="",
-               color=:auto,
-               linewidth=2,
-               linestyle=:solid,
-               markersize=6,
-               markercount=10,
-               markertype=:none,
-               ylimits=(1,-1),
-               xlimits=(1,-1),
-               xlabel="",
-               ylabel="",
-               title="",
-               xaxis=:linear,
-               yaxis=:linear,
-               legend=:none,
-               clear=false)
+function plot!(p::PlutoPlotlyPlot,x,y; kwargs...)
+
+    default_args=(label="",
+                  color=:auto,
+                  linewidth=2,
+                  linestyle=:solid,
+                  markersize=6,
+                  markercount=10,
+                  markertype=:none)
+    args=merge(p.args,default_args)
+    args=merge(args,kwargs)
 
 
-    if clear
+    
+    if args[:clear]
         p.jsdict=Dict{String,Any}("cmdcount" => 0)
     end
     
     command!(p,"plot")
     parameter!(p,"x",collect(x))
     parameter!(p,"y",collect(y))
-    parameter!(p,"label",label)
-    parameter!(p,"linewidth",linewidth)
-    parameter!(p,"markercount",markercount)
-    parameter!(p,"markertype",mshapes[markertype])
-    parameter!(p,"markersize",markersize)
-    parameter!(p,"linestyle",String(linestyle))
-    parameter!(p,"ylimits",collect(Float32,ylimits))
-    parameter!(p,"xlimits",collect(Float32,xlimits))
-    parameter!(p,"xlabel",xlabel)
-    parameter!(p,"ylabel",ylabel)
-    parameter!(p,"xaxis",String(xaxis))
-    parameter!(p,"yaxis",String(yaxis))
-    parameter!(p,"title",title)
-    
-    if legend==:none
+    parameter!(p,"label",args[:label])
+    parameter!(p,"linewidth",args[:linewidth])
+    parameter!(p,"markercount",args[:markercount])
+    parameter!(p,"markertype",mshapes[args[:markertype]])
+    parameter!(p,"markersize",args[:markersize])
+    parameter!(p,"linestyle",String(args[:linestyle]))
+    parameter!(p,"ylimits",collect(Float32,args[:ylimits]))
+    parameter!(p,"xlimits",collect(Float32,args[:xlimits]))
+    parameter!(p,"xlabel",args[:xlabel])
+    parameter!(p,"ylabel",args[:ylabel])
+    parameter!(p,"xaxis",String(args[:xaxis]))
+    parameter!(p,"yaxis",String(args[:yaxis]))
+    parameter!(p,"title",args[:title])
+    if args[:legend]==:none
         parameter!(p,"showlegend",0)
     else
         parameter!(p,"showlegend",1)
-        slegend=String(legend)
+        slegend=String(args[:legend])
         parameter!(p,"legendxpos",slegend[1:1])
         parameter!(p,"legendypos",slegend[2:2])
     end
     
-    parameter!(p,"clear",clear ? 1 : 0)
+    parameter!(p,"clear",args[:clear] ? 1 : 0)
    
     
-    if color == :auto
+    if args[:color] == :auto
         parameter!(p,"color","auto")
     else
-        rgb=RGB(color)
+        rgb=RGB(args[:color])
         rgb=[rgb.r,rgb.g,rgb.b]
         rgb=UInt8.(floor.(rgb*255))
         parameter!(p,"color",rgb)
@@ -153,7 +158,15 @@ end
 Plot piecewise linear function on  triangular grid given as "heatmap" and
 with isolines using Plotly's mesh3d.
 """
-function tricontour!(p::PlutoPlotlyPlot,pts, tris,f;colormap=:viridis, isolines=0, kwargs...)
+function tricontour!(p::PlutoPlotlyPlot,pts, tris,f;kwargs...)
+
+    default_args=(colormap=:viridis, isolines=0)
+    args=merge(p.args,default_args)
+    args=merge(args,kwargs)
+
+    isolines=args[:isolines]
+
+
     zval=0.0
     p.jsdict=Dict{String,Any}("cmdcount" => 0)
 
@@ -167,7 +180,7 @@ function tricontour!(p::PlutoPlotlyPlot,pts, tris,f;colormap=:viridis, isolines=
 
     
     stops=collect(0:0.01:1)
-    rgb=reinterpret(Float64,get(colorschemes[colormap],stops,(0,1)))
+    rgb=reinterpret(Float64,get(colorschemes[args[:colormap]],stops,(0,1)))
     rgb=UInt8.(floor.(rgb*255))
 
     parameter!(p,"cstops",stops)
@@ -225,7 +238,16 @@ end
 Plot heatmap and isolines on rectangular grid defined by X and Y
 using Plotly's native contour plot.
 """
-function contour!(p::PlutoPlotlyPlot,X,Y,f; colormap=:viridis, isolines=0 , kwargs...)
+function contour!(p::PlutoPlotlyPlot,X,Y,f; kwargs...)
+    default_args=(colormap=:viridis, isolines=0)
+    args=merge(p.args,default_args)
+    args=merge(args,kwargs)
+
+    isolines=args[:isolines]
+    colormap=args[:colormap]
+
+
+
     p.jsdict=Dict{String,Any}("cmdcount" => 0)
     command!(p,"contour")
     parameter!(p,"x",collect(X))

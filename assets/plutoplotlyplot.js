@@ -39,7 +39,8 @@ function plutoplotlyplot(uuid,jsdict,w,h)
         title: {
             text: '',
             font: {
-                size: 14
+                size: 12,
+                family: 'Arial'
             }
         },
         
@@ -57,6 +58,20 @@ function plutoplotlyplot(uuid,jsdict,w,h)
             exponentformat: 'e',
             linewidth: 2,
             gridcolor: '#bdbdbd',
+            title: {
+                font: {
+                    size: 10,
+                    family: 'Arial'
+                },
+            },
+            titlefont: {
+                size: 10,
+                family: 'Arial'
+            },
+            tickfont: {
+                size: 10,
+                family: 'Arial'
+            }
         },
 
         yaxis: {
@@ -68,16 +83,35 @@ function plutoplotlyplot(uuid,jsdict,w,h)
             exponentformat: 'e',
             linewidth: 2,
             gridcolor: '#bdbdbd',
+            title: {
+                font: {
+                    size: 10,
+                    family: 'Arial'
+                },
+            },
+            titlefont: {
+                size: 10,
+                family: 'Arial'
+            },
+            tickfont: {
+                size: 10,
+                family: 'Arial'
+            }
         },
 
         showlegend: false,
         legend:{
-                bgcolor: 'rgba(255,255,255,0.8)',
+            bgcolor: 'rgba(255,255,255,0.8)',
+            font: {
+                size: 10,
+                family: 'Arial'
+            },
+
         },
         
         margin: {
-            l: 40,
-            r: 10,
+            l: 60,
+            r: 25,
             b: 40,
             t: 30,
             pad: 0

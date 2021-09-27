@@ -43,24 +43,26 @@ end
 let X=collect(0:0.1:10); plot(X,sin.(X)) end
 
 # ╔═╡ 763bdefc-200e-4afb-a6c9-71fb5ee16f58
-let X=collect(0:0.1:10); plot(X,X.^2,xaxis=:log) end
+let X=collect(0:0.1:10); plot(X,X.^2,xaxis=:log,label="x", legend=:lt) end
 
 # ╔═╡ 4cd2182a-ea7c-49f6-a3f8-029b8727430f
-let X=collect(0:0.1:100); plot(X,X.^2,yaxis=:log) end
+let X=collect(0:0.1:100); plot(X,X.^2,yaxis=:log,label="x",legend=:rb) end
 
 # ╔═╡ b9e1184b-62db-41c9-9340-b9db0aff5b78
  let X=collect(0:0.1:100); 
-	p=PlutoVistaPlot(dim=1)
-	plot!(p,X,X.^2,xaxis=:log,yaxis=:log,color=:red) 
-	plot!(p,X,X.^3,xaxis=:log,yaxis=:log) 
-	plot!(p,X,X.^4,xaxis=:log,yaxis=:log,ylabel="x",xlabel="ψ",title="title") 
+	p=PlutoVistaPlot(xaxis=:log,yaxis=:log,ylabel="x",xlabel="ψ",title="title",legend=:lt)
+	plot!(p,X,X.^2;color=:red,label="2") 
+	plot!(p,X,X.^3,label="3")
+	plot!(p,X,X.^4,label="4")  
 end
 
-# ╔═╡ e102affd-bf12-4e22-9990-54f7ee4ad067
- xlabel=L"$x^3$"
-
-# ╔═╡ e7976441-9851-4f67-931b-abf76a9cc31b
-xlabel.s
+# ╔═╡ ad1da8b8-723f-4b18-ba50-fb5a6d5d1176
+ let X=collect(0:0.1:1000); 
+	p=PlutoVistaPlot(dim=1,resolution=(600,300))
+	plot!(p,X,X.^20,color=:red,label="2") 
+	plot!(p,X,X.^30,label="3") 
+	plot!(p,X,X.^40,ylabel="y",xlabel="xxx",title="title",label="4",legend=:lt,xaxis=:log,yaxis=:log) 
+end
 
 # ╔═╡ 7c06fcf0-8c98-49f7-add8-435f57a9c9da
 function maketriangulation(maxarea)
@@ -76,7 +78,7 @@ end
 
 # ╔═╡ db2823d9-aa6d-4be3-af5c-873c072cfd2b
 md"""
-Change grid resolution: $(@bind resolution Slider(5:200))
+Change grid resolution: $(@bind resolution Slider(20:200))
 """
 
 # ╔═╡ 890710fe-dac0-4256-b1ba-79776f1ea7e5
@@ -132,6 +134,40 @@ let X=collect(0:0.1:10); plot(X,sin.(X)) end
 # ╔═╡ edfe1dd2-94a5-403f-b589-53bfca839057
 "\$x^k\$"
 
+# ╔═╡ 9709e98a-50f3-4ee5-912c-e370c8c93193
+ function fpdens(x::AbstractFloat;sample_size=1000) 
+    xleft=x
+    xright=x
+    for i=1:sample_size
+        xleft=prevfloat(xleft)
+        xright=nextfloat(xright)
+    end
+    return prevfloat(2.0*sample_size/(xright-xleft))
+end;
+
+
+# ╔═╡ f8684eae-00c8-4e19-b638-5be32c045cfc
+X=10.0.^collect(-40:0.1:40);
+
+# ╔═╡ 7f5612f3-a0cb-4319-b4bf-4eefe5dc2a18
+let
+    p=plot(resolution=(600,300),
+		title="Number of numbers per unit interval",
+		xaxis=:log,yaxis=:log,xlabel="x",ylabel="n",legend=:rt)
+    plot!(p,X,map(x->1.0e20/x,X), label="O(1/x)",linewidth=0.5,color=:black,linestyle=:dot)
+    plot!(p,X,fpdens.(Float16.(X)),label="Float16")
+    plot!(p,X,fpdens.(Float32.(X)),label="Float32")
+    plot!(p,X,fpdens.(Float64.(X)),label="Float64")
+    plot!(p,X,map(x-> x<typemax(Int8) ? 1  : 0,X),
+		linestyle=:dash,label="Int8")
+    plot!(p,X,map(x-> x<typemax(Int32) ? 1 : 0,X),
+		linestyle=:dash,label="Int32")
+    plot!(p,X,map(x-> x<typemax(Int64) ? 1 : 0,X),
+		linestyle=:dash,label="Int64")
+    plot!(p,X,map(x-> x<typemax(Int16) ? 1 : 0,X),
+		linestyle=:dash,color=:black,label="Int16")
+end
+
 # ╔═╡ Cell order:
 # ╟─93ca4fd0-8f61-4174-b459-55f5395c0f56
 # ╠═2acd1978-03b1-4e8f-ba9f-2b3d58123613
@@ -140,8 +176,7 @@ let X=collect(0:0.1:10); plot(X,sin.(X)) end
 # ╠═763bdefc-200e-4afb-a6c9-71fb5ee16f58
 # ╠═4cd2182a-ea7c-49f6-a3f8-029b8727430f
 # ╠═b9e1184b-62db-41c9-9340-b9db0aff5b78
-# ╠═e102affd-bf12-4e22-9990-54f7ee4ad067
-# ╠═e7976441-9851-4f67-931b-abf76a9cc31b
+# ╠═ad1da8b8-723f-4b18-ba50-fb5a6d5d1176
 # ╠═7c06fcf0-8c98-49f7-add8-435f57a9c9da
 # ╠═890710fe-dac0-4256-b1ba-79776f1ea7e5
 # ╠═b8a976e3-7fef-4527-ae6a-4da31c93a04f
@@ -156,3 +191,6 @@ let X=collect(0:0.1:10); plot(X,sin.(X)) end
 # ╠═34072263-1180-4bc0-a004-2f112ea4cbed
 # ╠═5c23809b-9d92-43da-a85d-6c8531c3b547
 # ╠═edfe1dd2-94a5-403f-b589-53bfca839057
+# ╠═9709e98a-50f3-4ee5-912c-e370c8c93193
+# ╠═f8684eae-00c8-4e19-b638-5be32c045cfc
+# ╠═7f5612f3-a0cb-4319-b4bf-4eefe5dc2a18
