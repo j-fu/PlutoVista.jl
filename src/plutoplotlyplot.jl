@@ -30,7 +30,7 @@ function PlutoPlotlyPlot(;resolution=(300,300), kwargs...)
     p.jsdict=Dict{String,Any}("cmdcount" => 0)
     p.w=resolution[1]
     p.h=resolution[2]
-    default_args=(ylimits=(1,-1),
+    default_args=(limits=(1,-1),
                   xlimits=(1,-1),
                   xlabel="",
                   ylabel="",
@@ -121,7 +121,7 @@ function plot!(p::PlutoPlotlyPlot,x,y; kwargs...)
     parameter!(p,"markertype",mshapes[args[:markertype]])
     parameter!(p,"markersize",args[:markersize])
     parameter!(p,"linestyle",String(args[:linestyle]))
-    parameter!(p,"ylimits",collect(Float32,args[:ylimits]))
+    parameter!(p,"ylimits",collect(Float32,args[:limits]))
     parameter!(p,"xlimits",collect(Float32,args[:xlimits]))
     parameter!(p,"xlabel",args[:xlabel])
     parameter!(p,"ylabel",args[:ylabel])

@@ -57,7 +57,6 @@ function Base.show(io::IO, ::MIME"text/html", p::PlutoVTKPlot)
     canvascolorbar = read(joinpath(@__DIR__, "..", "assets", "canvascolorbar.js"), String)
     uuidcbar="$(p.uuid)"*"cbar"
     div=""
-
     if !p.update
     div="""
         <p>
@@ -127,20 +126,60 @@ end
 
 
 """
-     tricontour!(p::PlutoVTKPlot,pts, tris,f; colormap, isolines)
+    outline!(p::PlutoVTKPlot,pts,faces,facemarkers,facecolormap,nbregions,xyzmin,xyzmax;alpha=0.1)
+
+Plot transparent outline of grid boundaries.
+"""
+function outline!(p::PlutoVTKPlot,pts,faces,facemarkers,facecolormap,nbregions,xyzmin,xyzmax;alpha=0.1)
+    bregpoints0,bregfacets0=GridVisualize.extract_visible_bfaces3D(pts,faces,facemarkers,nbregions,
+                                                                   xyzmax,
+                                                                   primepoints=hcat(xyzmin,xyzmax)
+                                                                   )
+    bregpoints=hcat([reshape(reinterpret(Float32,bregpoints0[i]),(3,length(bregpoints0[i]))) for i=1:nbregions]...)
+    bregfacets=vcat([vtkpolys(reshape(reinterpret(Int32,bregfacets0[i]),(3,length(bregfacets0[i]))),
+                              offset= ( i==1 ? 0 : sum(k->length(bregpoints0[k]),1:i-1) ) )
+                     for i=1:nbregions]...)
+    bfacemarkers=vcat([fill(i,length(bregfacets0[i])) for i=1:nbregions]...)
+    
+    if typeof(facecolormap)==Symbol
+        facecmap=colorschemes[facecolormap]
+    else
+        facecmap=ColorScheme(facecolormap)
+    end
+    facergb=reinterpret(Float64,get(facecmap,bfacemarkers,(1,size(facecmap))))
+    nfaces=length(facergb)÷3
+    facergba=zeros(UInt8,nfaces*4)
+    irgb=0
+    irgba=0
+    for i=1:nfaces
+        facergba[irgba+1]=UInt8(floor(facergb[irgb+1]*255))
+        facergba[irgba+2]=UInt8(floor(facergb[irgb+2]*255))
+        facergba[irgba+3]=UInt8(floor(facergb[irgb+3]*255))
+        facergba[irgba+4]=UInt8(floor(alpha*255))
+        irgb+=3
+        irgba+=4
+    end
+    parameter!(p,"opolys",bregfacets)
+    parameter!(p,"opoints",vec(bregpoints))
+    parameter!(p,"ocolors",facergba)
+    
+end
+
+
+
+"""
+     tricontour!(p::PlutoVTKPlot,pts, tris,f; colormap, levels, limits)
 
 Plot piecewise linear function on  triangular grid given as "heatmap".
 Isolines can be given as a number or as a range.
 """
 function tricontour!(p::PlutoVTKPlot, pts, tris,f;kwargs...)
 
-    default_args=(colormap=:viridis, isolines=0)
+    default_args=(colormap=:viridis, levels=0, limits=:auto)
     args=merge(p.args,default_args)
     args=merge(args,kwargs)
 
-    isolines=args[:isolines]
     colormap=args[:colormap]
-
 
     
     p.jsdict=Dict{String,Any}("cmdcount" => 0)
@@ -148,48 +187,34 @@ function tricontour!(p::PlutoVTKPlot, pts, tris,f;kwargs...)
 
     command!(p,"tricontour")
 
-
-    if isa(isolines,Number)
-        (fmin,fmax)=extrema(f)
-    else
-        (fmin,fmax)=extrema(isolines)
-    end        
+    levels,crange=GridVisualize.isolevels(args,f)
 
     parameter!(p,"points",vec(vcat(pts,zeros(eltype(pts),length(f))')))
     parameter!(p,"polys",vtkpolys(tris))
 
-    rgb=reinterpret(Float64,get(colorschemes[colormap],f,(fmin,fmax)))
+    rgb=reinterpret(Float64,get(colorschemes[colormap],f,crange))
     parameter!(p,"colors",UInt8.(floor.(rgb*255)))
 
-    xisolines=[fmin,fmax]
+    parameter!(p,"isopoints","none")
+    parameter!(p,"isolines","none")
     
-    if isolines==0
-        parameter!(p,"isopoints","none")
-        parameter!(p,"isolines","none")
-    else
-        if isa(isolines,Number)
-            xisolines=range(fmin,fmax,length=isolines)
-        else
-            xisolines=isolines
-        end
-        iso_pts=GridVisualize.marching_triangles(pts,tris,f,xisolines)
-        niso_pts=length(iso_pts)
-        iso_pts=vcat(reshape(reinterpret(Float32,iso_pts),(2,niso_pts)),zeros(niso_pts)')
-        iso_lines=Vector{UInt32}(undef,niso_pts+Int32(niso_pts//2))
-        
-        iline=0
-        ipt=0
-        for i=1:niso_pts//2
-            iso_lines[iline+1]=2
-            iso_lines[iline+2]=ipt
-            iso_lines[iline+3]=ipt+1
-            iline=iline+3
-            ipt=ipt+2
-        end
-        parameter!(p,"isopoints",vec(iso_pts))
-        parameter!(p,"isolines",iso_lines)
+    
+    iso_pts=GridVisualize.marching_triangles(pts,tris,f,collect(levels))
+    niso_pts=length(iso_pts)
+    iso_pts=vcat(reshape(reinterpret(Float32,iso_pts),(2,niso_pts)),zeros(niso_pts)')
+    iso_lines=Vector{UInt32}(undef,niso_pts+Int32(niso_pts//2))
+    iline=0
+    ipt=0
+    for i=1:niso_pts//2
+        iso_lines[iline+1]=2
+        iso_lines[iline+2]=ipt
+        iso_lines[iline+3]=ipt+1
+        iline=iline+3
+        ipt=ipt+2
     end
-
+    parameter!(p,"isopoints",vec(iso_pts))
+    parameter!(p,"isolines",iso_lines)
+    
     # It seems a colorbar is best drawn via canvas...
     # https://github.com/Kitware/vtk-js/issues/1621
     bar_stops=collect(0:0.01:1)
@@ -198,17 +223,17 @@ function tricontour!(p::PlutoVTKPlot, pts, tris,f;kwargs...)
     p.jsdict["cbar"]=1
     p.jsdict["cstops"]=bar_stops
     p.jsdict["colors"]=bar_rgb
-    p.jsdict["levels"]=collect(xisolines)
+    p.jsdict["levels"]=collect(levels)
 
     axis2d!(p)
     p
 end
 
 """
-     contour!(p::PlutoVTKPlot,X,Y,f; colormap, isolines)
+     contour!(p::PlutoVTKPlot,X,Y,f; colormap, levels)
 
 Plot piecewise linear function on  triangular grid created from the tensor product of X and Y arrays as "heatmap".
-Isolines can be given as a number or as a range.
+Levels can be given as a number or as a range.
 """
 contour!(p::PlutoVTKPlot,X,Y,f; kwargs...)=tricontour!(p,triang(X,Y)...,vec(f);kwargs...)
 
@@ -221,40 +246,29 @@ for piecewise linear function on  tetrahedral mesh.
 """
 function tetcontour!(p::PlutoVTKPlot, pts, tets,func; kwargs...)
 
-
     default_args=(colormap=:viridis,
-                  flevel=prevfloat(Inf),
-                  flimits=(1.0,-1.0),
+                  levels=5,
+                  limits=:auto,
                   faces=nothing,
                   facemarkers=nothing,
                   facecolormap=nothing,
-                  xplane=prevfloat(Inf),
-                  yplane=prevfloat(Inf),
-                  zplane=prevfloat(Inf),
-                  outline=true,
-                  alpha=0.1)
-
+                  xplanes=[prevfloat(Inf)],
+                  yplanes=[prevfloat(Inf)],
+                  zplanes=[prevfloat(Inf)],
+                  levelalpha=0.25,
+                  outlinealpha=0.1)
     args=merge(p.args,default_args)
     args=merge(args,kwargs)
 
+
+    levels,crange=GridVisualize.isolevels(args,func)
     colormap=args[:colormap]
-    flevel=args[:flevel]
-    flimits=args[:flimits]
     faces=args[:faces]
     facemarkers=args[:facemarkers]
     facecolormap=args[:facecolormap]
-    xplane=args[:xplane]
-    yplane=args[:yplane]
-    zplane=args[:zplane]
-    outline=args[:outline]
-    alpha=args[:alpha]
-    
 
-
-    
     p.jsdict=Dict{String,Any}("cmdcount" => 0)
     command!(p,"tetcontour")
-
     xyzmin=zeros(3)
     xyzmax=ones(3)
 
@@ -273,43 +287,63 @@ function tetcontour!(p::PlutoVTKPlot, pts, tets,func; kwargs...)
         xyzmin[idim]=minimum(pts[idim,:])
         xyzmax[idim]=maximum(pts[idim,:])
     end
-    xyzcut=[xplane,yplane,zplane]
-    fminmax=extrema(func)
-    if flimits[1]<flimits[2]
-        fminmax[1]=flimits[1]
-        fminmax[2]=flimits[2]
-    end
 
 
-    xplane=max(xyzmin[1],min(xyzmax[1],xplane))
-    yplane=max(xyzmin[2],min(xyzmax[2],yplane))
-    zplane=max(xyzmin[3],min(xyzmax[3],zplane))
-    flevel=max(fminmax[1],min(fminmax[2],flevel))
+    x=args[:xplanes]
+    y=args[:yplanes]
+    z=args[:zplanes]    
+
+    ε=1.0e-5*(xyzmax.-xyzmin)
+    
+    xplanes=isa(x,Number) ? collect(range(xyzmin[1]+ε[1],xyzmax[1]-ε[1],length=ceil(x))) : x
+    yplanes=isa(y,Number) ? collect(range(xyzmin[2]+ε[2],xyzmax[2]-ε[2],length=ceil(y))) : y
+    zplanes=isa(z,Number) ? collect(range(xyzmin[3]+ε[3],xyzmax[3]-ε[3],length=ceil(z))) : z
+
+    xplanes[1]=min(xyzmax[1],xplanes[1])
+    yplanes[1]=min(xyzmax[2],yplanes[1])
+    zplanes[1]=min(xyzmax[3],zplanes[1])
 
         
     cpts0,faces0,values=GridVisualize.marching_tetrahedra(pts,tets,func,
                                                           primepoints=hcat(xyzmin,xyzmax),
-                                                          primevalues=fminmax,
-                                                          GridVisualize.makeplanes(xyzmin,xyzmax,xplane,yplane,zplane),
-                                                          [flevel]
+                                                          primevalues=crange,
+                                                          GridVisualize.makeplanes(xyzmin,xyzmax,xplanes,yplanes,zplanes),
+                                                          levels
                                                           )
 
     cfaces=reshape(reinterpret(Int32,faces0),(3,length(faces0)))
     cpts=copy(reinterpret(Float32,cpts0))
     parameter!(p,"points",cpts)
     parameter!(p,"polys",vtkpolys(cfaces))
-    nan_replacement=0.5*(fminmax[1]+fminmax[2])
+    nan_replacement=0.5*(crange[1]+crange[2])
     for i=1:length(values)
         if isnan(values[i])
             values[i]=nan_replacement
         end
     end
 
-
     
-    rgb=reinterpret(Float64,get(colorschemes[colormap],values,fminmax))
-    parameter!(p,"colors",UInt8.(floor.(rgb*255)))
-
+    rgb=reinterpret(Float64,get(colorschemes[colormap],values,crange))
+    
+    if args[:levelalpha]>0
+        nfaces=length(rgb)÷3
+        rgba=zeros(UInt8,nfaces*4)
+        irgb=0
+        irgba=0
+        for i=1:nfaces
+            rgba[irgba+1]=UInt8(floor(rgb[irgb+1]*255))
+            rgba[irgba+2]=UInt8(floor(rgb[irgb+2]*255))
+            rgba[irgba+3]=UInt8(floor(rgb[irgb+3]*255))
+            rgba[irgba+4]=UInt8(floor(args[:levelalpha]*255))
+            irgb+=3
+            irgba+=4
+        end
+        parameter!(p,"transparent",1)
+        parameter!(p,"colors",rgba)
+    else
+        parameter!(p,"transparent",0)
+        parameter!(p,"colors",UInt8.(floor.(rgb*255)))
+    end        
 
     # It seems a colorbar is best drawn via canvas...
     # https://github.com/Kitware/vtk-js/issues/1621
@@ -319,18 +353,19 @@ function tetcontour!(p::PlutoVTKPlot, pts, tets,func; kwargs...)
     p.jsdict["cbar"]=1
     p.jsdict["cstops"]=bar_stops
     p.jsdict["colors"]=bar_rgb
-    p.jsdict["levels"]=[fminmax[1],flevel,fminmax[2]]
+    p.jsdict["levels"]=vcat([crange[1]],levels,[crange[2]])
 
 
-    if outline && faces!=nothing
+    if args[:outlinealpha]>0 && faces!=nothing
         parameter!(p,"outline",1)
-        outline!(p,pts,faces,facemarkers,facecolormap,nbregions,xyzmin,xyzmax;alpha=alpha)
+        outline!(p,pts,faces,facemarkers,facecolormap,nbregions,xyzmin,xyzmax;alpha=args[:outlinealpha])
     else
         parameter!(p,"outline",0)
     end
 
     axis3d!(p)
     p
+    
 end
 
 
@@ -440,65 +475,21 @@ end
 
 
 """
-    outline!(p::PlutoVTKPlot,pts,faces,facemarkers,facecolormap,nbregions,xyzmin,xyzmax;alpha=0.1)
-
-Plot transparent outline of grid boundaries.
-"""
-function outline!(p::PlutoVTKPlot,pts,faces,facemarkers,facecolormap,nbregions,xyzmin,xyzmax;alpha=0.1)
-    bregpoints0,bregfacets0=GridVisualize.extract_visible_bfaces3D(pts,faces,facemarkers,nbregions,
-                                                                   xyzmax,
-                                                                   primepoints=hcat(xyzmin,xyzmax)
-                                                                   )
-    bregpoints=hcat([reshape(reinterpret(Float32,bregpoints0[i]),(3,length(bregpoints0[i]))) for i=1:nbregions]...)
-    bregfacets=vcat([vtkpolys(reshape(reinterpret(Int32,bregfacets0[i]),(3,length(bregfacets0[i]))),
-                              offset= ( i==1 ? 0 : sum(k->length(bregpoints0[k]),1:i-1) ) )
-                     for i=1:nbregions]...)
-    bfacemarkers=vcat([fill(i,length(bregfacets0[i])) for i=1:nbregions]...)
-    
-    if typeof(facecolormap)==Symbol
-        facecmap=colorschemes[facecolormap]
-    else
-        facecmap=ColorScheme(facecolormap)
-    end
-    facergb=reinterpret(Float64,get(facecmap,bfacemarkers,(1,size(facecmap))))
-    nfaces=length(facergb)÷3
-    facergba=zeros(UInt8,nfaces*4)
-    irgb=0
-    irgba=0
-    for i=1:nfaces
-        facergba[irgba+1]=UInt8(floor(facergb[irgb+1]*255))
-        facergba[irgba+2]=UInt8(floor(facergb[irgb+2]*255))
-        facergba[irgba+3]=UInt8(floor(facergb[irgb+3]*255))
-        facergba[irgba+4]=UInt8(floor(alpha*255))
-        irgb+=3
-        irgba+=4
-    end
-    parameter!(p,"opolys",bregfacets)
-    parameter!(p,"opoints",vec(bregpoints))
-    parameter!(p,"ocolors",facergba)
-    
-end
-
-"""
      tetmesh!(p::PlutoVTKPlot,pts, tris;markers, colormap, faces, facemarkers, facecolormap,xplane,yplane,zplane, outline, alpha)
 
 Plot parts of tetrahedral mesh below the planes given by the `*plane` parameters.
 """
 function tetmesh!(p::PlutoVTKPlot, pts, tets;kwargs...)
 
-
-
-
     default_args=(markers=nothing,
                   colormap=nothing,
                   faces=nothing,
                   facemarkers=nothing,
                   facecolormap=nothing,
-                  xplane=prevfloat(Inf),
-                  yplane=prevfloat(Inf),
-                  zplane=prevfloat(Inf),
-                  outline=true,
-                  alpha=0.1)
+                  xplanes=[prevfloat(Inf)],
+                  yplanes=[prevfloat(Inf)],
+                  zplanes=[prevfloat(Inf)],
+                  outlinealpha=0.1)
     
     args=merge(p.args,default_args)
     args=merge(args,kwargs)
@@ -508,15 +499,12 @@ function tetmesh!(p::PlutoVTKPlot, pts, tets;kwargs...)
     faces=args[:faces]
     facemarkers=args[:facemarkers]
     facecolormap=args[:facecolormap]
-    xplane=args[:xplane]
-    yplane=args[:yplane]
-    zplane=args[:zplane]
-    outline=args[:outline]
-    alpha=args[:alpha]
+    xplane=args[:xplanes][1]
+    yplane=args[:yplanes][2]
+    zplane=args[:zplanes][3]
     
     
-    
-    
+
 
     ntet=size(tets,2)
     command!(p,"tetmesh")
@@ -572,6 +560,8 @@ function tetmesh!(p::PlutoVTKPlot, pts, tets;kwargs...)
         cmap=ColorScheme(colormap)
     end
     rgb=reinterpret(Float64,get(cmap,regmarkers,(1,size(cmap))))
+    nfaces=length(rgb)÷3
+
     
     bar_stops=collect(1:size(cmap))
     bar_rgb=reinterpret(Float64,get(cmap,bar_stops,(1,size(cmap))))
@@ -612,9 +602,9 @@ function tetmesh!(p::PlutoVTKPlot, pts, tets;kwargs...)
         p.jsdict["elevels"]=collect(1:size(ecmap))
     end
 
-    if outline && faces!=nothing
+    if args[:outlinealpha]>0 && faces!=nothing
         parameter!(p,"outline",1)
-        outline!(p,pts,faces,facemarkers,facecolormap,nbregions,xyzmin,xyzmax;alpha=alpha)
+        outline!(p,pts,faces,facemarkers,facecolormap,nbregions,xyzmin,xyzmax;alpha=args[:outlinealpha])
     else
         parameter!(p,"outline",0)
     end
@@ -622,7 +612,6 @@ function tetmesh!(p::PlutoVTKPlot, pts, tets;kwargs...)
     parameter!(p,"polys",facets)
     parameter!(p,"points",vec(points))
     parameter!(p,"colors",UInt8.(floor.(rgb*255)))
-
     axis3d!(p)
     p
 end

@@ -10,7 +10,6 @@ function setinteractorstyle(interactor, cam)
 function plutovtkplot(uuid,jsdict,invalidation)
 {
 
-
     if (window[uuid+"data"]==undefined)
     {
         window[uuid+"data"]={}
@@ -41,10 +40,10 @@ function plutovtkplot(uuid,jsdict,invalidation)
     }
     var win=window[uuid+"data"]
     win.update=true
-    
     // Loop over content of jsdict
-    for (var cmd = 1 ; cmd <= jsdict.cmdcount ; cmd++)
-    {  
+    for (var cmd = 1 ; cmd <= jsdict["cmdcount"] ; cmd++)
+    {
+        
         if (jsdict[cmd]=="tricontour")
         {
             // see https://discourse.vtk.org/t/manually-create-polydata-in-vtk-js/885/15
@@ -122,7 +121,8 @@ function plutovtkplot(uuid,jsdict,invalidation)
     	    var opoints=jsdict[cmd+"opoints"]
  	    var opolys=jsdict[cmd+"opolys"]
             var ocolors=jsdict[cmd+"ocolors"]
-
+            var transparent=jsdict[cmd+"transparent"]
+            
             if (outline==1)
             {
                 var ocolorData = vtk.Common.Core.vtkDataArray.newInstance({
@@ -134,14 +134,25 @@ function plutovtkplot(uuid,jsdict,invalidation)
             }
 
             
-            /// need to use LUT here!
-            var colorData = vtk.Common.Core.vtkDataArray.newInstance({
-                name: 'Colors',
-                values: colors,
-                numberOfComponents: 3,
-            });
+            if (transparent==1)
+            {
+                /// need to use LUT here!
+                var colorData = vtk.Common.Core.vtkDataArray.newInstance({
+                    name: 'Colors',
+                    values: colors,
+                    numberOfComponents: 4,
+                });
+            }
+            else
+            {
+                /// need to use LUT here!
+                var colorData = vtk.Common.Core.vtkDataArray.newInstance({
+                    name: 'Colors',
+                    values: colors,
+                    numberOfComponents: 3,
+                });
+            }
 
-            
             if (!win.update)
             {
                 win.dataset = vtk.Common.DataModel.vtkPolyData.newInstance();
@@ -149,6 +160,10 @@ function plutovtkplot(uuid,jsdict,invalidation)
                 var mapper = vtk.Rendering.Core.vtkMapper.newInstance();
                 mapper.setInputData(win.dataset);
                 mapper.setColorModeToDirectScalars()
+                if (transparent==1)
+                {
+                    win.actor.setForceTranslucent(true) //  https://discourse.vtk.org/t/wireframe-not-visible-behind-transparent-surfaces/6671
+                }
                 win.actor.setMapper(mapper);
                 win.renderer.addActor(win.actor);
 
@@ -415,7 +430,7 @@ function plutovtkplot(uuid,jsdict,invalidation)
                 cubeAxes.setAxisTextStyle({fontFamily: "Arial"})
                 cubeAxes.setAxisTextStyle({fontSize: "12"})
                 
-                cubeAxes.getProperty().setColor(0,0,0);
+                cubeAxes.getProperty().setColor(0.75,0.75,0.75);
 	        win.renderer.addActor(cubeAxes);
                 win.renderer.resetCamera();
                 win.renderWindow.render();
