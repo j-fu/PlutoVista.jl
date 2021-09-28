@@ -289,19 +289,10 @@ function tetcontour!(p::PlutoVTKPlot, pts, tets,func; kwargs...)
     end
 
 
-    x=args[:xplanes]
-    y=args[:yplanes]
-    z=args[:zplanes]    
+    xplanes=args[:xplanes]
+    yplanes=args[:yplanes]
+    zplanes=args[:zplanes]    
 
-    ε=1.0e-5*(xyzmax.-xyzmin)
-    
-    xplanes=isa(x,Number) ? collect(range(xyzmin[1]+ε[1],xyzmax[1]-ε[1],length=ceil(x))) : x
-    yplanes=isa(y,Number) ? collect(range(xyzmin[2]+ε[2],xyzmax[2]-ε[2],length=ceil(y))) : y
-    zplanes=isa(z,Number) ? collect(range(xyzmin[3]+ε[3],xyzmax[3]-ε[3],length=ceil(z))) : z
-
-    xplanes[1]=min(xyzmax[1],xplanes[1])
-    yplanes[1]=min(xyzmax[2],yplanes[1])
-    zplanes[1]=min(xyzmax[3],zplanes[1])
 
         
     cpts0,faces0,values=GridVisualize.marching_tetrahedra(pts,tets,func,
@@ -321,8 +312,7 @@ function tetcontour!(p::PlutoVTKPlot, pts, tets,func; kwargs...)
             values[i]=nan_replacement
         end
     end
-
-    
+    crange=(Float64(crange[1]),Float64(crange[2]))
     rgb=reinterpret(Float64,get(colorschemes[colormap],values,crange))
     
     if args[:levelalpha]>0
