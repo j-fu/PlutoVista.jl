@@ -35,8 +35,8 @@ function PlutoPlotlyPlot(;resolution=(300,300), kwargs...)
                   xlabel="",
                   ylabel="",
                   title="",
-                  xaxis=:linear,
-                  yaxis=:linear,
+                  xscale=:linear,
+                  yscale=:linear,
                   legend=:none,
                   clear=false)
     p.args=merge(default_args,kwargs)
@@ -111,6 +111,9 @@ function plot!(p::PlutoPlotlyPlot,x,y; kwargs...)
     if args[:clear]
         p.jsdict=Dict{String,Any}("cmdcount" => 0)
     end
+
+    xscale= args[:xscale]==:identity ? :linear :  args[:xscale]
+    yscale= args[:yscale]==:identity ? :linear :  args[:yscale]
     
     command!(p,"plot")
     parameter!(p,"x",collect(x))
@@ -125,8 +128,8 @@ function plot!(p::PlutoPlotlyPlot,x,y; kwargs...)
     parameter!(p,"xlimits",collect(Float32,args[:xlimits]))
     parameter!(p,"xlabel",args[:xlabel])
     parameter!(p,"ylabel",args[:ylabel])
-    parameter!(p,"xaxis",String(args[:xaxis]))
-    parameter!(p,"yaxis",String(args[:yaxis]))
+    parameter!(p,"xaxis",String(xscale))
+    parameter!(p,"yaxis",String(yscale))
     parameter!(p,"title",args[:title])
     if args[:legend]==:none
         parameter!(p,"showlegend",0)
