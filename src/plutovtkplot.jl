@@ -262,6 +262,7 @@ function tetcontour!(p::PlutoVTKPlot, pts, tets,func; kwargs...)
 
 
     levels,crange=GridVisualize.isolevels(args,func)
+
     colormap=args[:colormap]
     faces=args[:faces]
     facemarkers=args[:facemarkers]
@@ -293,13 +294,14 @@ function tetcontour!(p::PlutoVTKPlot, pts, tets,func; kwargs...)
     yplanes=args[:yplanes]
     zplanes=args[:zplanes]    
 
-
+    
         
     cpts0,faces0,values=GridVisualize.marching_tetrahedra(pts,tets,func,
                                                           primepoints=hcat(xyzmin,xyzmax),
                                                           primevalues=crange,
                                                           GridVisualize.makeplanes(xyzmin,xyzmax,xplanes,yplanes,zplanes),
-                                                          levels
+                                                          levels;
+                                                          tol=0.0
                                                           )
 
     cfaces=reshape(reinterpret(Int32,faces0),(3,length(faces0)))
@@ -308,12 +310,21 @@ function tetcontour!(p::PlutoVTKPlot, pts, tets,func; kwargs...)
     parameter!(p,"polys",vtkpolys(cfaces))
     nan_replacement=0.5*(crange[1]+crange[2])
     for i=1:length(values)
-        if isnan(values[i])
+        if isnan(values[i]) || isinf(values[i])
             values[i]=nan_replacement
         end
     end
+    # nan_replacement=0.0
+    # for i=1:length(cpts)
+    #     if isnan(cpts[i]) || isinf(cpts[i])
+    #         cpts[i]=nan_replacement
+    #     end
+    # end
+
     crange=(Float64(crange[1]),Float64(crange[2]))
     rgb=reinterpret(Float64,get(colorschemes[colormap],values,crange))
+    
+
     
     if args[:levelalpha]>0
         nfaces=length(rgb)÷3
@@ -489,9 +500,10 @@ function tetmesh!(p::PlutoVTKPlot, pts, tets;kwargs...)
     faces=args[:faces]
     facemarkers=args[:facemarkers]
     facecolormap=args[:facecolormap]
+
     xplane=args[:xplanes][1]
-    yplane=args[:yplanes][2]
-    zplane=args[:zplanes][3]
+    yplane=args[:yplanes][1]
+    zplane=args[:zplanes][1]
     
     
 
@@ -533,6 +545,7 @@ function tetmesh!(p::PlutoVTKPlot, pts, tets;kwargs...)
 
     
     xyzcut=[xplane,yplane,zplane]
+
     regpoints0,regfacets0=GridVisualize.extract_visible_cells3D(pts,tets,markers,nregions,
                                                                 xyzcut,
                                                                 primepoints=hcat(xyzmin,xyzmax)
