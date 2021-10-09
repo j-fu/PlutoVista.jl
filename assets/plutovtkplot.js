@@ -6,17 +6,42 @@ function setinteractorstyle(interactor, cam)
         interactor.setInteractorStyle(vtk.Interaction.Style.vtkInteractorStyleTrackballCamera.newInstance());
 }
 
+function add_outline_dataset(win,opoints,opolys,ocolors)
+{
+    var ocolorData = vtk.Common.Core.vtkDataArray.newInstance({
+        name: 'Colors',
+        values: ocolors,
+        numberOfComponents: 4,
+    });
+    
+    if (win.outline_dataset==undefined)
+    {
+        win.outline_dataset = vtk.Common.DataModel.vtkPolyData.newInstance();
+        var actor = vtk.Rendering.Core.vtkActor.newInstance();
+	var mapper = vtk.Rendering.Core.vtkMapper.newInstance();
+	mapper.setInputData(win.outline_dataset);
+        mapper.setColorModeToDirectScalars()
+        actor.setForceTranslucent(true) //  https://discourse.vtk.org/t/wireframe-not-visible-behind-transparent-surfaces/6671
+	actor.setMapper(mapper);
+        win.renderer.addActor(actor);
+    }
+    win.outline_dataset.getPoints().setData(opoints, 3);
+    win.outline_dataset.getPolys().setData(opolys,1);
+    win.outline_dataset.getCellData().setActiveScalars('Colors');
+    win.outline_dataset.getCellData().setScalars(ocolorData);        
+    win.outline_dataset.modified()
+}
 
 function plutovtkplot(uuid,jsdict,invalidation)
 {
-
-    if (window[uuid+"data"]==undefined)
+    
+    if (window[uuid+"data"] == undefined)
     {
         window[uuid+"data"]={}
+
         var win=window[uuid+"data"]
         win.renderWindow = vtk.Rendering.Core.vtkRenderWindow.newInstance();
         win.renderer = vtk.Rendering.Core.vtkRenderer.newInstance();
-        win.update=false
         
         // OpenGlRenderWindow
         win.openGlRenderWindow = vtk.Rendering.OpenGL.vtkRenderWindow.newInstance();
@@ -37,82 +62,113 @@ function plutovtkplot(uuid,jsdict,invalidation)
         win.openGlRenderWindow.setSize(dims.width, dims.height);
         win.interactor.bindEvents(rootContainer);
         win.renderWindow.addRenderer(win.renderer)
+
+        // The invalidation promise is resolved when the cell starts rendering a newer output.
+        // We use it to release the WebGL context.
+        // (More info at https://plutocon2021-demos.netlify.app/fonsp%20%E2%80%94%20javascript%20inside%20pluto or https://observablehq.com/@observablehq/invalidation )
+        invalidation.then(() => {
+            win.renderWindow.delete();
+            win.openGlRenderWindow.delete();
+            win.interactor.delete();
+        });
     }
+    
+
     var win=window[uuid+"data"]
-    win.update=true
+    
     // Loop over content of jsdict
     for (var cmd = 1 ; cmd <= jsdict["cmdcount"] ; cmd++)
     {
         
+        /////////////////////////////////////////////////////////////////
         if (jsdict[cmd]=="tricontour")
         {
-            // see https://discourse.vtk.org/t/manually-create-polydata-in-vtk-js/885/15
-            if (win.dataset==undefined)
-            {
-                win.update=false
-            }
-
     	    var points=jsdict[cmd+"points"]
  	    var polys=jsdict[cmd+"polys"]
             var isopoints=jsdict[cmd+"isopoints"]
  	    var isolines=jsdict[cmd+"isolines"]
             var colors=jsdict[cmd+"colors"]
 
-            /// need to use LUT here!
-            var colorData = vtk.Common.Core.vtkDataArray.newInstance({
-                name: 'Colors',
-                values: colors,
-                numberOfComponents: 3,
-            });
-
-            
-            if (!win.update)
-            {
-                win.dataset = vtk.Common.DataModel.vtkPolyData.newInstance();
-                win.actor = vtk.Rendering.Core.vtkActor.newInstance();
-                var mapper = vtk.Rendering.Core.vtkMapper.newInstance();
-                mapper.setInputData(win.dataset);
-                mapper.setColorModeToDirectScalars()
-                win.actor.setMapper(mapper);
-                win.renderer.addActor(win.actor);
-            }
-            
-            win.dataset.getPoints().setData(points, 3);
-            win.dataset.getPolys().setData(polys,1);
-            win.dataset.getPointData().setActiveScalars('Colors');
-            win.dataset.getPointData().setScalars(colorData);        
-            win.dataset.modified()
-
-            if (isopoints != "none")
-            {
-                //https://discourse.vtk.org/t/manually-create-polydata-in-vtk-js/885/4
-                
-                if (!win.update)
+            { // Gouraud shaded triangles
+                if (win.color_triangle_dataset == undefined)
                 {
-                    var isomapper = vtk.Rendering.Core.vtkMapper.newInstance();
-                    var isoactor = vtk.Rendering.Core.vtkActor.newInstance();
-                    win.isodataset=vtk.Common.DataModel.vtkPolyData.newInstance();
-                    isomapper.setInputData(win.isodataset);
-                    isoactor.setMapper(isomapper);
-                    isoactor.getProperty().setColor(0, 0, 0)
-                    win.renderer.addActor(isoactor);
+                    win.color_triangle_dataset = vtk.Common.DataModel.vtkPolyData.newInstance();
+                    var actor = vtk.Rendering.Core.vtkActor.newInstance();
+                    var mapper = vtk.Rendering.Core.vtkMapper.newInstance();
+                    mapper.setInputData(win.color_triangle_dataset);
+                    mapper.setColorModeToDirectScalars()
+                    actor.setMapper(mapper);
+                    win.renderer.addActor(actor);
+                    
+                    // the axis actor is later used to read axis bounds
+                    win.axis_actor=actor
                 }
                 
-                win.isodataset.getPoints().setData(isopoints, 3);
-                win.isodataset.getLines().setData(isolines);
-                win.isodataset.modified()
+                var colorData = vtk.Common.Core.vtkDataArray.newInstance({
+                    name: 'Colors',
+                    values: colors,
+                    numberOfComponents: 3,
+                });
+                
+                win.color_triangle_dataset.getPoints().setData(points, 3);
+                win.color_triangle_dataset.getPolys().setData(polys,1);
+                win.color_triangle_dataset.getPointData().setActiveScalars('Colors');
+                win.color_triangle_dataset.getPointData().setScalars(colorData);        
+                win.color_triangle_dataset.modified()
             }
-            win.renderWindow.render();
+
+            if (isolines != "none")
+            { // Optional isolines
+                
+                //https://discourse.vtk.org/t/manually-create-polydata-in-vtk-js/885/4
+                
+                if (win.isoline_dataset == undefined)
+                {
+                    win.isoline_dataset=vtk.Common.DataModel.vtkPolyData.newInstance();
+                    var mapper = vtk.Rendering.Core.vtkMapper.newInstance();
+                    var actor = vtk.Rendering.Core.vtkActor.newInstance();
+                    mapper.setInputData(win.isoline_dataset);
+                    actor.setMapper(mapper);
+                    actor.getProperty().setColor(0, 0, 0)
+                    win.renderer.addActor(actor);
+                }
+                
+                win.isoline_dataset.getPoints().setData(isopoints, 3);
+                win.isoline_dataset.getLines().setData(isolines);
+                win.isoline_dataset.modified()
+            }
         }
-        if (jsdict[cmd]=="tetcontour")
+        /////////////////////////////////////////////////////////////////
+        else if (jsdict[cmd]=="quiver")
+        { // 2D quiver
+            var qpoints=jsdict[cmd+"points"]
+ 	    var qlines=jsdict[cmd+"lines"]
+            
+            if (win.quiver_dataset == undefined)
+            {
+                win.quiver_dataset=vtk.Common.DataModel.vtkPolyData.newInstance();
+                var mapper = vtk.Rendering.Core.vtkMapper.newInstance();
+                var actor = vtk.Rendering.Core.vtkActor.newInstance();
+                mapper.setInputData(win.quiver_dataset);
+                actor.setMapper(mapper);
+                actor.getProperty().setColor(0, 0, 0)
+                win.renderer.addActor(actor);
+
+                if (win.axis_actor == undefined)
+                {
+                    win.axis_actor=actor
+                }
+            }
+            
+            win.quiver_dataset.getPoints().setData(qpoints, 3);
+	    win.quiver_dataset.getLines().setData(qlines);
+	    win.quiver_dataset.modified()
+        }
+        /////////////////////////////////////////////////////////////////
+        else if (jsdict[cmd]=="tetcontour")
         {
 
-            // see https://discourse.vtk.org/t/manually-create-polydata-in-vtk-js/885/15
-            if (win.dataset==undefined)
-            {
-                win.update=false
-            }
-    	    var points=jsdict[cmd+"points"]
+            var points=jsdict[cmd+"points"]
  	    var polys=jsdict[cmd+"polys"]
             var colors=jsdict[cmd+"colors"]
 
@@ -122,197 +178,155 @@ function plutovtkplot(uuid,jsdict,invalidation)
  	    var opolys=jsdict[cmd+"opolys"]
             var ocolors=jsdict[cmd+"ocolors"]
             var transparent=jsdict[cmd+"transparent"]
-            
-            if (outline==1)
-            {
-                var ocolorData = vtk.Common.Core.vtkDataArray.newInstance({
-                    name: 'Colors',
-                    values: ocolors,
-                    numberOfComponents: 4,
-                });
 
-            }
 
-            
-            if (transparent==1)
-            {
-                /// need to use LUT here!
-                var colorData = vtk.Common.Core.vtkDataArray.newInstance({
-                    name: 'Colors',
-                    values: colors,
-                    numberOfComponents: 4,
-                });
-            }
-            else
-            {
-                /// need to use LUT here!
-                var colorData = vtk.Common.Core.vtkDataArray.newInstance({
-                    name: 'Colors',
-                    values: colors,
-                    numberOfComponents: 3,
-                });
-            }
-
-            if (!win.update)
-            {
-                win.dataset = vtk.Common.DataModel.vtkPolyData.newInstance();
-                win.actor = vtk.Rendering.Core.vtkActor.newInstance();
-                var mapper = vtk.Rendering.Core.vtkMapper.newInstance();
-                mapper.setInputData(win.dataset);
-                mapper.setColorModeToDirectScalars()
+            { // isosurfaces and plane sections
+                
+                if (win.iso_plane_dataset == undefined)
+                {
+                    win.iso_plane_dataset = vtk.Common.DataModel.vtkPolyData.newInstance();
+                    var actor = vtk.Rendering.Core.vtkActor.newInstance();
+                    var mapper = vtk.Rendering.Core.vtkMapper.newInstance();
+                    mapper.setInputData(win.iso_plane_dataset);
+                    mapper.setColorModeToDirectScalars()
+                    if (transparent==1)
+                    {
+                        actor.setForceTranslucent(true) //  https://discourse.vtk.org/t/wireframe-not-visible-behind-transparent-surfaces/6671
+                    }
+                    actor.setMapper(mapper);
+                    win.renderer.addActor(actor);
+                    win.axis_actor=actor
+                }
+                
                 if (transparent==1)
                 {
-                    win.actor.setForceTranslucent(true) //  https://discourse.vtk.org/t/wireframe-not-visible-behind-transparent-surfaces/6671
+                    var colorData = vtk.Common.Core.vtkDataArray.newInstance({
+                        name: 'Colors',
+                        values: colors,
+                        numberOfComponents: 4,
+                    });
                 }
-                win.actor.setMapper(mapper);
-                win.renderer.addActor(win.actor);
-
-                if (outline==1)
+                else
                 {
-                    win.odataset = vtk.Common.DataModel.vtkPolyData.newInstance();
-                    win.oactor = vtk.Rendering.Core.vtkActor.newInstance();
-		    var omapper = vtk.Rendering.Core.vtkMapper.newInstance();
-		    omapper.setInputData(win.odataset);
-                    omapper.setColorModeToDirectScalars()
-                    win.oactor.setForceTranslucent(true) //  https://discourse.vtk.org/t/wireframe-not-visible-behind-transparent-surfaces/6671
-		    win.oactor.setMapper(omapper);
-                    win.renderer.addActor(win.oactor);
+                    var colorData = vtk.Common.Core.vtkDataArray.newInstance({
+                        name: 'Colors',
+                        values: colors,
+                        numberOfComponents: 3,
+                    });
                 }
-
-
-
+                win.iso_plane_dataset.getPoints().setData(points, 3);
+                win.iso_plane_dataset.getPolys().setData(polys,1);
+                win.iso_plane_dataset.getPointData().setActiveScalars('Colors');
+                win.iso_plane_dataset.getPointData().setScalars(colorData);        
+                win.iso_plane_dataset.modified()
             }
-            
 
+            
             if (outline==1)
             {
-                win.odataset.getPoints().setData(opoints, 3);
-                win.odataset.getPolys().setData(opolys,1);
-                win.odataset.getCellData().setActiveScalars('Colors');
-                win.odataset.getCellData().setScalars(ocolorData);        
-                win.odataset.modified()
+                add_outline_dataset(win,opoints,opolys,ocolors)
             }
-
-
-            win.dataset.getPoints().setData(points, 3);
-            win.dataset.getPolys().setData(polys,1);
-            win.dataset.getPointData().setActiveScalars('Colors');
-            win.dataset.getPointData().setScalars(colorData);        
-            win.dataset.modified()
-            win.renderWindow.render();
         }
+        /////////////////////////////////////////////////////////////////
         else if (jsdict[cmd]=="trimesh")
         {
-            // see https://discourse.vtk.org/t/manually-create-polydata-in-vtk-js/885/15
-            if (win.dataset==undefined)
-            {
-                win.update=false
-            }
 
     	    var points=jsdict[cmd+"points"]
  	    var polys=jsdict[cmd+"polys"]
             var colors=jsdict[cmd+"colors"]
             var lines=jsdict[cmd+"lines"]
             var linecolors=jsdict[cmd+"linecolors"]
-
+            
             if (colors!="none")
-            {
-                /// need to use LUT here!
+            {   // clolored triangles
+                
+                if (win.colored_triangle_dataset == undefined)
+                {
+                    win.colored_triangle_dataset = vtk.Common.DataModel.vtkPolyData.newInstance();
+                    var actor = vtk.Rendering.Core.vtkActor.newInstance();
+		    var mapper = vtk.Rendering.Core.vtkMapper.newInstance();
+		    mapper.setInputData(win.colored_triangle_dataset);
+                    mapper.setColorModeToDirectScalars()
+		    actor.setMapper(mapper);
+                    win.renderer.addActor(actor);
+
+                    win.axis_actor=actor
+                }
+                
                 var colorData = vtk.Common.Core.vtkDataArray.newInstance({
                     name: 'Colors',
                     values: colors,
                     numberOfComponents: 3,
                 });
-            }
-            
-            if (!win.update)
-            {
-                if (colors!="none")
-                {
-                    win.celldataset = vtk.Common.DataModel.vtkPolyData.newInstance();
-                    win.cellactor = vtk.Rendering.Core.vtkActor.newInstance();
-		    var cellmapper = vtk.Rendering.Core.vtkMapper.newInstance();
-		    cellmapper.setInputData(win.celldataset);
-                    cellmapper.setColorModeToDirectScalars()
-		    win.cellactor.setMapper(cellmapper);
-                    win.renderer.addActor(win.cellactor);
-                }
-
                 
-                win.dataset = vtk.Common.DataModel.vtkPolyData.newInstance();
-                win.actor = vtk.Rendering.Core.vtkActor.newInstance();
-		var mapper = vtk.Rendering.Core.vtkMapper.newInstance();
-                mapper.setColorModeToDefault()
-		win.actor.getProperty().setRepresentation(1);
-		win.actor.getProperty().setColor(0, 0, 0);
-		win.actor.getProperty().setLineWidth(1.5);
-		mapper.setInputData(win.dataset);
-		win.actor.setMapper(mapper);
-		win.renderer.addActor(win.actor);
+                win.colored_triangle_dataset.getPoints().setData(points, 3);
+                win.colored_triangle_dataset.getPolys().setData(polys,1);
+                win.colored_triangle_dataset.getCellData().setActiveScalars('Colors');
+                win.colored_triangle_dataset.getCellData().setScalars(colorData);        
+                win.colored_triangle_dataset.modified()
             }
-            
 
-            if (colors !="none")
-            {
-                win.celldataset.getPoints().setData(points, 3);
-                win.celldataset.getPolys().setData(polys,1);
-                win.celldataset.getCellData().setActiveScalars('Colors');
-                win.celldataset.getCellData().setScalars(colorData);        
-                win.celldataset.modified()
+            { // triangle edges
+                
+                if (win.triangle_edges == undefined)
+                {
+                    win.triangle_edges = vtk.Common.DataModel.vtkPolyData.newInstance();
+                    var actor = vtk.Rendering.Core.vtkActor.newInstance();
+		    var mapper = vtk.Rendering.Core.vtkMapper.newInstance();
+                    mapper.setColorModeToDefault()
+		    actor.getProperty().setRepresentation(1);
+		    actor.getProperty().setColor(0, 0, 0);
+		    actor.getProperty().setLineWidth(1.5);
+		    mapper.setInputData(win.triangle_edges);
+		    actor.setMapper(mapper);
+		    win.renderer.addActor(actor);
+                }
+                
+                
+                win.triangle_edges.getPoints().setData(points, 3);
+                win.triangle_edges.getPolys().setData(polys,1);
+                win.triangle_edges.modified()
             }
-            win.dataset.getPoints().setData(points, 3);
-            win.dataset.getPolys().setData(polys,1);
-            win.dataset.modified()
-
-            if (linecolors!="none")
-            {
-                /// need to use LUT here!
-                var linecolorData = vtk.Common.Core.vtkDataArray.newInstance({
-                    name: 'Colors',
-                    values: linecolors,
-                    numberOfComponents: 3,
-                });
-            }
-            
 
 
             if (lines != "none")
-            {
-                //https://discourse.vtk.org/t/manually-create-polydata-in-vtk-js/885/4
-                
-                if (!win.update)
+            { // boundary edges
+            
+                if (linecolors!="none")
                 {
-                    var linemapper = vtk.Rendering.Core.vtkMapper.newInstance();
-                    var lineactor = vtk.Rendering.Core.vtkActor.newInstance();
-                    win.linedataset=vtk.Common.DataModel.vtkPolyData.newInstance();
-                    linemapper.setInputData(win.linedataset);
-                    lineactor.setMapper(linemapper);
-                    lineactor.getProperty().setColor(0, 0, 0)
-		    lineactor.getProperty().setLineWidth(4);
-
-                    win.renderer.addActor(lineactor);
+                    var linecolorData = vtk.Common.Core.vtkDataArray.newInstance({
+                        name: 'Colors',
+                        values: linecolors,
+                        numberOfComponents: 3,
+                    });
                 }
                 
-                win.linedataset.getPoints().setData(points, 3);
-                win.linedataset.getLines().setData(lines);
+                if (win.boundary_edge_dataset == undefined)
+                {
+                    win.boundary_edge_dataset=vtk.Common.DataModel.vtkPolyData.newInstance();
+                    var mapper = vtk.Rendering.Core.vtkMapper.newInstance();
+                    var actor = vtk.Rendering.Core.vtkActor.newInstance();
+                    mapper.setInputData(win.boundary_edge_dataset);
+                    actor.setMapper(mapper);
+                    actor.getProperty().setColor(0, 0, 0)
+		    actor.getProperty().setLineWidth(4);
+                    win.renderer.addActor(actor);
+                }
+                
+                win.boundary_edge_dataset.getPoints().setData(points, 3);
+                win.boundary_edge_dataset.getLines().setData(lines);
                 if (linecolors!="none")
-                    {
-                        win.linedataset.getCellData().setActiveScalars('Colors');
-                        win.linedataset.getCellData().setScalars(linecolorData);
-                    }
-                win.linedataset.modified()
+                {
+                    win.boundary_edge_dataset.getCellData().setActiveScalars('Colors');
+                    win.boundary_edge_dataset.getCellData().setScalars(linecolorData);
+                }
+                win.boundary_edge_dataset.modified()
             }
-
-            win.renderWindow.render();
 
         }
+        /////////////////////////////////////////////////////////////////
         else if (jsdict[cmd]=="tetmesh")
         {
-            // see https://discourse.vtk.org/t/manually-create-polydata-in-vtk-js/885/15
-            if (win.dataset==undefined)
-            {
-                win.update=false
-            }
     	    var points=jsdict[cmd+"points"]
  	    var polys=jsdict[cmd+"polys"]
             var colors=jsdict[cmd+"colors"]
@@ -332,114 +346,89 @@ function plutovtkplot(uuid,jsdict,invalidation)
  	    var opolys=jsdict[cmd+"opolys"]
             var ocolors=jsdict[cmd+"ocolors"]
 
-            if (outline==1)
-            {
-                var ocolorData = vtk.Common.Core.vtkDataArray.newInstance({
-                    name: 'Colors',
-                    values: ocolors,
-                    numberOfComponents: 4,
-                });
-
-            }
-
 
             
-            if (!win.update)
-            {
+            { // colored cells
                 if (colors!="none")
                 {
-                    win.celldataset = vtk.Common.DataModel.vtkPolyData.newInstance();
-                    win.cellactor = vtk.Rendering.Core.vtkActor.newInstance();
-		    var cellmapper = vtk.Rendering.Core.vtkMapper.newInstance();
-		    cellmapper.setInputData(win.celldataset);
-                    cellmapper.setColorModeToDirectScalars()
-		    win.cellactor.setMapper(cellmapper);
-                    win.renderer.addActor(win.cellactor);
+                    if (win.cell_color_dataset == undefined)
+                    {
+                        win.cell_color_dataset = vtk.Common.DataModel.vtkPolyData.newInstance();
+                        var actor = vtk.Rendering.Core.vtkActor.newInstance();
+                        var mapper = vtk.Rendering.Core.vtkMapper.newInstance();
+                        mapper.setInputData(win.cell_color_dataset);
+                        mapper.setColorModeToDirectScalars()
+                        actor.setMapper(mapper);
+                        win.renderer.addActor(actor);
+                    }
+                    win.cell_color_dataset.getPoints().setData(points, 3);
+                    win.cell_color_dataset.getPolys().setData(polys,1);
+                    win.cell_color_dataset.getCellData().setActiveScalars('Colors');
+                    win.cell_color_dataset.getCellData().setScalars(colorData);        
+                    win.cell_color_dataset.modified()
                 }
+            }
 
-                if (outline==1)
-                {
-                    win.odataset = vtk.Common.DataModel.vtkPolyData.newInstance();
-                    win.oactor = vtk.Rendering.Core.vtkActor.newInstance();
-		    var omapper = vtk.Rendering.Core.vtkMapper.newInstance();
-		    omapper.setInputData(win.odataset);
-                    omapper.setColorModeToDirectScalars()
-                    win.oactor.setForceTranslucent(true) //  https://discourse.vtk.org/t/wireframe-not-visible-behind-transparent-surfaces/6671
-		    win.oactor.setMapper(omapper);
-                    win.renderer.addActor(win.oactor);
-                }
-
+            { // edges of cells
                 
-                win.dataset = vtk.Common.DataModel.vtkPolyData.newInstance();
-                win.actor = vtk.Rendering.Core.vtkActor.newInstance();
-		var mapper = vtk.Rendering.Core.vtkMapper.newInstance();
-                mapper.setColorModeToDefault()
-		win.actor.getProperty().setRepresentation(1);
-		win.actor.getProperty().setColor(0, 0, 0);
-		win.actor.getProperty().setLineWidth(1.5);
-		mapper.setInputData(win.dataset);
-		win.actor.setMapper(mapper);
-		win.renderer.addActor(win.actor);
+                if (win.cell_edge_dataset == undefined)
+                {
+                    
+                    win.cell_edge_dataset = vtk.Common.DataModel.vtkPolyData.newInstance();
+                    var actor = vtk.Rendering.Core.vtkActor.newInstance();
+		    var mapper = vtk.Rendering.Core.vtkMapper.newInstance();
+                    mapper.setColorModeToDefault()
+		    actor.getProperty().setRepresentation(1);
+		    actor.getProperty().setColor(0, 0, 0);
+		    actor.getProperty().setLineWidth(1.5);
+		    mapper.setInputData(win.cell_edge_dataset);
+		    actor.setMapper(mapper);
+		    win.renderer.addActor(actor);
+                    win.axis_actor=actor
+                }
+                
+                win.cell_edge_dataset.getPoints().setData(points, 3);
+                win.cell_edge_dataset.getPolys().setData(polys,1);
+                win.cell_edge_dataset.modified()
             }
             
-
-            if (colors !="none")
-            {
-                win.celldataset.getPoints().setData(points, 3);
-                win.celldataset.getPolys().setData(polys,1);
-                win.celldataset.getCellData().setActiveScalars('Colors');
-                win.celldataset.getCellData().setScalars(colorData);        
-                win.celldataset.modified()
-            }
-
             if (outline==1)
             {
-                win.odataset.getPoints().setData(opoints, 3);
-                win.odataset.getPolys().setData(opolys,1);
-                win.odataset.getCellData().setActiveScalars('Colors');
-                win.odataset.getCellData().setScalars(ocolorData);        
-                win.odataset.modified()
+                add_outline_dataset(win,opoints,opolys,ocolors)
             }
 
-
-            
-            win.dataset.getPoints().setData(points, 3);
-            win.dataset.getPolys().setData(polys,1);
-            win.dataset.modified()
-
-            win.renderWindow.render();
-
         }
+        /////////////////////////////////////////////////////////////////
         else if (jsdict[cmd]=="axis")
         {
-
-            if (!win.update)
+            if (win.cubeAxes == undefined)
             {
  	        var cam=jsdict[cmd+"cam"]
-                var cubeAxes = vtk.Rendering.Core.vtkCubeAxesActor.newInstance();
+                win.cubeAxes = vtk.Rendering.Core.vtkCubeAxesActor.newInstance();
                 var camera=win.renderer.getActiveCamera()
-	        cubeAxes.setCamera(camera);
-                cubeAxes.setAxisLabels(['x','y','z'])
-	        cubeAxes.setDataBounds(win.actor.getBounds());
+	        win.cubeAxes.setCamera(camera);
+                win.cubeAxes.setAxisLabels(['x','y','z'])
+	        win.cubeAxes.setDataBounds(win.axis_actor.getBounds());
                 
-                cubeAxes.setTickTextStyle({fontColor: "black"})
-                cubeAxes.setTickTextStyle({fontFamily: "Arial"})
-                cubeAxes.setTickTextStyle({fontSize: "10"})
+                win.cubeAxes.setTickTextStyle({fontColor: "black"})
+                win.cubeAxes.setTickTextStyle({fontFamily: "Arial"})
+                win.cubeAxes.setTickTextStyle({fontSize: "10"})
                 
-                cubeAxes.setAxisTextStyle({fontColor: "black"})
-                cubeAxes.setAxisTextStyle({fontFamily: "Arial"})
-                cubeAxes.setAxisTextStyle({fontSize: "12"})
+                win.cubeAxes.setAxisTextStyle({fontColor: "black"})
+                win.cubeAxes.setAxisTextStyle({fontFamily: "Arial"})
+                win.cubeAxes.setAxisTextStyle({fontSize: "12"})
                 
-                cubeAxes.getProperty().setColor(0.75,0.75,0.75);
-	        win.renderer.addActor(cubeAxes);
+                win.cubeAxes.getProperty().setColor(0.75,0.75,0.75);
+	        win.renderer.addActor(win.cubeAxes);
                 win.renderer.resetCamera();
                 win.renderWindow.render();
                 
                 if (cam=="2D")
-                     cubeAxes.setGridLines(false)
+                     win.cubeAxes.setGridLines(false)
                 setinteractorstyle(win.interactor,cam)
             }
         }
+        /////////////////////////////////////////////////////////////////
         else if (jsdict[cmd]=="triplot")
         {// Experimental
 
@@ -447,21 +436,17 @@ function plutovtkplot(uuid,jsdict,invalidation)
  	    var polys=jsdict[cmd+"polys"]
  	    var cam=jsdict[cmd+"cam"]
 
-            if (win.dataset==undefined)
-            {
-                win.update=false
-            }
-            
 
-            if (!win.update)
+            if (win.triplot_dataset == undefined)
             {
-                win.actor = vtk.Rendering.Core.vtkActor.newInstance();
+                win.triplot_dataset = vtk.Common.DataModel.vtkPolyData.newInstance();
+                var actor = vtk.Rendering.Core.vtkActor.newInstance();
                 var mapper = vtk.Rendering.Core.vtkMapper.newInstance();
-                win.dataset = vtk.Common.DataModel.vtkPolyData.newInstance();
-                mapper.setInputData(win.dataset);
-                win.actor.setMapper(mapper);
-                win.renderer.addActor(win.actor);
+                mapper.setInputData(win.triplot_dataset);
+                actor.setMapper(mapper);
+                win.renderer.addActor(actor);
                 setinteractorstyle(win.interactor,cam)
+                win.axis_actor=actor
             }
             
             // Apply transformation to the points coordinates // figure this out later
@@ -471,48 +456,32 @@ function plutovtkplot(uuid,jsdict,invalidation)
             ///      .rotateFromDirections([1, 0, 0], model.direction)
             ///      .apply(points);
             
-            win.dataset.getPoints().setData(points, 3);
-            win.dataset.getPolys().setData(polys,1);
-            win.dataset.modified()
+            win.triplot_dataset.getPoints().setData(points, 3);
+            win.triplot_dataset.getPolys().setData(polys,1);
+            win.triplot_dataset.modified()
             win.renderWindow.render();
         }
+        /////////////////////////////////////////////////////////////////
         else if (jsdict[cmd]=="plot")
         {// Experimental
     	    var points=jsdict[cmd+"points"]
  	    var lines=jsdict[cmd+"lines"]
-
-            win.actor = vtk.Rendering.Core.vtkActor.newInstance();
+            
+            var actor = vtk.Rendering.Core.vtkActor.newInstance();
             var mapper = vtk.Rendering.Core.vtkMapper.newInstance();
 
-            var dataset=vtk.Common.DataModel.vtkPolyData.newInstance();
-            dataset.getPoints().setData(points, 3);
-            dataset.getLines().setData(lines);
+            win.plotdataset=vtk.Common.DataModel.vtkPolyData.newInstance();
+            win.plotdataset.getPoints().setData(points, 3);
+            win.plotdataset.getLines().setData(lines);
             mapper.setInputData(dataset);
-            win.actor.setMapper(mapper);
-            win.actor.getProperty().setColor(0, 0, 0)
-            win.renderer.addActor(window.actor);
+            actor.setMapper(mapper);
+            actor.getProperty().setColor(0, 0, 0)
+            win.renderer.addActor(actor);
             setinteractorstyle(interactor,cam)
         }
-
     }
     
-    //renderer.setLayer(0);
-
-//    win.renderer.resetCamera();
     win.renderWindow.render();
-
-
-    // The invalidation promise is resolved when the cell starts rendering a newer output.
-    // We use it to release the WebGL context.
-    // (More info at https://plutocon2021-demos.netlify.app/fonsp%20%E2%80%94%20javascript%20inside%20pluto or https://observablehq.com/@observablehq/invalidation )
-    invalidation.then(() => {
-        if (!win.update) // run this only if called from original cell
-        {
-            win.renderWindow.delete();
-            win.openGlRenderWindow.delete();
-            win.interactor.delete();
-        }
-    });
 }
 
     
