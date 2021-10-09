@@ -157,7 +157,29 @@ tetmesh!(p3dx,g3x[Coordinates],g3x[CellNodes];
 		markers=g3x[CellRegions],
 	faces=g3x[BFaceNodes],
 	facemarkers=g3x[BFaceRegions],
-	xplane=gxplane,yplane=gyplane,zplane=gzplane,outlinealpha=0)
+	xplanes=gxplane,yplanes=gyplane,zplanes=gzplane,outlinealpha=0.2)
+
+# ╔═╡ 4263e897-d878-4fab-acae-a6c4dae37c5e
+qp=PlutoVTKPlot(resolution=(500,500))
+
+# ╔═╡ 5dfb1dde-06ed-483a-bac3-6a21a7f98856
+@bind x0 Slider(1:0.01:9)
+
+# ╔═╡ 6d7547c6-5667-463f-99dc-2f3fbaeb4c4d
+let
+	n=50
+	X=0:10/n:10
+	g=simplexgrid(X,X)
+	pts=g[Coordinates]
+    f(x,y)=sin(x-x0)*cos(y)+0.05*(x-x0)*y
+    fx(x,y)=-cos(x-x0)*cos(y)-0.05*y
+    fy(x,y)=sin(x-x0)*sin(y)-0.05*(x-x0)
+    v=map(f,g)
+    ∇v=0.5*vcat(map(fx,g)',map(fy,g)')
+	
+	tricontour!(qp,pts,g[CellNodes],v,colormap=:summer,levels=5)
+	quiver2d!(qp,pts,∇v)
+end
 
 # ╔═╡ Cell order:
 # ╟─93ca4fd0-8f61-4174-b459-55f5395c0f56
@@ -187,3 +209,6 @@ tetmesh!(p3dx,g3x[Coordinates],g3x[CellNodes];
 # ╟─90ff6ffc-84dc-45fd-8d09-9eb916397630
 # ╠═ae5707d9-41b7-4937-924a-fb54b83c31db
 # ╠═519d106f-3f6f-4db1-b4e4-c5e7ef176857
+# ╠═4263e897-d878-4fab-acae-a6c4dae37c5e
+# ╠═5dfb1dde-06ed-483a-bac3-6a21a7f98856
+# ╠═6d7547c6-5667-463f-99dc-2f3fbaeb4c4d

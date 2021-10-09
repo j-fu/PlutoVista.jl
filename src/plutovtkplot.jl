@@ -622,6 +622,81 @@ end
 
 
 
+"""
+    quiver2d
+"""
+function quiver2d!(p::PlutoVTKPlot, pts, qvec; kwargs...)
+
+    command!(p,"quiver")
+    zcoord=zeros(size(pts,2))
+
+    cminmax=extrema(pts, dims=(2,))
+
+    # length scale for arrowhead drawing
+    extent=maximum([cminmax[i][2]-cminmax[i][1] for i=1:2])
+    l0=extent/150
+
+    pts3=vcat(pts,zcoord')
+    vec3=vcat(qvec,zcoord')
+    
+
+    nvec=size(qvec,2)
+    # Calculate points for arrowheads
+    apts=copy(pts3)
+    bpts=copy(pts3)
+    for i=1:nvec
+
+        #normal to vectors
+        vnorm=sqrt(qvec[1,i]^2+qvec[2,i]^2)
+        normal1=0.75*l0*qvec[2,i]/vnorm
+        normal2=-0.75*l0*qvec[1,i]/vnorm
+
+        # distance from tip
+        dist1=2*l0*qvec[1,i]/vnorm
+        dist2=2*l0*qvec[2,i]/vnorm
+
+        # side points for arrowhead
+        apts[1,i]=pts[1,i]+qvec[1,i]-dist1+normal1
+        apts[2,i]=pts[2,i]+qvec[2,i]-dist2+normal2
+
+        bpts[1,i]=pts[1,i]+qvec[1,i]-dist1-normal1
+        bpts[2,i]=pts[2,i]+qvec[2,i]-dist2-normal2
+    end
+
+
+    qpts=hcat(pts3,pts3+vec3,apts,bpts)
+
+    
+    npts=size(pts,2)
+    lines=Vector{UInt32}(undef,3*npts+4*npts)
+    iline=0
+    ipt=0
+    for i=1:npts
+
+        # vector line
+        lines[iline+1]=2
+        lines[iline+2]=ipt      # pts3
+        lines[iline+3]=npts+ipt # pts3+vec3 
+        iline=iline+3
+
+
+        # arrowhead
+        lines[iline+1]=3
+        lines[iline+2]=2*npts+ipt  # apts
+        lines[iline+3]=npts+ipt    # pts3+vec3
+        lines[iline+4]=3*npts+ipt  # bpts
+
+        iline=iline+4
+        
+        ipt=ipt+1
+    end
+
+    parameter!(p,"points",vec(qpts))
+    parameter!(p,"lines",lines)
+    axis2d!(p)
+    p
+end
+
 
 
 #####################################

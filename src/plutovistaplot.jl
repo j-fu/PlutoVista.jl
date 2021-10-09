@@ -77,6 +77,15 @@ function tetcontour(;kwargs...)
 end
 
 
+quiver2d(pts,qvec; kwargs...)=quiver2d!(PlutoVistaPlot(;kwargs...),pts,qvec; kwargs...)
+quiver2d!(p::PlutoVistaPlot,pts,qvec;backend=:vtk, kwargs...)=quiver2d!(backend!(p; datadim=2,backend=backend, kwargs...),
+                                                                              pts,qvec; kwargs...)
+function quiver2d(;kwargs...)
+    p=PlutoVistaPlot(;kwargs...)
+    backend!(p;datadim=3,kwargs...)
+end
+
+
 
 trimesh(pts,tris; kwargs...)=trimesh!(PlutoVistaPlot(;kwargs...),pts,tris; kwargs...)
 trimesh!(p::PlutoVistaPlot,pts,tris; backend=:vtk, kwargs...)=trimesh!(backend!(p;datadim=2,backend=backend, kwargs...),

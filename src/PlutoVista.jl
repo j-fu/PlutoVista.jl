@@ -14,6 +14,7 @@ export tricontour!,contour!
 export trimesh!
 export tetcontour!
 export tetmesh!
+export quiver2d!
 
 
 include("plutoplotlyplot.jl")
@@ -37,7 +38,7 @@ export PlutoCanvasPlot
 # API
 include("plutovistaplot.jl")
 export PlutoVistaPlot
-export  tricontour,trimesh,contour,tetcontour,tetmesh
+export  tricontour,trimesh,contour,tetcontour,tetmesh,quiver2d
 
 
 end # module
