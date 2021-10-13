@@ -1,10 +1,44 @@
+// overwrite handleKeyPress
+// kind of modeled by https://kitware.github.io/vtk-js/api/Rendering_Core_Follower.html 
+
+function vtkMyInteractorStyleImage(publicAPI, model)
+{
+    model.classHierarchy.push('vtkMyInteractorStyleImage');
+    publicAPI.handleKeyPress = (k) => {}
+}
+
+function vtkMyInteractorStyleTrackballCamera(publicAPI, model)
+{
+    model.classHierarchy.push('vtkMyInteractorStyleTrackballCamera');
+    publicAPI.handleKeyPress = (k) => {}
+}
+
+function extend2d(publicAPI, model, initialValues = {})
+{
+    vtk.Interaction.Style.vtkInteractorStyleImage.extend(publicAPI, model, initialValues);
+    vtkMyInteractorStyleImage(publicAPI, model);
+}
+
+function extend3d(publicAPI, model, initialValues = {})
+{
+    vtk.Interaction.Style.vtkInteractorStyleTrackballCamera.extend(publicAPI, model, initialValues);
+    vtkMyInteractorStyleTrackballCamera(publicAPI, model);
+}
+
+
 function setinteractorstyle(interactor, cam)
 {
+    const mynewInstance2d = vtk.macro.newInstance(extend2d, 'vtkMyInteractorStyleImage');
+    const mynewInstance3d = vtk.macro.newInstance(extend3d, 'vtkMyInteractorStyleTrackballCamera');
     if (cam=="2D")
-        interactor.setInteractorStyle(vtk.Interaction.Style.vtkInteractorStyleImage.newInstance());
+//        var style=vtk.Interaction.Style.vtkMyInteractorStyleImage.newInstance()
+        var style=mynewInstance2d()
     else
-        interactor.setInteractorStyle(vtk.Interaction.Style.vtkInteractorStyleTrackballCamera.newInstance());
+//        var style=vtk.Interaction.Style.vtkInteractorStyleTrackballCamera.newInstance()
+        var style=mynewInstance3d()
+    interactor.setInteractorStyle(style)
 }
+
 
 function add_outline_dataset(win,opoints,opolys,ocolors)
 {
