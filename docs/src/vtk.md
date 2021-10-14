@@ -1,6 +1,5 @@
-# vtj.js API
-Besides of experimental and development work, using
-this API directly  should be avoided.
+# vtk.js API
+This API is normally being used via [`PlutoVistaPlot`](@ref).
 
 ```@docs
 PlutoVTKPlot
