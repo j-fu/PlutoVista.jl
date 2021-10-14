@@ -1,8 +1,10 @@
 """
-Structure containig plot information. 
-In particular it contains dict of data sent to javascript.
+$(TYPEDEF)
+
+Structure containing plot information for Plotly.js
 """
 mutable struct PlutoPlotlyPlot  <: AbstractPlutoVistaBackend
+
     # command list passed to javascript
     jsdict::Dict{String,Any}
     args
@@ -18,11 +20,11 @@ mutable struct PlutoPlotlyPlot  <: AbstractPlutoVistaBackend
 end
 
 """
-````
- PlutoPlotlyPlot(;resolution=(300,300))
-````
+$(TYPEDSIGNATURES)
 
-Create a plotly plot with given resolution in the notebook
+Create a plotly plot.
+
+
 """
 function PlutoPlotlyPlot(;resolution=(300,300), kwargs...)
     p=PlutoPlotlyPlot(nothing)
@@ -45,7 +47,9 @@ function PlutoPlotlyPlot(;resolution=(300,300), kwargs...)
 end
 
 """
-Show plot
+$(TYPEDSIGNATURES)
+
+Show plotly plot.
 """
 function Base.show(io::IO, ::MIME"text/html", p::PlutoPlotlyPlot)
     plutoplotlyplot = read(joinpath(@__DIR__, "..", "assets", "plutoplotlyplot.js"), String)
@@ -93,7 +97,11 @@ const mshapes=Dict(
     :none => "none"
 )
 
+"""
+$(SIGNATURES)
 
+1D plotly.js plot
+"""
 function plot!(p::PlutoPlotlyPlot,x,y; kwargs...)
 
     default_args=(label="",
@@ -156,9 +164,9 @@ end
 
 
 """
-     tricontour!(p::PlutoPlotlyPlot,pts, tris,f; colormap, isolines)
+$(SIGNATURES)
 
-Plot piecewise linear function on  triangular grid given as "heatmap" and
+Experimental. Plot piecewise linear function on  triangular grid given as "heatmap" and
 with isolines using Plotly's mesh3d.
 """
 function tricontour!(p::PlutoPlotlyPlot,pts, tris,f;kwargs...)
@@ -236,9 +244,9 @@ end
 
 
 """
-     contour!(p::PlutoPlotlyPlot, X, Y,f; colormap, isolines)
+$(SIGNATURES)
 
-Plot heatmap and isolines on rectangular grid defined by X and Y
+Experimental. Plot heatmap and isolines on rectangular grid defined by X and Y
 using Plotly's native contour plot.
 """
 function contour!(p::PlutoPlotlyPlot,X,Y,f; kwargs...)
@@ -282,9 +290,9 @@ end
 # than VTK for 3D data. 
 
 """
-     triplot!(p::PlutoPlotlyPlot,pts, tris,f)
+$(SIGNATURES)
 
-Plot piecewise linear function on  triangular grid given by points and triangles
+Experimental. Plot piecewise linear function on  triangular grid given by points and triangles
 as matrices
 """
 function triplot!(p::PlutoPlotlyPlot,pts, tris,f)

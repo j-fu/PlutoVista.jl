@@ -1,5 +1,5 @@
 // overwrite handleKeyPress
-// kind of modeled by https://kitware.github.io/vtk-js/api/Rendering_Core_Follower.html 
+// kind of modeled after https://kitware.github.io/vtk-js/api/Rendering_Core_Follower.html 
 
 function vtkMyInteractorStyleImage(publicAPI, model)
 {

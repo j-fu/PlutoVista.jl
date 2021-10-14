@@ -2,6 +2,7 @@ module PlutoVista
 using UUIDs
 using Colors
 using ColorSchemes
+using DocStringExtensions
 using GridVisualize
 
 abstract type AbstractPlutoVistaBackend end

@@ -1,6 +1,7 @@
 """
-Structure containig plot information. 
-In particular it contains dict of data sent to javascript.
+$(TYPEDEF)
+
+Structure containig plot information for vtk.js.
 """
 mutable struct PlutoVTKPlot  <: AbstractPlutoVistaBackend
     # command list passed to javascript
@@ -22,9 +23,7 @@ mutable struct PlutoVTKPlot  <: AbstractPlutoVistaBackend
 end
 
 """
-````
-    PlutoVTKPlot(;resolution=(300,300))
-````
+$(SIGNATURES)
 
 Create a vtk plot with given resolution in the notebook.
 """
@@ -168,7 +167,7 @@ end
 
 
 """
-     tricontour!(p::PlutoVTKPlot,pts, tris,f; colormap, levels, limits)
+$(SIGNATURES)
 
 Plot piecewise linear function on  triangular grid given as "heatmap".
 Isolines can be given as a number or as a range.
@@ -230,7 +229,7 @@ function tricontour!(p::PlutoVTKPlot, pts, tris,f;kwargs...)
 end
 
 """
-     contour!(p::PlutoVTKPlot,X,Y,f; colormap, levels)
+$(SIGNATURES)
 
 Plot piecewise linear function on  triangular grid created from the tensor product of X and Y arrays as "heatmap".
 Levels can be given as a number or as a range.
@@ -239,9 +238,9 @@ contour!(p::PlutoVTKPlot,X,Y,f; kwargs...)=tricontour!(p,triang(X,Y)...,vec(f);k
 
 
 """
-     tetcontour!(p::PlutoVTKPlot,pts, tets,f; colormap, flevel, xplane, yplane, zplane)
+$(SIGNATURES)
 
-Plot isosurface given by `flevel` and contour maps on planes given by the `*plane` parameters
+Plot isosurfaces given by `levels` and contour maps on planes given by the `*planes` parameters
 for piecewise linear function on  tetrahedral mesh. 
 """
 function tetcontour!(p::PlutoVTKPlot, pts, tets,func; kwargs...)
@@ -373,7 +372,7 @@ end
 
 
 """
-     trimesh!(p::PlutoVTKPlot,pts, tris;markers, colormap, edges, edgemarkers, edgecolormap)
+$(SIGNATURES)
 
 Plot  triangular grid with optional region and boundary markers.
 """
@@ -476,7 +475,7 @@ end
 
 
 """
-     tetmesh!(p::PlutoVTKPlot,pts, tris;markers, colormap, faces, facemarkers, facecolormap,xplane,yplane,zplane, outline, alpha)
+$(SIGNATURES)
 
 Plot parts of tetrahedral mesh below the planes given by the `*plane` parameters.
 """
@@ -623,7 +622,9 @@ end
 
 
 """
-    quiver2d
+$(SIGNATURES)
+
+2D quiver.
 """
 function quiver2d!(p::PlutoVTKPlot, pts, qvec; kwargs...)
 
@@ -702,9 +703,9 @@ end
 #####################################
 # Experimental part
 """
-     triplot!(p::PlutoVTKPlot,pts, tris,f)
+$(SIGNATURES)
 
-Plot piecewise linear function on  triangular grid given by points and triangles
+Experimental: Plot piecewise linear function on  triangular grid given by points and triangles
 as matrices
 """
 function triplot!(p::PlutoVTKPlot,pts, tris,f)

@@ -25,7 +25,9 @@ function mkdocs()
              repo="https://github.com/j-fu/PlutoVista.jl",
              pages=[
                  "Home"=>"index.md",
-                 "API"=> "api.md",
+                 "plotly.js API"=> "plotly.md",
+                 "vtk.js API"=> "vtk.md",
+                 "Internals" => "internals.md"
              ])
 end
 

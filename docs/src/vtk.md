@@ -1,0 +1,15 @@
+# vtj.js API
+Besides of experimental and development work, using
+this API directly  should be avoided.
+
+```@docs
+PlutoVTKPlot
+PlutoVTKPlot(;resolution=(300,300),kwargs...)
+tricontour!(p::PlutoVTKPlot,pts,tris,f; kwargs...)
+quiver2d!(p::PlutoVTKPlot, pts, qvec; kwargs...)
+triplot!(p::PlutoVTKPlot,pts, tris,f)
+contour!(p::PlutoVTKPlot,X,Y,f; kwargs...)
+trimesh!(p::PlutoVTKPlot,pts, tris; kwargs...)
+tetcontour!(p::PlutoVTKPlot,pts, tris, f; kwargs...)
+tetmesh!(p::PlutoVTKPlot,pts, tris; kwargs...)
+```
