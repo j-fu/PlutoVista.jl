@@ -317,7 +317,7 @@ Triangulate = "f7e6ffb2-c36d-4f8f-a77e-16e897189344"
 [compat]
 ExtendableGrids = "~0.8.3"
 PlutoUI = "~0.7.16"
-PlutoVista = "~0.8.1"
+PlutoVista = "~0.8.2"
 SimplexGridFactory = "~0.5.8"
 TetGen = "~1.3.0"
 Triangulate = "~2.1.0"
@@ -555,10 +555,10 @@ uuid = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
 version = "0.7.16"
 
 [[deps.PlutoVista]]
-deps = ["ColorSchemes", "Colors", "GridVisualize", "UUIDs"]
-git-tree-sha1 = "05c4f4f1a94ff2cfb6d442cced5965c8ab422e92"
+deps = ["ColorSchemes", "Colors", "DocStringExtensions", "GridVisualize", "UUIDs"]
+git-tree-sha1 = "ce59550b517ab41b5e687174f93f57c76f872b6d"
 uuid = "646e1f28-b900-46d7-9d87-d554eb38a413"
-version = "0.8.1"
+version = "0.8.2"
 
 [[deps.Preferences]]
 deps = ["TOML"]
@@ -697,8 +697,8 @@ uuid = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
 """
 
 # ╔═╡ Cell order:
-# ╠═93ca4fd0-8f61-4174-b459-55f5395c0f56
-# ╠═fdf728b9-ade9-46f3-8aaf-cf22aaaa55d2
+# ╟─93ca4fd0-8f61-4174-b459-55f5395c0f56
+# ╟─fdf728b9-ade9-46f3-8aaf-cf22aaaa55d2
 # ╠═c102e87a-b570-4d86-b087-3506396fc065
 # ╟─53f55db7-225f-4717-ab62-e024211e98a2
 # ╟─b8a976e3-7fef-4527-ae6a-4da31c93a04f
