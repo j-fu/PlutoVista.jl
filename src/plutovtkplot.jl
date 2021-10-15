@@ -645,16 +645,23 @@ function quiver2d!(p::PlutoVTKPlot, pts, qvec; kwargs...)
     # Calculate points for arrowheads
     apts=copy(pts3)
     bpts=copy(pts3)
+
+    # possibly make them parameters to satisfy user's taste
+    arrowtip_width_factor=1.5
+    arrowtip_length_factor=4.0
+   
     for i=1:nvec
 
         #normal to vectors
-        vnorm=sqrt(qvec[1,i]^2+qvec[2,i]^2)
-        normal1=0.75*l0*qvec[2,i]/vnorm
-        normal2=-0.75*l0*qvec[1,i]/vnorm
+        #     vnorm=sqrt(qvec[1,i]^2+qvec[2,i]^2)
+        # We don't normalise it as everything should be scaled with vector length
+        normal1= arrowtip_width_factor*l0*qvec[2,i]
+        normal2=-arrowtip_width_factor*l0*qvec[1,i]
+
 
         # distance from tip
-        dist1=2*l0*qvec[1,i]/vnorm
-        dist2=2*l0*qvec[2,i]/vnorm
+        dist1=arrowtip_length_factor*l0*qvec[1,i]
+        dist2=arrowtip_length_factor*l0*qvec[2,i]
 
         # side points for arrowhead
         apts[1,i]=pts[1,i]+qvec[1,i]-dist1+normal1
