@@ -33,6 +33,20 @@ plot!(p::PlutoVistaPlot,x,y; kwargs...)
 
 ## 2D plots
 
+When using vtk.js (default), interactive control via mouse includes the following actions:
+
+- Left Mouse + Shift: Pan
+- Left Mouse + Ctrl/Alt: Reset camera
+- Left Mouse + Shift + Ctrl/Alt: Dolly (Zoom)
+- Mouse Wheel: Dolly (Zoom)
+- Multi-Touch Pinch: Dolly (Zoom)
+- Multi-Touch Pan: Pan
+- 3D Events: Camera Pose
+
+Compared to [vtk.js](https://kitware.github.io/vtk-js/api/Interaction_Style_InteractorStyleTrackballCamera.html), 
+keyboard interaction and rotation have  been disabled,  "spin" has been replaced by "reset camera".
+
+
 ```@docs
 tricontour
 tricontour!(p::PlutoVistaPlot,pts,tris,f;backend=:vtk, kwargs...)
@@ -44,6 +58,22 @@ trimesh!(p::PlutoVistaPlot,pts,tris; backend=:vtk, kwargs...)
 
 
 ## 3D plots
+
+When using vtk.js (default), interactive control via mouse includes the following actions:
+
+- Left Mouse: Rotate
+- Left Mouse + Shift: Pan
+- Left Mouse + Ctrl/Alt: Reset camera
+- Left Mouse + Shift + Ctrl/Alt: Dolly (Zoom)
+- Mouse Wheel: Dolly (Zoom)
+- Multi-Touch Rotate: Rotate
+- Multi-Touch Pinch: Dolly (Zoom)
+- Multi-Touch Pan: Pan
+- 3D Events: Camera Pose
+
+Compared to [vtk.js](https://kitware.github.io/vtk-js/api/Interaction_Style_InteractorStyleTrackballCamera.html), 
+keyboard interaction has   been disabled, and  "spin" has been replaced by "reset camera".
+
 
 ```@docs
 tetcontour

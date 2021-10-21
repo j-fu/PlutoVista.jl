@@ -1,22 +1,25 @@
 // overwrite handleKeyPress
 // kind of modeled after https://kitware.github.io/vtk-js/api/Rendering_Core_Follower.html 
 
-function vtkMyInteractorStyleImage(publicAPI, model)
+function vtkMyInteractorStyleTrackballCamera2D(publicAPI, model)
 {
-    model.classHierarchy.push('vtkMyInteractorStyleImage');
+    model.classHierarchy.push('vtkMyInteractorStyleTrackballCamera2D');
     publicAPI.handleKeyPress = (k) => {}
+    publicAPI.handleMouseRotate= (renderer, pos) => {}
+    publicAPI.handleMouseSpin= (renderer, pos) => {renderer.resetCamera()}
 }
 
 function vtkMyInteractorStyleTrackballCamera(publicAPI, model)
 {
     model.classHierarchy.push('vtkMyInteractorStyleTrackballCamera');
     publicAPI.handleKeyPress = (k) => {}
+    publicAPI.handleMouseSpin= (renderer, pos) => {renderer.resetCamera()}
 }
 
 function extend2d(publicAPI, model, initialValues = {})
 {
-    vtk.Interaction.Style.vtkInteractorStyleImage.extend(publicAPI, model, initialValues);
-    vtkMyInteractorStyleImage(publicAPI, model);
+    vtk.Interaction.Style.vtkInteractorStyleTrackballCamera.extend(publicAPI, model, initialValues);
+    vtkMyInteractorStyleTrackballCamera2D(publicAPI, model);
 }
 
 function extend3d(publicAPI, model, initialValues = {})
@@ -28,7 +31,7 @@ function extend3d(publicAPI, model, initialValues = {})
 
 function setinteractorstyle(interactor, cam)
 {
-    const mynewInstance2d = vtk.macro.newInstance(extend2d, 'vtkMyInteractorStyleImage');
+    const mynewInstance2d = vtk.macro.newInstance(extend2d, 'vtkMyInteractorStyleTrackballCamera2D');
     const mynewInstance3d = vtk.macro.newInstance(extend3d, 'vtkMyInteractorStyleTrackballCamera');
     if (cam=="2D")
 //        var style=vtk.Interaction.Style.vtkMyInteractorStyleImage.newInstance()
