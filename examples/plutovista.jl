@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.16.1
+# v0.16.2
 
 using Markdown
 using InteractiveUtils
@@ -315,10 +315,10 @@ TetGen = "c5d3f3f7-f850-59f6-8a2e-ffc6dc1317ea"
 Triangulate = "f7e6ffb2-c36d-4f8f-a77e-16e897189344"
 
 [compat]
-ExtendableGrids = "~0.8.3"
+ExtendableGrids = "~0.8.7"
 PlutoUI = "~0.7.16"
-PlutoVista = "~0.8.2"
-SimplexGridFactory = "~0.5.8"
+PlutoVista = "~0.8.4"
+SimplexGridFactory = "~0.5.9"
 TetGen = "~1.3.0"
 Triangulate = "~2.1.0"
 """
@@ -410,9 +410,9 @@ version = "1.2.9"
 
 [[deps.ExtendableGrids]]
 deps = ["AbstractTrees", "Dates", "DocStringExtensions", "ElasticArrays", "InteractiveUtils", "LinearAlgebra", "Printf", "Random", "SparseArrays", "Test"]
-git-tree-sha1 = "85dbe70afc7153ad510577f158214b45be22593b"
+git-tree-sha1 = "1e8e50f054057f23e908fbd6935766dca6293cc2"
 uuid = "cfc395e8-590f-11e8-1f13-43a2532b2fa8"
-version = "0.8.3"
+version = "0.8.7"
 
 [[deps.FixedPointNumbers]]
 deps = ["Statistics"]
@@ -428,9 +428,9 @@ version = "0.4.1"
 
 [[deps.GridVisualize]]
 deps = ["ColorSchemes", "Colors", "DocStringExtensions", "ElasticArrays", "ExtendableGrids", "GeometryBasics", "LinearAlgebra", "Observables", "OrderedCollections", "PkgVersion", "Printf", "Requires", "StaticArrays"]
-git-tree-sha1 = "0cf1ee93e7b6e88eb0b7e5122e72c7d88102bbc5"
+git-tree-sha1 = "925ba2f11df005d894b113292d32fca9afe3f8c8"
 uuid = "5eed8a63-0fb0-45eb-886d-8d5a387d12b8"
-version = "0.3.4"
+version = "0.3.9"
 
 [[deps.Hyperscript]]
 deps = ["Test"]
@@ -534,9 +534,9 @@ version = "1.4.1"
 
 [[deps.Parsers]]
 deps = ["Dates"]
-git-tree-sha1 = "98f59ff3639b3d9485a03a72f3ab35bab9465720"
+git-tree-sha1 = "f19e978f81eca5fd7620650d7dbea58f825802ee"
 uuid = "69de0a69-1ddd-5017-9359-2bf0b02dc9f0"
-version = "2.0.6"
+version = "2.1.0"
 
 [[deps.Pkg]]
 deps = ["Artifacts", "Dates", "Downloads", "LibGit2", "Libdl", "Logging", "Markdown", "Printf", "REPL", "Random", "SHA", "Serialization", "TOML", "Tar", "UUIDs", "p7zip_jll"]
@@ -556,9 +556,9 @@ version = "0.7.16"
 
 [[deps.PlutoVista]]
 deps = ["ColorSchemes", "Colors", "DocStringExtensions", "GridVisualize", "UUIDs"]
-git-tree-sha1 = "ce59550b517ab41b5e687174f93f57c76f872b6d"
+git-tree-sha1 = "29894b1c2258ae59a2af698d3f16dcfe683baa71"
 uuid = "646e1f28-b900-46d7-9d87-d554eb38a413"
-version = "0.8.2"
+version = "0.8.4"
 
 [[deps.Preferences]]
 deps = ["TOML"]
@@ -597,9 +597,9 @@ uuid = "9e88b42a-f829-5b0c-bbe9-9e923198166b"
 
 [[deps.SimplexGridFactory]]
 deps = ["DocStringExtensions", "ElasticArrays", "ExtendableGrids", "GridVisualize", "LinearAlgebra", "Printf", "Test"]
-git-tree-sha1 = "e55646af1d0f68763eaca28f666d381982eeb65f"
+git-tree-sha1 = "af52ec74a4b6cfcc5b6d60d259099fa0596de2c1"
 uuid = "57bfcd06-606e-45d6-baf4-4ba06da0efd5"
-version = "0.5.8"
+version = "0.5.9"
 
 [[deps.Sockets]]
 uuid = "6462fe0b-24de-5631-8697-dd941f90decc"
