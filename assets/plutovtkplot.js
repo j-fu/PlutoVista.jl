@@ -364,7 +364,7 @@ function plutovtkplot(uuid,jsdict,invalidation)
     	    var points=jsdict[cmd+"points"]
  	    var polys=jsdict[cmd+"polys"]
             var colors=jsdict[cmd+"colors"]
-
+            
             if (colors!="none")
             {
                 /// need to use LUT here!

@@ -14,9 +14,9 @@ function canvascolorbar(uuid,w,h,cbdict)
 
     if (cbdict["cbar"]==1) /*gradient colorbar for contour plots */
     {
-        var cstops=cbdict["cstops"]
-        var colors=cbdict["colors"]
-        var levels=cbdict["levels"]
+        var cstops=cbdict["cbar_stops"]
+        var colors=cbdict["cbar_colors"]
+        var levels=cbdict["cbar_levels"]
 
         var grad = ctx.createLinearGradient(0,h1, 0, h0);
         var icol=0
@@ -48,9 +48,9 @@ function canvascolorbar(uuid,w,h,cbdict)
     /* discontinuous colorbars for cell and boundary region numbers*/
     else if (cbdict["cbar"]==2) 
     {
-        var cstops=cbdict["cstops"]
-        var colors=cbdict["colors"]
-        var levels=cbdict["levels"]
+        var cstops=cbdict["cbar_stops"]
+        var colors=cbdict["cbar_colors"]
+        var levels=cbdict["cbar_levels"]
 
         // Region markers
         if (cstops!=undefined)
@@ -80,9 +80,9 @@ function canvascolorbar(uuid,w,h,cbdict)
         }
         
         // edge markers
-        var cstops=cbdict["ecstops"]
-        var colors=cbdict["ecolors"]
-        var levels=cbdict["elevels"]
+        var cstops=cbdict["ecbar_stops"]
+        var colors=cbdict["ecbar_colors"]
+        var levels=cbdict["ecbar_levels"]
         if (cstops!=undefined)
         {
             var lmin=levels[0]

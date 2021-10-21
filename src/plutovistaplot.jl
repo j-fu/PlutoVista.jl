@@ -3,7 +3,8 @@ $(TYPEDEF)
 
 PlutoVistaPlot is a wrapper struct around different possible backends.
 As default, for 1D plots, [`PlutoPlotlyPlot`](@ref) and for 2D and 3D plots,
-[`PlutoVTKPlot`](@ref) are chosen.
+[`PlutoVTKPlot`](@ref) are chosen. The backend is automatically chosen
+when the first plot is invoked.
 
 """
 mutable struct PlutoVistaPlot

@@ -17,7 +17,9 @@ Please see:
 
 So far, this package is in an early state.
 
-## PlutoVista plot constructor
+## PlutoVistaPlot
+
+
 ```@docs
 PlutoVistaPlot
 PlutoVistaPlot(;resolution=(300,300),kwargs...)

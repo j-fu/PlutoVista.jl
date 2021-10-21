@@ -109,7 +109,7 @@ Coding is   [3, i11, i12, i13,   3 , i21, i22 ,i23, ...]
 Careful: js indexing counts from zero.
 """
 function vtkpolys(tris; offset=0)
-    ipoly=1
+   ipoly=1
     ntri=size(tris,2)
     off=offset-1
     polys=Vector{Int32}(undef,4*ntri)
@@ -220,9 +220,9 @@ function tricontour!(p::PlutoVTKPlot, pts, tris,f;kwargs...)
     bar_rgb=reinterpret(Float64,get(colorschemes[colormap],bar_stops,(0,1)))
     bar_rgb=UInt8.(floor.(bar_rgb*255))
     p.jsdict["cbar"]=1
-    p.jsdict["cstops"]=bar_stops
-    p.jsdict["colors"]=bar_rgb
-    p.jsdict["levels"]=collect(levels)
+    p.jsdict["cbar_stops"]=bar_stops
+    p.jsdict["cbar_colors"]=bar_rgb
+    p.jsdict["cbar_levels"]=collect(levels)
 
     axis2d!(p)
     p
@@ -351,9 +351,9 @@ function tetcontour!(p::PlutoVTKPlot, pts, tets,func; kwargs...)
     bar_rgb=reinterpret(Float64,get(colorschemes[colormap],bar_stops,(0,1)))
     bar_rgb=UInt8.(floor.(bar_rgb*255))
     p.jsdict["cbar"]=1
-    p.jsdict["cstops"]=bar_stops
-    p.jsdict["colors"]=bar_rgb
-    p.jsdict["levels"]=vcat([crange[1]],levels,[crange[2]])
+    p.jsdict["cbar_stops"]=bar_stops
+    p.jsdict["cbar_colors"]=bar_rgb
+    p.jsdict["cbar_levels"]=vcat([crange[1]],levels,[crange[2]])
 
 
     if args[:outlinealpha]>0 && faces!=nothing
@@ -419,9 +419,9 @@ function trimesh!(p::PlutoVTKPlot,pts, tris; kwargs...)
         bar_rgb=reinterpret(Float64,get(cmap,bar_stops,(1,size(cmap))))
         bar_rgb=UInt8.(floor.(bar_rgb*255))
         p.jsdict["cbar"]=2
-        p.jsdict["cstops"]=bar_stops
-        p.jsdict["colors"]=bar_rgb
-        p.jsdict["levels"]=collect(1:size(cmap))
+        p.jsdict["cbar_stops"]=bar_stops
+        p.jsdict["cbar_colors"]=bar_rgb
+        p.jsdict["cbar_levels"]=collect(1:size(cmap))
         
     else
         parameter!(p,"colors","none")
@@ -455,9 +455,9 @@ function trimesh!(p::PlutoVTKPlot,pts, tris; kwargs...)
             ebar_stops=collect(1:size(ecmap))
             ebar_rgb=reinterpret(Float64,get(ecmap,ebar_stops,(1,size(ecmap))))
             ebar_rgb=UInt8.(floor.(ebar_rgb*255))
-            p.jsdict["ecstops"]=ebar_stops
-            p.jsdict["ecolors"]=ebar_rgb
-            p.jsdict["elevels"]=collect(1:size(ecmap))
+            p.jsdict["ecbar_stops"]=ebar_stops
+            p.jsdict["ecbar_colors"]=ebar_rgb
+            p.jsdict["ecbar_levels"]=collect(1:size(ecmap))
         else
             parameter!(p,"linecolors","none")
         end
@@ -550,8 +550,10 @@ function tetmesh!(p::PlutoVTKPlot, pts, tets;kwargs...)
                                                                 primepoints=hcat(xyzmin,xyzmax)
                                                                 )
     
-    points=hcat([reshape(reinterpret(Float32,regpoints0[i] ),(3,length(regpoints0[i] ))) for i=1:nregions]...)
-    facets=vcat([vtkpolys(reshape(reinterpret(Int32,regfacets0[i]),(3,length(regfacets0[i])))) for i=1:nregions]...)
+    points=hcat( [          reshape(reinterpret(Float32,regpoints0[i]),(3,length(regpoints0[i])))   for i=1:nregions]... )
+    facets=vcat( [vtkpolys( reshape(reinterpret(Int32,  regfacets0[i]),(3,length(regfacets0[i]))),
+                            offset= ( i==1 ? 0 : sum(k->length(regpoints0[k]),1:i-1) ) )
+                            for i=1:nregions]... )
 
     
     regmarkers=vcat([fill(i,length(regfacets0[i])) for i=1:nregions]...)
@@ -569,11 +571,11 @@ function tetmesh!(p::PlutoVTKPlot, pts, tets;kwargs...)
     bar_rgb=reinterpret(Float64,get(cmap,bar_stops,(1,size(cmap))))
     bar_rgb=UInt8.(floor.(bar_rgb*255))
     p.jsdict["cbar"]=2
-    p.jsdict["cstops"]=bar_stops
-    p.jsdict["colors"]=bar_rgb
-    p.jsdict["levels"]=collect(1:size(cmap))
+    p.jsdict["cbar_stops"]=bar_stops
+    p.jsdict["cbar_colors"]=bar_rgb
+    p.jsdict["cbar_levels"]=collect(1:size(cmap))
     
-    
+
     if faces!=nothing
         bregpoints0,bregfacets0=GridVisualize.extract_visible_bfaces3D(pts,faces,facemarkers,nbregions,
                                                                        xyzcut,
@@ -599,9 +601,9 @@ function tetmesh!(p::PlutoVTKPlot, pts, tets;kwargs...)
         ebar_stops=collect(1:size(ecmap))
         ebar_rgb=reinterpret(Float64,get(ecmap,ebar_stops,(1,size(ecmap))))
         ebar_rgb=UInt8.(floor.(ebar_rgb*255))
-        p.jsdict["ecstops"]=ebar_stops
-        p.jsdict["ecolors"]=ebar_rgb
-        p.jsdict["elevels"]=collect(1:size(ecmap))
+        p.jsdict["ecbar_stops"]=ebar_stops
+        p.jsdict["ecbar_colors"]=ebar_rgb
+        p.jsdict["ecbar_levels"]=collect(1:size(ecmap))
     end
 
     if args[:outlinealpha]>0 && faces!=nothing
@@ -614,6 +616,7 @@ function tetmesh!(p::PlutoVTKPlot, pts, tets;kwargs...)
     parameter!(p,"polys",facets)
     parameter!(p,"points",vec(points))
     parameter!(p,"colors",UInt8.(floor.(rgb*255)))
+
     axis3d!(p)
     p
 end
