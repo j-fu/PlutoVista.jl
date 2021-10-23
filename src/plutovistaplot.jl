@@ -87,6 +87,10 @@ Keyword  arguments:
 - `clear=false`: clear plot contents
 - `label=""`: label of particular plot
 - `color=:auto`
+- `titlefontsize=12`
+- `axisfontsize=10`
+- `tickfontsize=10`
+- `legendfontsize=10`
 - `linewidth=2`
 - `linestyle=:solid`: 
 - `markersize=6`

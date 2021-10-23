@@ -32,6 +32,11 @@ function plutoplotlyplot(uuid,jsdict,w,h)
 //    https://www.somesolvedproblems.com/2018/10/how-to-customize-plotlys-modebar.html
     var buttons=[["resetScale2d", "toImage","toggleHover"]]
 
+    var legendfontsize=10
+    var axisfontsize=10
+    var titlefontsize=12
+    var tickfontsize=10
+
     var layout = {
         autosize: false,
         width: w,
@@ -39,7 +44,7 @@ function plutoplotlyplot(uuid,jsdict,w,h)
         title: {
             text: '',
             font: {
-                size: 12,
+                size: titlefontsize,
                 family: 'Arial'
             }
         },
@@ -58,18 +63,12 @@ function plutoplotlyplot(uuid,jsdict,w,h)
             exponentformat: 'e',
             linewidth: 2,
             gridcolor: '#bdbdbd',
-            title: {
-                font: {
-                    size: 10,
-                    family: 'Arial'
-                },
-            },
             titlefont: {
-                size: 10,
+                size: axisfontsize,
                 family: 'Arial'
             },
             tickfont: {
-                size: 10,
+                size: tickfontsize,
                 family: 'Arial'
             }
         },
@@ -83,18 +82,12 @@ function plutoplotlyplot(uuid,jsdict,w,h)
             exponentformat: 'e',
             linewidth: 2,
             gridcolor: '#bdbdbd',
-            title: {
-                font: {
-                    size: 10,
-                    family: 'Arial'
-                },
-            },
             titlefont: {
-                size: 10,
+                size: axisfontsize,
                 family: 'Arial'
             },
             tickfont: {
-                size: 10,
+                size: tickfontsize,
                 family: 'Arial'
             }
         },
@@ -103,7 +96,7 @@ function plutoplotlyplot(uuid,jsdict,w,h)
         legend:{
             bgcolor: 'rgba(255,255,255,0.8)',
             font: {
-                size: 10,
+                size: legendfontsize,
                 family: 'Arial'
             },
 
@@ -140,6 +133,12 @@ function plutoplotlyplot(uuid,jsdict,w,h)
                 layout=graphDiv.layout
             }
             
+            legendfontsize= jsdict[cmd+"legendfontsize"]
+            axisfontsize= jsdict[cmd+"axisfontsize"] 
+            titlefontsize= jsdict[cmd+"titlefontsize"]
+            tickfontsize= jsdict[cmd+"tickfontsize"]
+            
+
             
             var mode  = jsdict[cmd+"markertype"] == "none" ? "lines" : "lines+markers"
             var color=jsdict[cmd+"color"] 
@@ -226,7 +225,13 @@ function plutoplotlyplot(uuid,jsdict,w,h)
 
             layout.xaxis.type=jsdict[cmd+"xaxis"]
             layout.yaxis.type=jsdict[cmd+"yaxis"]
-            
+
+            layout.title.font.size=titlefontsize
+            layout.xaxis.titlefont.size=axisfontsize
+            layout.xaxis.tickfont.size=tickfontsize
+            layout.yaxis.titlefont.size=axisfontsize
+            layout.yaxis.tickfont.size=tickfontsize
+            layout.legend.font.size=legendfontsize
             
             data.push(trace)
             

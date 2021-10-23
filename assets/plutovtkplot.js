@@ -1,4 +1,4 @@
-// overwrite handleKeyPress
+// overwrite handleKeyPress and others
 // kind of modeled after https://kitware.github.io/vtk-js/api/Rendering_Core_Follower.html 
 
 function vtkMyInteractorStyleTrackballCamera2D(publicAPI, model)
@@ -39,6 +39,8 @@ function setinteractorstyle(interactor, cam)
     else
 //        var style=vtk.Interaction.Style.vtkInteractorStyleTrackballCamera.newInstance()
         var style=mynewInstance3d()
+    
+    style.invokeInteractionEvent({ type: 'InteractionEvent' });
     interactor.setInteractorStyle(style)
 }
 
@@ -88,10 +90,7 @@ function plutovtkplot(uuid,jsdict,invalidation)
         // Interactor
         win.interactor = vtk.Rendering.Core.vtkRenderWindowInteractor.newInstance();
         win.interactor.setView(win.openGlRenderWindow);
-        win.interactor.initialize();
         
-        win.interactor.setInteractorStyle(vtk.Interaction.Style.vtkInteractorStyleTrackballCamera.newInstance());
-
         //ensure to plot to the right place
         var rootContainer = document.getElementById(uuid);
         win.openGlRenderWindow.setContainer(rootContainer);
@@ -405,7 +404,6 @@ function plutovtkplot(uuid,jsdict,invalidation)
                     win.cell_color_dataset.modified()
                 }
             }
-
             { // edges of cells
                 
                 if (win.cell_edge_dataset == undefined)
@@ -438,41 +436,54 @@ function plutovtkplot(uuid,jsdict,invalidation)
         /////////////////////////////////////////////////////////////////
         else if (jsdict[cmd]=="axis")
         {
+            var axisfontsize= jsdict[cmd+"axisfontsize"] 
+            var tickfontsize= jsdict[cmd+"tickfontsize"]
             if (win.cubeAxes == undefined)
             {
- 	        var cam=jsdict[cmd+"cam"]
+ 	        var camstyle=jsdict[cmd+"cam"]
+
+
+
+
                 win.cubeAxes = vtk.Rendering.Core.vtkCubeAxesActor.newInstance();
-                var camera=win.renderer.getActiveCamera()
-	        win.cubeAxes.setCamera(camera);
-                win.cubeAxes.setAxisLabels(['x','y','z'])
-	        win.cubeAxes.setDataBounds(win.axis_actor.getBounds());
+  	        win.renderer.addActor(win.cubeAxes);
+
+                win.interactor.initialize();
+                setinteractorstyle(win.interactor,camstyle)
                 
+
+
+                var camera=win.renderer.getActiveCamera()
+                if (camstyle=="3D")
+                {
+                    camera.roll(-30);
+                    camera.elevation(-60);
+                }
+
+                win.cubeAxes.setCamera(camera);
+
+                
+                win.cubeAxes.setAxisLabels(['x','y','z'])
+                if (camstyle=="2D")
+                    win.cubeAxes.setGridLines(false)
+
                 win.cubeAxes.setTickTextStyle({fontColor: "black"})
                 win.cubeAxes.setTickTextStyle({fontFamily: "Arial"})
-                win.cubeAxes.setTickTextStyle({fontSize: "10"})
+                win.cubeAxes.setTickTextStyle({fontSize: tickfontsize})
                 
                 win.cubeAxes.setAxisTextStyle({fontColor: "black"})
                 win.cubeAxes.setAxisTextStyle({fontFamily: "Arial"})
-                win.cubeAxes.setAxisTextStyle({fontSize: "12"})
+                win.cubeAxes.setAxisTextStyle({fontSize: axisfontsize})
                 
                 win.cubeAxes.getProperty().setColor(0.75,0.75,0.75);
-	        win.renderer.addActor(win.cubeAxes);
+	        win.cubeAxes.setDataBounds(win.axis_actor.getBounds());
+
                 win.renderer.resetCamera();
-                win.renderWindow.render();
-                
-                if (cam=="2D")
-                     win.cubeAxes.setGridLines(false)
-                setinteractorstyle(win.interactor,cam)
             }
         }
         /////////////////////////////////////////////////////////////////
         else if (jsdict[cmd]=="triplot")
         {// Experimental
-
-    	    var points=jsdict[cmd+"points"]
- 	    var polys=jsdict[cmd+"polys"]
- 	    var cam=jsdict[cmd+"cam"]
-
 
             if (win.triplot_dataset == undefined)
             {
@@ -482,21 +493,14 @@ function plutovtkplot(uuid,jsdict,invalidation)
                 mapper.setInputData(win.triplot_dataset);
                 actor.setMapper(mapper);
                 win.renderer.addActor(actor);
-                setinteractorstyle(win.interactor,cam)
                 win.axis_actor=actor
             }
             
-            // Apply transformation to the points coordinates // figure this out later
-            //    vtkMatrixBuilder
-            ///      .buildFromRadian()
-            ///      .translate(...model.center)
-            ///      .rotateFromDirections([1, 0, 0], model.direction)
-            ///      .apply(points);
-            
+    	    var points=jsdict[cmd+"points"]
+ 	    var polys=jsdict[cmd+"polys"]
             win.triplot_dataset.getPoints().setData(points, 3);
             win.triplot_dataset.getPolys().setData(polys,1);
             win.triplot_dataset.modified()
-            win.renderWindow.render();
         }
         /////////////////////////////////////////////////////////////////
         else if (jsdict[cmd]=="plot")
@@ -514,11 +518,9 @@ function plutovtkplot(uuid,jsdict,invalidation)
             actor.setMapper(mapper);
             actor.getProperty().setColor(0, 0, 0)
             win.renderer.addActor(actor);
-            setinteractorstyle(interactor,cam)
         }
     }
-    
-    win.renderWindow.render();
+    win.renderWindow.render()
 }
 
     

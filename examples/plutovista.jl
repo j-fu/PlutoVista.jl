@@ -141,7 +141,7 @@ end;
 
 # ╔═╡ 724495e1-d501-4a03-be88-16b644938afd
 md"""
-Change grid resolution: $(@bind resolution Slider(10:1:20))
+Change grid resolution: $(@bind resolution Slider(10:1:100))
 """
 
 # ╔═╡ d3ad0d4f-859d-44ac-a387-aac8d465cc6d
