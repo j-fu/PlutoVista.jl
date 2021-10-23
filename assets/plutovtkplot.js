@@ -461,7 +461,6 @@ function plutovtkplot(uuid,jsdict,invalidation)
                 }
 
                 win.cubeAxes.setCamera(camera);
-
                 
                 win.cubeAxes.setAxisLabels(['x','y','z'])
                 if (camstyle=="2D")
