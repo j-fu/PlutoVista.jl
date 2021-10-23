@@ -8,7 +8,6 @@ function canvascolorbar(uuid,w,h,cbdict)
     var canvas = document.getElementById(uuid);
     var ctx = canvas.getContext("2d");
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.font = "10px Arial"
     ctx.textBaseline = "middle"
     ctx.textAlign = "left"
 
@@ -17,6 +16,8 @@ function canvascolorbar(uuid,w,h,cbdict)
         var cstops=cbdict["cbar_stops"]
         var colors=cbdict["cbar_colors"]
         var levels=cbdict["cbar_levels"]
+        var legendfontsize=cbdict["cbar_fontsize"]
+        ctx.font = `${legendfontsize}px Arial`
 
         var grad = ctx.createLinearGradient(0,h1, 0, h0);
         var icol=0
@@ -51,6 +52,8 @@ function canvascolorbar(uuid,w,h,cbdict)
         var cstops=cbdict["cbar_stops"]
         var colors=cbdict["cbar_colors"]
         var levels=cbdict["cbar_levels"]
+        var legendfontsize=cbdict["cbar_fontsize"]
+        ctx.font = `${legendfontsize}px Arial`
 
         // Region markers
         if (cstops!=undefined)

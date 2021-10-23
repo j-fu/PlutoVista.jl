@@ -35,6 +35,10 @@ function PlutoVTKPlot(;resolution=(300,300), kwargs...)
     p.h=resolution[2]
 
     default_args=(title="",
+                  titlefontsize=12,
+                  axisfontsize=10,
+                  tickfontsize=10,
+                  legendfontsize=10,
                   clear=false)
 
     p.args=merge(default_args,kwargs)
@@ -87,8 +91,10 @@ end
 Add 3D coordinate system axes to the plot.
 Sets camera handling to 3D mode.
 """
-function axis3d!(p::PlutoVTKPlot)
+function axis3d!(p::PlutoVTKPlot; kwargs...)
     command!(p,"axis")
+    parameter!(p,"axisfontsize"   ,kwargs[:axisfontsize])  
+    parameter!(p,"tickfontsize"   ,kwargs[:tickfontsize])   
     parameter!(p,"cam","3D")
 end
 
@@ -97,8 +103,10 @@ end
 Add 2D coordinate system axes to the plot.
 Sets camera handling to 2D mode.
 """
-function axis2d!(p::PlutoVTKPlot)
+function axis2d!(p::PlutoVTKPlot; kwargs...)
     command!(p,"axis")
+    parameter!(p,"axisfontsize"   ,kwargs[:axisfontsize])  
+    parameter!(p,"tickfontsize"   ,kwargs[:tickfontsize])   
     parameter!(p,"cam","2D")
 end
 
@@ -223,8 +231,9 @@ function tricontour!(p::PlutoVTKPlot, pts, tris,f;kwargs...)
     p.jsdict["cbar_stops"]=bar_stops
     p.jsdict["cbar_colors"]=bar_rgb
     p.jsdict["cbar_levels"]=collect(levels)
+    p.jsdict["cbar_fontsize"]=args[:legendfontsize]
 
-    axis2d!(p)
+    axis2d!(p; args...)
     p
 end
 
@@ -354,6 +363,7 @@ function tetcontour!(p::PlutoVTKPlot, pts, tets,func; kwargs...)
     p.jsdict["cbar_stops"]=bar_stops
     p.jsdict["cbar_colors"]=bar_rgb
     p.jsdict["cbar_levels"]=vcat([crange[1]],levels,[crange[2]])
+    p.jsdict["cbar_fontsize"]=args[:legendfontsize]
 
 
     if args[:outlinealpha]>0 && faces!=nothing
@@ -363,7 +373,7 @@ function tetcontour!(p::PlutoVTKPlot, pts, tets,func; kwargs...)
         parameter!(p,"outline",0)
     end
 
-    axis3d!(p)
+    axis3d!(p; args...)
     p
     
 end
@@ -422,6 +432,7 @@ function trimesh!(p::PlutoVTKPlot,pts, tris; kwargs...)
         p.jsdict["cbar_stops"]=bar_stops
         p.jsdict["cbar_colors"]=bar_rgb
         p.jsdict["cbar_levels"]=collect(1:size(cmap))
+        p.jsdict["cbar_fontsize"]=args[:legendfontsize]
         
     else
         parameter!(p,"colors","none")
@@ -469,7 +480,7 @@ function trimesh!(p::PlutoVTKPlot,pts, tris; kwargs...)
     
     
     
-    axis2d!(p)
+    axis2d!(p; args...)
     p
 end
 
@@ -574,7 +585,8 @@ function tetmesh!(p::PlutoVTKPlot, pts, tets;kwargs...)
     p.jsdict["cbar_stops"]=bar_stops
     p.jsdict["cbar_colors"]=bar_rgb
     p.jsdict["cbar_levels"]=collect(1:size(cmap))
-    
+    p.jsdict["cbar_fontsize"]=args[:legendfontsize]
+
 
     if faces!=nothing
         bregpoints0,bregfacets0=GridVisualize.extract_visible_bfaces3D(pts,faces,facemarkers,nbregions,
@@ -617,7 +629,7 @@ function tetmesh!(p::PlutoVTKPlot, pts, tets;kwargs...)
     parameter!(p,"points",vec(points))
     parameter!(p,"colors",UInt8.(floor.(rgb*255)))
 
-    axis3d!(p)
+    axis3d!(p; args...)
     p
 end
 
@@ -631,6 +643,7 @@ $(SIGNATURES)
 """
 function quiver2d!(p::PlutoVTKPlot, pts, qvec; kwargs...)
 
+    args=merge((kwargs...),p.args)
     command!(p,"quiver")
     zcoord=zeros(size(pts,2))
 
@@ -704,7 +717,7 @@ function quiver2d!(p::PlutoVTKPlot, pts, qvec; kwargs...)
 
     parameter!(p,"points",vec(qpts))
     parameter!(p,"lines",lines)
-    axis2d!(p)
+    axis2d!(p; args...)
     p
 end
 
@@ -718,7 +731,8 @@ $(SIGNATURES)
 Experimental: Plot piecewise linear function on  triangular grid given by points and triangles
 as matrices
 """
-function triplot!(p::PlutoVTKPlot,pts, tris,f)
+function triplot!(p::PlutoVTKPlot,pts, tris,f; kwargs...)
+    args=merge((kwargs...),p.args)
     p.jsdict=Dict{String,Any}("cmdcount" => 0)
     command!(p,"triplot")
     # make 3D points from 2D points by adding function value as
@@ -726,7 +740,7 @@ function triplot!(p::PlutoVTKPlot,pts, tris,f)
     p.jsdict["cbar"]=0
     parameter!(p,"points",vec(vcat(pts,f')))
     parameter!(p,"polys",vtkpolys(tris))
-    axis3d!(p)
+    axis3d!(p;args...)
     p
 end
 

@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.16.1
+# v0.16.3
 
 using Markdown
 using InteractiveUtils
@@ -43,14 +43,14 @@ end
 let X=collect(0:0.1:10); plot(X,sin.(X)) end
 
 # ╔═╡ 763bdefc-200e-4afb-a6c9-71fb5ee16f58
-let X=collect(0:0.1:10); plot(X,X.^2,xaxis=:log,label="x", legend=:lt) end
+let X=collect(0:0.1:10); plot(X,X.^2,xscale=:log,label="x", legend=:lt,legendfontsize=20) end
 
 # ╔═╡ 4cd2182a-ea7c-49f6-a3f8-029b8727430f
-let X=collect(0:0.1:100); plot(X,X.^2,yaxis=:log,label="x",legend=:rb) end
+let X=collect(0:0.1:100); plot(X,X.^2,yscale=:log,label="x",legend=:rb,tickfontsize=20) end
 
 # ╔═╡ b9e1184b-62db-41c9-9340-b9db0aff5b78
  let X=collect(0:0.1:100); 
-	p=PlutoVistaPlot(xaxis=:log,yaxis=:log,ylabel="x",xlabel="ψ",title="title",legend=:lt)
+	p=PlutoVistaPlot(xscale=:log,yscale=:log,ylabel="x",xlabel="ψ",title="title",legend=:lt,axisfontsize=20)
 	plot!(p,X,X.^2;color=:red,label="2") 
 	plot!(p,X,X.^3,label="3")
 	plot!(p,X,X.^4,label="4")  
@@ -58,10 +58,10 @@ end
 
 # ╔═╡ ad1da8b8-723f-4b18-ba50-fb5a6d5d1176
  let X=collect(0:0.1:1000); 
-	p=PlutoVistaPlot(dim=1,resolution=(600,300))
+	p=PlutoVistaPlot(dim=1,resolution=(600,300),title="title",titlefontsize=20,legend=:lt,xscale=:log,yscale=:log)
 	plot!(p,X,X.^20,color=:red,label="2") 
 	plot!(p,X,X.^30,label="3") 
-	plot!(p,X,X.^40,ylabel="y",xlabel="xxx",title="title",label="4",legend=:lt,xaxis=:log,yaxis=:log) 
+plot!(p,X,X.^40,ylabel="y",xlabel="xxx",label="4") 
 end
 
 # ╔═╡ 7c06fcf0-8c98-49f7-add8-435f57a9c9da
@@ -153,7 +153,7 @@ X=10.0.^collect(-40:0.1:40);
 let
     p=plot(resolution=(600,300),
 		title="Number of numbers per unit interval",
-		xaxis=:log,yaxis=:log,xlabel="x",ylabel="n",legend=:rt)
+		xscale=:log,yscale=:log,xlabel="x",ylabel="n",legend=:rt)
     plot!(p,X,map(x->1.0e20/x,X), label="O(1/x)",linewidth=0.5,color=:black,linestyle=:dot)
     plot!(p,X,fpdens.(Float16.(X)),label="Float16")
     plot!(p,X,fpdens.(Float32.(X)),label="Float32")

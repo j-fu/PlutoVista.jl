@@ -40,8 +40,13 @@ function PlutoPlotlyPlot(;resolution=(300,300), kwargs...)
                   xscale=:linear,
                   yscale=:linear,
                   legend=:none,
+                  titlefontsize=12,
+                  axisfontsize=10,
+                  tickfontsize=10,
+                  legendfontsize=10,
                   clear=false)
     p.args=merge(default_args,kwargs)
+    @show p.args[:xscale]
     p.update=false
     p
 end
@@ -122,6 +127,7 @@ function plot!(p::PlutoPlotlyPlot,x,y; kwargs...)
 
     xscale= args[:xscale]==:identity ? :linear :  args[:xscale]
     yscale= args[:yscale]==:identity ? :linear :  args[:yscale]
+
     
     command!(p,"plot")
     parameter!(p,"x",collect(x))
@@ -139,6 +145,13 @@ function plot!(p::PlutoPlotlyPlot,x,y; kwargs...)
     parameter!(p,"xaxis",String(xscale))
     parameter!(p,"yaxis",String(yscale))
     parameter!(p,"title",args[:title])
+    parameter!(p,"legendfontsize",args[:legendfontsize])
+    parameter!(p,"axisfontsize"   ,args[:axisfontsize])  
+    parameter!(p,"titlefontsize"  ,args[:titlefontsize]) 
+    parameter!(p,"tickfontsize"   ,args[:tickfontsize])   
+
+
+    
     if args[:legend]==:none
         parameter!(p,"showlegend",0)
     else

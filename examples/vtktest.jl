@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.16.2
+# v0.16.3
 
 using Markdown
 using InteractiveUtils
@@ -54,7 +54,7 @@ function maketriangulation(maxarea)
 end
 
 # ╔═╡ 60dcfcf5-391e-418f-8e7c-3a0fe94f1e0d
-p=PlutoVTKPlot(resolution=(300,300))
+p=PlutoVTKPlot(resolution=(300,300),tickfontsize=10)
 
 # ╔═╡ db2823d9-aa6d-4be3-af5c-873c072cfd2b
 md"""
@@ -83,13 +83,13 @@ md"""Number of gridpoints: $(size(pts,2)) """
 
 # ╔═╡ 81046dcd-3cfb-4133-943f-61b9b3cdb183
 let
-	p=PlutoVTKPlot(resolution=(300,300))
+	p=PlutoVTKPlot(resolution=(300,300),axisfontsize=20)
 	tricontour!(p,pts,tris,func;cmap=:spring,levels=(0.1:0.2:1),limits=(0,1))
 end
 
 # ╔═╡ 7019ce3f-f2db-4581-8bd9-64f76231a62a
 let
-	p=PlutoVTKPlot(resolution=(300,300))
+	p=PlutoVTKPlot(resolution=(300,300),legendfontsize=15)
 	trimesh!(p,pts,tris;markers=markers,edges=edges,edgemarkers=edgemarkers)
 end
 
@@ -157,7 +157,7 @@ tetmesh!(p3dx,g3x[Coordinates],g3x[CellNodes];
 		markers=g3x[CellRegions],
 	faces=g3x[BFaceNodes],
 	facemarkers=g3x[BFaceRegions],
-	xplanes=gxplane,yplanes=gyplane,zplanes=gzplane,outlinealpha=0.2)
+	xplanes=gxplane,yplanes=gyplane,zplanes=gzplane,outlinealpha=0)
 
 # ╔═╡ 4263e897-d878-4fab-acae-a6c4dae37c5e
 qp=PlutoVTKPlot(resolution=(500,500))
