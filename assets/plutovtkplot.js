@@ -29,22 +29,21 @@ function extend3d(publicAPI, model, initialValues = {})
 }
 
 
-function setinteractorstyle(interactor, cam)
+function setinteractorstyle(interactor, camstyle)
 {
     const mynewInstance2d = vtk.macro.newInstance(extend2d, 'vtkMyInteractorStyleTrackballCamera2D');
     const mynewInstance3d = vtk.macro.newInstance(extend3d, 'vtkMyInteractorStyleTrackballCamera');
-    if (cam=="2D")
-//        var style=vtk.Interaction.Style.vtkMyInteractorStyleImage.newInstance()
+    if (camstyle=="2D")
+        //        var style=vtk.Interaction.Style.vtkMyInteractorStyleImage.newInstance()
         var style=mynewInstance2d()
     else
-//        var style=vtk.Interaction.Style.vtkInteractorStyleTrackballCamera.newInstance()
+    //        var style=vtk.Interaction.Style.vtkInteractorStyleTrackballCamera.newInstance()
         var style=mynewInstance3d()
     
-    style.invokeInteractionEvent({ type: 'InteractionEvent' });
     interactor.setInteractorStyle(style)
 }
 
-
+////////////////////////////////////////////////////////////////////////////////////////
 function add_outline_dataset(win,opoints,opolys,ocolors)
 {
     var ocolorData = vtk.Common.Core.vtkDataArray.newInstance({
@@ -70,6 +69,61 @@ function add_outline_dataset(win,opoints,opolys,ocolors)
     win.outline_dataset.getCellData().setScalars(ocolorData);        
     win.outline_dataset.modified()
 }
+
+////////////////////////////////////////////////////////////////////////////////////////
+function add_cell_dataset(win,points,polys,colors)
+{            
+    { // colored cells
+        if (colors!="none")
+        {
+            if (win.cell_color_dataset == undefined)
+            {
+                win.cell_color_dataset = vtk.Common.DataModel.vtkPolyData.newInstance();
+                var actor = vtk.Rendering.Core.vtkActor.newInstance();
+                var mapper = vtk.Rendering.Core.vtkMapper.newInstance();
+                mapper.setInputData(win.cell_color_dataset);
+                mapper.setColorModeToDirectScalars()
+                actor.setMapper(mapper);
+                win.renderer.addActor(actor);
+            }
+            
+            var colorData = vtk.Common.Core.vtkDataArray.newInstance({
+                name: 'Colors',
+                values: colors,
+                numberOfComponents: 3,
+            });
+            
+            win.cell_color_dataset.getPoints().setData(points, 3);
+            win.cell_color_dataset.getPolys().setData(polys,1);
+            win.cell_color_dataset.getCellData().setActiveScalars('Colors');
+            win.cell_color_dataset.getCellData().setScalars(colorData);        
+            win.cell_color_dataset.modified()
+        }
+    }
+    { // edges of cells
+        if (win.cell_edge_dataset == undefined)
+        {
+            
+            win.cell_edge_dataset = vtk.Common.DataModel.vtkPolyData.newInstance();
+            var actor = vtk.Rendering.Core.vtkActor.newInstance();
+	    var mapper = vtk.Rendering.Core.vtkMapper.newInstance();
+            mapper.setColorModeToDefault()
+	    actor.getProperty().setRepresentation(1);
+	    actor.getProperty().setColor(0, 0, 0);
+	    actor.getProperty().setLineWidth(1.5);
+	    mapper.setInputData(win.cell_edge_dataset);
+	    actor.setMapper(mapper);
+	    win.renderer.addActor(actor);
+            win.axis_actor=actor
+        }
+        
+        win.cell_edge_dataset.getPoints().setData(points, 3);
+        win.cell_edge_dataset.getPolys().setData(polys,1);
+        win.cell_edge_dataset.modified()
+    }
+}
+
+
 
 function plutovtkplot(uuid,jsdict,invalidation)
 {
@@ -273,58 +327,8 @@ function plutovtkplot(uuid,jsdict,invalidation)
             var lines=jsdict[cmd+"lines"]
             var linecolors=jsdict[cmd+"linecolors"]
             
-            if (colors!="none")
-            {   // clolored triangles
-                
-                if (win.colored_triangle_dataset == undefined)
-                {
-                    win.colored_triangle_dataset = vtk.Common.DataModel.vtkPolyData.newInstance();
-                    var actor = vtk.Rendering.Core.vtkActor.newInstance();
-		    var mapper = vtk.Rendering.Core.vtkMapper.newInstance();
-		    mapper.setInputData(win.colored_triangle_dataset);
-                    mapper.setColorModeToDirectScalars()
-		    actor.setMapper(mapper);
-                    win.renderer.addActor(actor);
-
-                    win.axis_actor=actor
-                }
-                
-                var colorData = vtk.Common.Core.vtkDataArray.newInstance({
-                    name: 'Colors',
-                    values: colors,
-                    numberOfComponents: 3,
-                });
-                
-                win.colored_triangle_dataset.getPoints().setData(points, 3);
-                win.colored_triangle_dataset.getPolys().setData(polys,1);
-                win.colored_triangle_dataset.getCellData().setActiveScalars('Colors');
-                win.colored_triangle_dataset.getCellData().setScalars(colorData);        
-                win.colored_triangle_dataset.modified()
-            }
-
-            { // triangle edges
-                
-                if (win.triangle_edges == undefined)
-                {
-                    win.triangle_edges = vtk.Common.DataModel.vtkPolyData.newInstance();
-                    var actor = vtk.Rendering.Core.vtkActor.newInstance();
-		    var mapper = vtk.Rendering.Core.vtkMapper.newInstance();
-                    mapper.setColorModeToDefault()
-		    actor.getProperty().setRepresentation(1);
-		    actor.getProperty().setColor(0, 0, 0);
-		    actor.getProperty().setLineWidth(1.5);
-		    mapper.setInputData(win.triangle_edges);
-		    actor.setMapper(mapper);
-		    win.renderer.addActor(actor);
-                }
-                
-                
-                win.triangle_edges.getPoints().setData(points, 3);
-                win.triangle_edges.getPolys().setData(polys,1);
-                win.triangle_edges.modified()
-            }
-
-
+            add_cell_dataset(win,points, polys, colors)
+            
             if (lines != "none")
             { // boundary edges
             
@@ -367,65 +371,13 @@ function plutovtkplot(uuid,jsdict,invalidation)
  	    var polys=jsdict[cmd+"polys"]
             var colors=jsdict[cmd+"colors"]
             
-            if (colors!="none")
-            {
-                /// need to use LUT here!
-                var colorData = vtk.Common.Core.vtkDataArray.newInstance({
-                    name: 'Colors',
-                    values: colors,
-                    numberOfComponents: 3,
-                });
-            }
-
             var outline=jsdict[cmd+"outline"]
     	    var opoints=jsdict[cmd+"opoints"]
  	    var opolys=jsdict[cmd+"opolys"]
             var ocolors=jsdict[cmd+"ocolors"]
 
+            add_cell_dataset(win,points, polys, colors)
 
-            
-            { // colored cells
-                if (colors!="none")
-                {
-                    if (win.cell_color_dataset == undefined)
-                    {
-                        win.cell_color_dataset = vtk.Common.DataModel.vtkPolyData.newInstance();
-                        var actor = vtk.Rendering.Core.vtkActor.newInstance();
-                        var mapper = vtk.Rendering.Core.vtkMapper.newInstance();
-                        mapper.setInputData(win.cell_color_dataset);
-                        mapper.setColorModeToDirectScalars()
-                        actor.setMapper(mapper);
-                        win.renderer.addActor(actor);
-                    }
-                    win.cell_color_dataset.getPoints().setData(points, 3);
-                    win.cell_color_dataset.getPolys().setData(polys,1);
-                    win.cell_color_dataset.getCellData().setActiveScalars('Colors');
-                    win.cell_color_dataset.getCellData().setScalars(colorData);        
-                    win.cell_color_dataset.modified()
-                }
-            }
-            { // edges of cells
-                
-                if (win.cell_edge_dataset == undefined)
-                {
-                    
-                    win.cell_edge_dataset = vtk.Common.DataModel.vtkPolyData.newInstance();
-                    var actor = vtk.Rendering.Core.vtkActor.newInstance();
-		    var mapper = vtk.Rendering.Core.vtkMapper.newInstance();
-                    mapper.setColorModeToDefault()
-		    actor.getProperty().setRepresentation(1);
-		    actor.getProperty().setColor(0, 0, 0);
-		    actor.getProperty().setLineWidth(1.5);
-		    mapper.setInputData(win.cell_edge_dataset);
-		    actor.setMapper(mapper);
-		    win.renderer.addActor(actor);
-                    win.axis_actor=actor
-                }
-                
-                win.cell_edge_dataset.getPoints().setData(points, 3);
-                win.cell_edge_dataset.getPolys().setData(polys,1);
-                win.cell_edge_dataset.modified()
-            }
             
             if (outline==1)
             {
