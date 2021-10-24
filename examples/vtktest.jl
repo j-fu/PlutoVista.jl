@@ -13,27 +13,19 @@ macro bind(def, element)
     end
 end
 
-# ╔═╡ 93ca4fd0-8f61-4174-b459-55f5395c0f56
-md"""
-# Test Notebook for [PlutoVista](https://github.com/j-fu/PlutoVista.jl)
-"""
-
-# ╔═╡ 2acd1978-03b1-4e8f-ba9f-2b3d58123613
-develop=true
+# ╔═╡ 08980845-f030-4a64-a4b2-ab027b3a2721
+   begin  using Pkg
+       Pkg.activate(mktempdir())
+	   Pkg.add("Revise")
+       using Revise
+       Pkg.add(["Triangulate","ExtendableGrids"])
+	   Pkg.develop("GridVisualize")
+	   Pkg.develop("PlutoVista")
+	   Pkg.develop("PlutoUI")
+   end	
 
 # ╔═╡ d6c0fb79-4129-444a-978a-bd2222b53df6
 begin
-    using Pkg
-    Pkg.activate(mktempdir())
-	Pkg.add("Revise")
-	using Revise
-    Pkg.add(["PlutoUI","Triangulate","ExtendableGrids"])
-    if develop	
-		Pkg.develop("GridVisualize")
-	    Pkg.develop("PlutoVista")
-    else
-	    Pkg.add("PlutoVista")
-    end	
     using PlutoUI
     using PlutoVista
     using GridVisualize
@@ -41,6 +33,11 @@ begin
     using Triangulate
 	using ExtendableGrids
 end
+
+# ╔═╡ 93ca4fd0-8f61-4174-b459-55f5395c0f56
+md"""
+# Test Notebook for [PlutoVista](https://github.com/j-fu/PlutoVista.jl) and [vtk.js](https://kitware.github.io/vtk-js/index.html)
+"""
 
 # ╔═╡ 7c06fcf0-8c98-49f7-add8-435f57a9c9da
 function maketriangulation(maxarea)
@@ -90,11 +87,11 @@ end
 # ╔═╡ 7019ce3f-f2db-4581-8bd9-64f76231a62a
 let
 	p=PlutoVTKPlot(resolution=(300,300),legendfontsize=15)
-	trimesh!(p,pts,tris;markers=markers,edges=edges,edgemarkers=edgemarkers)
+	trimesh!(p,pts,tris;
+		markers=markers,
+		edges=edges,edgemarkers=edgemarkers
+	)
 end
-
-# ╔═╡ 1d19e6a0-118f-4b94-b9fb-3b16f98e31fc
-markers
 
 # ╔═╡ 2e3546f6-eb47-4693-aa00-902570fab7b5
 function grid3d(;n=15)
@@ -124,7 +121,7 @@ z: $(@bind zplane Slider(0:0.01:1,show_value=true,default=0.45))
 """
 
 # ╔═╡ 3681ef5b-c794-44da-9fe7-cedcd68b426c
-tetcontour!(p3d,g[Coordinates],g[CellNodes],f;levels=-1:0.25:1,
+tetcontour!(p3d,g[Coordinates],g[CellNodes],f;levels=[flevel],
 	faces=g[BFaceNodes],
 	facemarkers=g[BFaceRegions],
 	xplanes=[xplane],yplanes=[yplane],zplanes=[zplane],outlinealpha=0.1, levelalpha=0.25)
@@ -181,9 +178,11 @@ let
 	quiver2d!(qp,pts,∇v)
 end
 
+# ╔═╡ 23c75823-e69f-4ca0-a3ca-783612ba9c3c
+html"""<hr>"""
+
 # ╔═╡ Cell order:
 # ╟─93ca4fd0-8f61-4174-b459-55f5395c0f56
-# ╠═2acd1978-03b1-4e8f-ba9f-2b3d58123613
 # ╠═d6c0fb79-4129-444a-978a-bd2222b53df6
 # ╠═7c06fcf0-8c98-49f7-add8-435f57a9c9da
 # ╠═890710fe-dac0-4256-b1ba-79776f1ea7e5
@@ -196,7 +195,6 @@ end
 # ╟─bce0cfe7-4112-4bb8-aac6-43885f3746a9
 # ╠═81046dcd-3cfb-4133-943f-61b9b3cdb183
 # ╠═7019ce3f-f2db-4581-8bd9-64f76231a62a
-# ╠═1d19e6a0-118f-4b94-b9fb-3b16f98e31fc
 # ╠═2e3546f6-eb47-4693-aa00-902570fab7b5
 # ╠═bd0a59a2-564d-42bd-ab6f-a50b26f9241f
 # ╠═368b8cf5-fabd-4b84-b33c-b15c4452393b
@@ -206,9 +204,11 @@ end
 # ╠═0f440c27-7ff1-4db5-b4eb-8ce1e9018ef1
 # ╠═606f6837-f3b7-4a52-b9c3-034799c7bf93
 # ╠═ecb3bb5e-6ae5-4d6e-9834-d52ce977b3fc
-# ╟─90ff6ffc-84dc-45fd-8d09-9eb916397630
+# ╠═90ff6ffc-84dc-45fd-8d09-9eb916397630
 # ╠═ae5707d9-41b7-4937-924a-fb54b83c31db
 # ╠═519d106f-3f6f-4db1-b4e4-c5e7ef176857
 # ╠═4263e897-d878-4fab-acae-a6c4dae37c5e
 # ╠═5dfb1dde-06ed-483a-bac3-6a21a7f98856
 # ╠═6d7547c6-5667-463f-99dc-2f3fbaeb4c4d
+# ╟─23c75823-e69f-4ca0-a3ca-783612ba9c3c
+# ╠═08980845-f030-4a64-a4b2-ab027b3a2721

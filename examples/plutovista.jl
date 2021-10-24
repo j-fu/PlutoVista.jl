@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.16.2
+# v0.16.3
 
 using Markdown
 using InteractiveUtils
@@ -27,16 +27,6 @@ end
 # ╔═╡ 93ca4fd0-8f61-4174-b459-55f5395c0f56
 md"""
 # Test Notebook for [PlutoVista](https://github.com/j-fu/PlutoVista.jl)
-"""
-
-# ╔═╡ fdf728b9-ade9-46f3-8aaf-cf22aaaa55d2
-md"""
-    using Pkg
-    Pkg.activate(mktempdir())
-	Pkg.add("Revise"); using Revise
-    Pkg.add(["PlutoUI","Triangulate","ExtendableGrids",
-	          "SimplexGridFactory","TetGen"])
-	Pkg.develop("PlutoVista")
 """
 
 # ╔═╡ 53f55db7-225f-4717-ab62-e024211e98a2
@@ -73,7 +63,7 @@ yscale: $(@bind yscale Slider(1:0.1:10,show_value=true)),
 
 # ╔═╡ 60dcfcf5-391e-418f-8e7c-3a0fe94f1e0d
 let
-	p=PlutoVistaPlot(resolution=(500,300))
+	p=PlutoVistaPlot(resolution=(500,300),titlefontsize=20)
 	plot!(p,X,yscale*sin.(X*xscale);label="sin",color=:red,linestyle=:dashdot)
 	plot!(p,X,cos.(X*xscale);label="cos",color=:green,linewidth=1,markertype=:star5)
 	plot!(p,X,X./X[end];color=:blue,linestyle=:dash,title="test",legend=:rt,xlabel="x")
@@ -85,7 +75,7 @@ For changing data, we can create the plot first and fill it afterwards.
 """
 
 # ╔═╡ c3b719cd-5134-4395-8f36-4daab6ee3bf0
-p1=plot(resolution=(600,300)); p1
+p1=plot(resolution=(600,300),axisfontsize=20)
 
 # ╔═╡ bdde2452-cf28-4d56-935c-693e6a1ca8a9
 md"""
@@ -95,7 +85,7 @@ md"""
 # ╔═╡ cf9f4d1a-ebcd-4b59-bb0c-cc0d6b3239ca
 begin
 	plot!(p1,X,sin.(X*xscale1);label="sin",color=:red,linestyle=:dashdot,clear=true)
-	plot!(p1,X,cos.(X*xscale1);label="cos",color=:green,linestyle=:dot,clear=false)
+	plot!(p1,X,cos.(X*xscale1);label="cos",color=:green,linestyle=:dot,clear=false,show=true,xlabel="x",ylabel="y")
 end
 
 # ╔═╡ d5240960-7759-48b8-94fd-3436f7b1573d
@@ -303,6 +293,20 @@ z: $(@bind zplane Slider(-2:0.01:2,show_value=true,default=-1.1))
 tetcontour!(p3d,g3[Coordinates],g3[CellNodes],f3;levels=[flevel],
 	xplanes=[xplane],yplanes=[yplane],zplanes=[zplane],levelalpha=0.7)
 
+# ╔═╡ b074a389-bd07-4548-a75c-efa8c7663b15
+html"""<hr>"""
+
+# ╔═╡ fdf728b9-ade9-46f3-8aaf-cf22aaaa55d2
+md"""
+    begin using Pkg
+       Pkg.activate(mktempdir())
+       Pkg.add("Revise"); using Revise
+       Pkg.add(["PlutoUI","Triangulate","ExtendableGrids",
+	          "SimplexGridFactory","TetGen"])
+	   Pkg.develop("PlutoVista")
+    end
+"""
+
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
 [deps]
@@ -327,7 +331,7 @@ Triangulate = "~2.1.0"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.7.0-rc1"
+julia_version = "1.7.0-rc2"
 manifest_format = "2.0"
 
 [[deps.AbstractTrees]]
@@ -439,9 +443,9 @@ uuid = "47d2ed2b-36de-50cf-bf87-49c2cf4b8b91"
 version = "0.0.4"
 
 [[deps.HypertextLiteral]]
-git-tree-sha1 = "f6532909bf3d40b308a0f360b6a0e626c0e263a8"
+git-tree-sha1 = "5efcf53d798efede8fee5b2c8b09284be359bf24"
 uuid = "ac1192a8-f4b3-4bfe-ba22-af5b92cd3ab2"
-version = "0.9.1"
+version = "0.9.2"
 
 [[deps.IOCapture]]
 deps = ["Logging", "Random"]
@@ -575,7 +579,7 @@ deps = ["InteractiveUtils", "Markdown", "Sockets", "Unicode"]
 uuid = "3fa0cd96-eef1-5676-8a61-b3b8758bbffb"
 
 [[deps.Random]]
-deps = ["Serialization"]
+deps = ["SHA", "Serialization"]
 uuid = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 
 [[deps.Reexport]]
@@ -698,7 +702,6 @@ uuid = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
 
 # ╔═╡ Cell order:
 # ╟─93ca4fd0-8f61-4174-b459-55f5395c0f56
-# ╟─fdf728b9-ade9-46f3-8aaf-cf22aaaa55d2
 # ╠═c102e87a-b570-4d86-b087-3506396fc065
 # ╟─53f55db7-225f-4717-ab62-e024211e98a2
 # ╟─b8a976e3-7fef-4527-ae6a-4da31c93a04f
@@ -719,7 +722,7 @@ uuid = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
 # ╠═ab232244-4fe2-4ab0-a0bf-d1d9510802d2
 # ╠═d3ad0d4f-859d-44ac-a387-aac8d465cc6d
 # ╟─83c7bffd-16c6-4cc7-8a68-87cbd739f3f4
-# ╠═724495e1-d501-4a03-be88-16b644938afd
+# ╟─724495e1-d501-4a03-be88-16b644938afd
 # ╟─da3bdabb-b81c-4c05-90cd-aee7b209e605
 # ╠═83be4a71-4f01-4f70-9cbe-f4e9b9222428
 # ╟─8186bd23-5727-4d87-805c-5e5c6a092535
@@ -751,5 +754,7 @@ uuid = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
 # ╠═809ceb74-8201-4cc1-8cdc-656dc070e020
 # ╟─c222b16b-0ddc-4287-a029-779bdd77dd7b
 # ╠═36e48e9c-9452-4b07-bce4-c1cfe3c19409
+# ╟─b074a389-bd07-4548-a75c-efa8c7663b15
+# ╠═fdf728b9-ade9-46f3-8aaf-cf22aaaa55d2
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002

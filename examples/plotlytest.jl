@@ -13,31 +13,28 @@ macro bind(def, element)
     end
 end
 
-# ╔═╡ 93ca4fd0-8f61-4174-b459-55f5395c0f56
-md"""
-# Test Notebook for [PlutoVista](https://github.com/j-fu/PlutoVista.jl)
-"""
-
-# ╔═╡ 2acd1978-03b1-4e8f-ba9f-2b3d58123613
-develop=true
+# ╔═╡ dc111222-038e-479b-993e-5ed58755df27
+    begin
+       using Pkg
+       Pkg.activate(mktempdir())
+	   Pkg.add("Revise"); using Revise
+       Pkg.add(["PlutoUI","Triangulate","LaTeXStrings"])
+	   Pkg.develop("PlutoVista")
+     end
 
 # ╔═╡ d6c0fb79-4129-444a-978a-bd2222b53df6
 begin
-    using Pkg
-    Pkg.activate(mktempdir())
-	Pkg.add("Revise"); using Revise
-    Pkg.add(["PlutoUI","Triangulate","LaTeXStrings"])
-    if develop	
-	    Pkg.develop("PlutoVista")
-    else
-	    Pkg.add("PlutoVista")
-    end	
     using PlutoUI
     using PlutoVista
     using Printf
 	using LaTeXStrings
     import Triangulate
 end
+
+# ╔═╡ 93ca4fd0-8f61-4174-b459-55f5395c0f56
+md"""
+# Test Notebook for [PlutoVista](https://github.com/j-fu/PlutoVista.jl) and plotly.js
+"""
 
 # ╔═╡ 9072dcea-e634-493e-ba1a-890220737683
 let X=collect(0:0.1:10); plot(X,sin.(X)) end
@@ -168,9 +165,11 @@ let
 		linestyle=:dash,color=:black,label="Int16")
 end
 
+# ╔═╡ 88fd8e90-e054-4dd4-858d-7367b590b89d
+html"""<hr>"""
+
 # ╔═╡ Cell order:
-# ╟─93ca4fd0-8f61-4174-b459-55f5395c0f56
-# ╠═2acd1978-03b1-4e8f-ba9f-2b3d58123613
+# ╠═93ca4fd0-8f61-4174-b459-55f5395c0f56
 # ╠═d6c0fb79-4129-444a-978a-bd2222b53df6
 # ╠═9072dcea-e634-493e-ba1a-890220737683
 # ╠═763bdefc-200e-4afb-a6c9-71fb5ee16f58
@@ -194,3 +193,5 @@ end
 # ╠═9709e98a-50f3-4ee5-912c-e370c8c93193
 # ╠═f8684eae-00c8-4e19-b638-5be32c045cfc
 # ╠═7f5612f3-a0cb-4319-b4bf-4eefe5dc2a18
+# ╟─88fd8e90-e054-4dd4-858d-7367b590b89d
+# ╠═dc111222-038e-479b-993e-5ed58755df27
