@@ -296,12 +296,16 @@ function tetcontour!(p::PlutoVTKPlot, pts, tets,func; kwargs...)
         xyzmin[idim]=minimum(pts[idim,:])
         xyzmax[idim]=maximum(pts[idim,:])
     end
+    extent=maximum(xyzmax-xyzmin)
+
+    # perturb planes to not to align with rect grid lines
+    xplanes=args[:xplanes].+(rand()-0.5)*1.0e-10*extent  
+    yplanes=args[:yplanes].+(rand()-0.5)*1.0e-10*extent  
+    zplanes=args[:zplanes].+(rand()-0.5)*1.0e-10*extent   
 
 
-    xplanes=args[:xplanes]
-    yplanes=args[:yplanes]
-    zplanes=args[:zplanes]    
 
+  
     
         
     cpts0,faces0,values=GridVisualize.marching_tetrahedra(pts,tets,func,
