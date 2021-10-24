@@ -54,6 +54,8 @@ function plutoplotlyplot(uuid,jsdict,w,h)
         },
         
         hovermode: false,
+        
+        
         xaxis: {
             title: '',
             mirror: true,
@@ -63,16 +65,22 @@ function plutoplotlyplot(uuid,jsdict,w,h)
             exponentformat: 'e',
             linewidth: 2,
             gridcolor: '#bdbdbd',
-            titlefont: {
-                size: axisfontsize,
-                family: 'Arial'
+            title: {
+                font: {
+                    size: axisfontsize,
+                    family: 'Arial'
+                },
             },
+            // titlefont: {
+            //     size: axisfontsize,
+            //     family: 'Arial'
+            // },
             tickfont: {
                 size: tickfontsize,
                 family: 'Arial'
             }
         },
-
+        
         yaxis: {
             title: '',
             mirror: true,
@@ -82,10 +90,16 @@ function plutoplotlyplot(uuid,jsdict,w,h)
             exponentformat: 'e',
             linewidth: 2,
             gridcolor: '#bdbdbd',
-            titlefont: {
-                size: axisfontsize,
-                family: 'Arial'
+            title: {
+                font: {
+                    size: axisfontsize,
+                    family: 'Arial'
+                },
             },
+            // titlefont: {
+            //     size: axisfontsize,
+            //     family: 'Arial'
+            // },
             tickfont: {
                 size: tickfontsize,
                 family: 'Arial'
@@ -132,7 +146,6 @@ function plutoplotlyplot(uuid,jsdict,w,h)
                 data=graphDiv.data
                 layout=graphDiv.layout
             }
-            
             legendfontsize= jsdict[cmd+"legendfontsize"]
             axisfontsize= jsdict[cmd+"axisfontsize"] 
             titlefontsize= jsdict[cmd+"titlefontsize"]
@@ -162,7 +175,6 @@ function plutoplotlyplot(uuid,jsdict,w,h)
                 }
             };
 
-            
             
             
             var yrange=jsdict[cmd+"ylimits"]
@@ -220,18 +232,19 @@ function plutoplotlyplot(uuid,jsdict,w,h)
             }
 
             
-            layout.xaxis.title=jsdict[cmd+"xlabel"]
-            layout.yaxis.title=jsdict[cmd+"ylabel"]
+            layout.xaxis.title.text=jsdict[cmd+"xlabel"]
+            layout.yaxis.title.text=jsdict[cmd+"ylabel"]
 
             layout.xaxis.type=jsdict[cmd+"xaxis"]
             layout.yaxis.type=jsdict[cmd+"yaxis"]
 
             layout.title.font.size=titlefontsize
-            layout.xaxis.titlefont.size=axisfontsize
-            layout.xaxis.tickfont.size=tickfontsize
-            layout.yaxis.titlefont.size=axisfontsize
-            layout.yaxis.tickfont.size=tickfontsize
             layout.legend.font.size=legendfontsize
+            layout.xaxis.title.font.size=axisfontsize
+            layout.yaxis.title.font.size=axisfontsize
+
+            layout.xaxis.tickfont.size=tickfontsize
+            layout.yaxis.tickfont.size=tickfontsize
             
             data.push(trace)
             
