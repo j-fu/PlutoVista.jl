@@ -46,7 +46,6 @@ function PlutoPlotlyPlot(;resolution=(300,300), kwargs...)
                   legendfontsize=10,
                   clear=false)
     p.args=merge(default_args,kwargs)
-    @show p.args[:xscale]
     p.update=false
     p
 end
