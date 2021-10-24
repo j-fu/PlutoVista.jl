@@ -321,7 +321,7 @@ Triangulate = "f7e6ffb2-c36d-4f8f-a77e-16e897189344"
 [compat]
 ExtendableGrids = "~0.8.7"
 PlutoUI = "~0.7.16"
-PlutoVista = "~0.8.4"
+PlutoVista = "~0.8.5"
 SimplexGridFactory = "~0.5.9"
 TetGen = "~1.3.0"
 Triangulate = "~2.1.0"
@@ -560,9 +560,9 @@ version = "0.7.16"
 
 [[deps.PlutoVista]]
 deps = ["ColorSchemes", "Colors", "DocStringExtensions", "GridVisualize", "UUIDs"]
-git-tree-sha1 = "29894b1c2258ae59a2af698d3f16dcfe683baa71"
+git-tree-sha1 = "6ba8bd07eeb78747ba7984bad19aa3df51dbf4a9"
 uuid = "646e1f28-b900-46d7-9d87-d554eb38a413"
-version = "0.8.4"
+version = "0.8.5"
 
 [[deps.Preferences]]
 deps = ["TOML"]
