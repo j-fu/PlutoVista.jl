@@ -9,6 +9,16 @@ function rendernotebook(name)
     notebook = Pluto.SessionActions.open(session, input; run_async=false)
     html_contents = Pluto.generate_html(notebook)
     write(output, html_contents)
+    
+    for c in notebook.cells
+        if c.errored
+            @info "Cell error:" c.output.body
+            @info "See the notebook file at " output
+            # run(`v $(output)`)
+        end
+        @assert !c.errored
+        @test !c.errored
+    end
 end
 
 
