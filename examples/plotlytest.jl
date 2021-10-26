@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.16.3
+# v0.16.4
 
 using Markdown
 using InteractiveUtils
@@ -16,7 +16,7 @@ end
 # ╔═╡ dc111222-038e-479b-993e-5ed58755df27
     begin
        using Pkg
-       Pkg.activate(mktempdir())
+       Pkg.activate(".testenv")
 	   Pkg.add("Revise"); using Revise
        Pkg.add(["PlutoUI","Triangulate","LaTeXStrings"])
 	   Pkg.develop("PlutoVista")

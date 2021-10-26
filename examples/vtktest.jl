@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.16.3
+# v0.16.4
 
 using Markdown
 using InteractiveUtils
@@ -15,13 +15,13 @@ end
 
 # ╔═╡ 08980845-f030-4a64-a4b2-ab027b3a2721
    begin  using Pkg
-       Pkg.activate(mktempdir())
+       Pkg.activate(".testenv")
 	   Pkg.add("Revise")
        using Revise
        Pkg.add(["Triangulate","ExtendableGrids"])
-	   Pkg.develop("GridVisualize")
+	   Pkg.add("GridVisualize")
+	   Pkg.add("PlutoUI")
 	   Pkg.develop("PlutoVista")
-	   Pkg.develop("PlutoUI")
    end	
 
 # ╔═╡ d6c0fb79-4129-444a-978a-bd2222b53df6

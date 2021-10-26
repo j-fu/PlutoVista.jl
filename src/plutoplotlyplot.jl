@@ -50,13 +50,16 @@ function PlutoPlotlyPlot(;resolution=(300,300), kwargs...)
     p
 end
 
+
+
+const plutoplotlyplot = read(joinpath(@__DIR__, "..", "assets", "plutoplotlyplot.js"), String)
+
 """
 $(TYPEDSIGNATURES)
 
 Show plotly plot.
 """
 function Base.show(io::IO, ::MIME"text/html", p::PlutoPlotlyPlot)
-    plutoplotlyplot = read(joinpath(@__DIR__, "..", "assets", "plutoplotlyplot.js"), String)
     result="""
         <script type="text/javascript" src="https://cdn.plot.ly/plotly-1.58.4.min.js"></script>
         <script>

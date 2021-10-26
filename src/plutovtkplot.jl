@@ -48,6 +48,8 @@ function PlutoVTKPlot(;resolution=(300,300), kwargs...)
     p
 end
 
+const plutovtkplot = read(joinpath(@__DIR__, "..", "assets", "plutovtkplot.js"), String)
+const canvascolorbar = read(joinpath(@__DIR__, "..", "assets", "canvascolorbar.js"), String)
 
 """
     Base.show(io::IO,::MIME"text/html",p::PlutoVTKPlot)
@@ -56,8 +58,6 @@ Show plot in html. This creates a vtk.js based renderer along with a canvas
 for handling the colorbar.
 """
 function Base.show(io::IO, ::MIME"text/html", p::PlutoVTKPlot)
-    plutovtkplot = read(joinpath(@__DIR__, "..", "assets", "plutovtkplot.js"), String)
-    canvascolorbar = read(joinpath(@__DIR__, "..", "assets", "canvascolorbar.js"), String)
     uuidcbar="$(p.uuid)"*"cbar"
     div=""
     if !p.update
