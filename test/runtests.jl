@@ -7,7 +7,8 @@ function testnotebook(name)
 
     pkgcellfortest=findfirst(c->occursin("PkgCellForTest",c.code),notebook.cells)
     if  pkgcellfortest!=nothing
-        notebook.cells[pkgcellfortest].code=replace(notebook.cells[pkgcellfortest].code,"md"=>"","\"\"\""=>"")
+        notebook.cells[pkgcellfortest].code=replace(notebook.cells[pkgcellfortest].code,"md"=>"")
+        notebook.cells[pkgcellfortest].code=replace(notebook.cells[pkgcellfortest].code,"\"\"\""=>"")
         @info "PkgCellForTest=$(pkgcellfortest)\n$(notebook.cells[pkgcellfortest].code)"
         Pluto.save_notebook(notebook,"tmp.jl")
         input="tmp.jl"
