@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.17.0
+# v0.16.4
 
 using Markdown
 using InteractiveUtils
@@ -297,7 +297,7 @@ html"""<hr>"""
 
 # ╔═╡ d932e456-b533-46b5-98d3-b06bc53fd2df
 md"""
-The purpose of the following cell is the possibility to easily run the notebook in package development mode by turning the markdown string to code. The markup `#PkgCellForTest` triggers this transition also during CI, so it is possible to actually run the CI for the notebook with the current master version.
+The purpose of the following cell is the possibility to easily run the notebook in package development mode by turning the markdown string to code. The markup `PkgCellForTest` triggers this transition also during CI, so it is possible to actually run the CI for the notebook with the current master version.
 """
 
 # ╔═╡ fdf728b9-ade9-46f3-8aaf-cf22aaaa55d2
