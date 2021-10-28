@@ -194,7 +194,7 @@ function tricontour!(p::PlutoVTKPlot, pts, tris,f;kwargs...)
 
     command!(p,"tricontour")
 
-    levels,crange=GridVisualize.isolevels(args,f)
+    levels,crange,colorbarticks=GridVisualize.isolevels(args,f)
 
     parameter!(p,"points",vec(vcat(pts,zeros(eltype(pts),length(f))')))
     parameter!(p,"polys",vtkpolys(tris))
@@ -230,7 +230,7 @@ function tricontour!(p::PlutoVTKPlot, pts, tris,f;kwargs...)
     p.jsdict["cbar"]=1
     p.jsdict["cbar_stops"]=bar_stops
     p.jsdict["cbar_colors"]=bar_rgb
-    p.jsdict["cbar_levels"]=collect(levels)
+    p.jsdict["cbar_levels"]=collect(colorbarticks)
     p.jsdict["cbar_fontsize"]=args[:legendfontsize]
 
     axis2d!(p; args...)

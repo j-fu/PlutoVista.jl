@@ -52,7 +52,7 @@ end
 
 
 
-const plutoplotlyplot = read(joinpath(@__DIR__, "..", "assets", "plutoplotlyplot.js"), String)
+const  plutoplotlyplot = read(joinpath(@__DIR__, "..", "assets", "plutoplotlyplot.js"), String)
 
 """
 $(TYPEDSIGNATURES)
@@ -186,12 +186,11 @@ with isolines using Plotly's mesh3d.
 """
 function tricontour!(p::PlutoPlotlyPlot,pts, tris,f;kwargs...)
 
-    default_args=(colormap=:viridis, isolines=0)
+    default_args=(colormap=:viridis, levels=0)
     args=merge(p.args,default_args)
     args=merge(args,kwargs)
 
-    isolines=args[:isolines]
-
+    levels,crange,colorbarticks=GridVisualize.isolevels(args,f)
 
     zval=0.0
     p.jsdict=Dict{String,Any}("cmdcount" => 0)
@@ -211,6 +210,7 @@ function tricontour!(p::PlutoPlotlyPlot,pts, tris,f;kwargs...)
 
     parameter!(p,"cstops",stops)
     parameter!(p,"colors",rgb)
+    parameter!(p,"colorbarticks",colorbarticks)
     
     
     parameter!(p,"i",tris[1,:].-1)
@@ -220,17 +220,12 @@ function tricontour!(p::PlutoPlotlyPlot,pts, tris,f;kwargs...)
 
     (fmin,fmax)=extrema(f)
 
-    if isolines==0
+    if levels==0
         parameter!(p,"iso_x","none")
         parameter!(p,"iso_y","none")
         parameter!(p,"iso_z","none")
     else
-        if isa(isolines,Number)
-            xisolines=range(fmin,fmax,length=isolines)
-        else
-            xisolines=isolines
-        end
-        iso_pts0=GridVisualize.marching_triangles(pts,tris,f,xisolines)
+        iso_pts0=GridVisualize.marching_triangles(pts,tris,f,levels)
         niso_pts=length(iso_pts0)
         iso_pts=vcat(reshape(reinterpret(Float32,iso_pts0),(2,niso_pts)))
 

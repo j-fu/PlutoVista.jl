@@ -115,7 +115,6 @@ function plutoplotlyplot(uuid,jsdict,w,h)
             },
 
         },
-        
         margin: {
             l: 60,
             r: 25,
@@ -123,6 +122,7 @@ function plutoplotlyplot(uuid,jsdict,w,h)
             t: 30,
             pad: 0
         },
+        
     };
             
     var data=[]
@@ -277,20 +277,15 @@ function plutoplotlyplot(uuid,jsdict,w,h)
         }
         else if (jsdict[cmd]=="tricontour")
         {
+            buttons=[["resetScale2d", "toImage","pan2d","hoverClosestCartesian"]]
+
             var data=[]
             // this is slower than vtk, but has hover and
-            // stays interactive in html
             var cstops=jsdict[cmd+"cstops"]
             var colors=jsdict[cmd+"colors"]
 
             var colorscale=make_colorscale(cstops,colors)
             var f=jsdict[cmd+"f"]
-            var hinfo=[]
-            for (var i=0; i<f.length; i++)
-            {
-                hinfo.push(`f: ${Number.parseFloat(f[i]).toPrecision(5)}`)
-            }
-
             var mesh = {
                 type: 'mesh3d',
                 x: jsdict[cmd+"x"],
@@ -300,13 +295,23 @@ function plutoplotlyplot(uuid,jsdict,w,h)
                 j: jsdict[cmd+"j"],
                 k: jsdict[cmd+"k"],
                 intensity: f,
-                hoverinfo: "x+y+text",
-                text: hinfo,
+                hovertemplate: "f(%{x},%{y})=%{intensity:0.3e}",
                 colorscale: colorscale,
+                colorbar: { thickness: 10,
+                            tickwidth: 1,
+                            tickvals: jsdict[cmd+"colorbarticks"],
+                            len: 0.8},
                 name : ''
             }
+            layout.margin= {
+                l: 5,
+                r: 5,
+                b: 5,
+                t: 5,
+                pad: 0
+            },
 
-  
+            
             // shoehorn 3D scene into 2D mode
             layout.scene={
                 dragmode : 'pan',
@@ -321,7 +326,7 @@ function plutoplotlyplot(uuid,jsdict,w,h)
                 },
                 xaxis: { tickangle: 0,showspikes: false, autorange: "reversed"},
                 yaxis: { tickangle: 0,showspikes: false},
-                zaxis: { visible: false, showgrid: false,showspikes: false}
+                zaxis: { visible: false, showgrid: false,showspikes: false},
             }
             data.push(mesh)
 
@@ -347,7 +352,7 @@ function plutoplotlyplot(uuid,jsdict,w,h)
                 };
                 data.push(line)
             }
-            Plotly.newPlot(uuid, data,layout)
+//           Plotly.newPlot(uuid, data,layout)
         }
         else if (jsdict[cmd]=="triplot"|| jsdict[cmd]=="triupdate")
         { //  Experimental, slower than vtk
