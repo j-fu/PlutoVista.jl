@@ -1,20 +1,22 @@
-using Test, Pluto,PlutoVista,Pkg
+using Test, Pluto
 
-function testnotebook(name)
-    input=joinpath(@__DIR__,"..","examples",name*".jl")
-
+function testnotebook(input)
+    # de-markdown eventual cells with Pkg.develop and write
+    # to pluto-tmp.jl
     notebook=Pluto.load_notebook_nobackup(input)
-
-    pkgcellfortest=findfirst(c->occursin("PkgCellForTest",c.code),notebook.cells)
+    pkgcellfortest=findfirst(c->occursin("Pkg.develop",c.code),notebook.cells)
     if  pkgcellfortest!=nothing
+        # de-markdown pkg cell
         notebook.cells[pkgcellfortest].code=replace(notebook.cells[pkgcellfortest].code,"md"=>"")
         notebook.cells[pkgcellfortest].code=replace(notebook.cells[pkgcellfortest].code,"\"\"\""=>"")
-        @info "PkgCellForTest=$(pkgcellfortest)\n$(notebook.cells[pkgcellfortest].code)"
-        Pluto.save_notebook(notebook,"tmp.jl")
-        input="tmp.jl"
+        notebook.cells[pkgcellfortest].code=replace(notebook.cells[pkgcellfortest].code,";"=>"")
+        @info "Pkg cell: $(pkgcellfortest)\n$(notebook.cells[pkgcellfortest].code)"
+        Pluto.save_notebook(notebook,"pluto-tmp.jl")
+        input="pluto-tmp.jl"
         sleep(1)
     end
 
+    # run notebook and check for cell errors
     session = Pluto.ServerSession();
     notebook = Pluto.SessionActions.open(session, input; run_async=false)
     errored=false
@@ -27,27 +29,13 @@ function testnotebook(name)
     !errored
 end
 
-notebooks=["vtktest","plotlytest","plutovista"]
 
 @testset "notebooks" begin
+    notebooks=["vtktest.jl","plotlytest.jl","plutovista.jl"]
     for notebook in notebooks
-        @info "notebook: $(notebook)"
-        @test testnotebook(notebook)
+        input=joinpath(@__DIR__,"..","examples",notebook)
+        @info "notebook: $(input)"
+        @test testnotebook(input)
     end
 end
 
-#=
-
-How to run notebook with dev'ed package:
-name="tmanifest.jl"
-
-Pluto.load_notebook(name,disable_writing_notebook_file=true)
-pkgcellfortest=findfirst(c->occursin("PkgCellForTest",c.code),notebook.cells)
-notebook.cells[pkgcellfortest].code=replace(notebook.cells[pkgcellfortest].code,"md"=>"","\"\"\""=>"")
-Pluto.save_notebook(notebook,"tmp.jl")
-
-find cell with Pkg
-unmarkdown this cell
-run tmp.jl
-
-=#           

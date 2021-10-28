@@ -295,23 +295,18 @@ tetcontour!(p3d,g3[Coordinates],g3[CellNodes],f3;levels=[flevel],
 # ╔═╡ b074a389-bd07-4548-a75c-efa8c7663b15
 html"""<hr>"""
 
-# ╔═╡ d932e456-b533-46b5-98d3-b06bc53fd2df
-md"""
-The purpose of the following cell is the possibility to easily run the notebook in package development mode by turning the markdown string to code. The markup triggers this transition also during CI, so it is possible to actually run the CI for the notebook with the current master version.
-"""
-
 # ╔═╡ fdf728b9-ade9-46f3-8aaf-cf22aaaa55d2
 md"""
-begin
+    begin
      using Pkg
      Pkg.activate(".testenv")
-     Pkg.add("Revise"); using Revise
+     Pkg.add("Revise")
+     using Revise
       Pkg.add(["PlutoUI","Triangulate",
 	   "ExtendableGrids","SimplexGridFactory","TetGen"])
      Pkg.develop("PlutoVista")
-     #PkgCellForTest markup for turning this cell into code during CI
     end
-"""
+""";
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -760,7 +755,6 @@ uuid = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
 # ╟─c222b16b-0ddc-4287-a029-779bdd77dd7b
 # ╠═36e48e9c-9452-4b07-bce4-c1cfe3c19409
 # ╟─b074a389-bd07-4548-a75c-efa8c7663b15
-# ╟─d932e456-b533-46b5-98d3-b06bc53fd2df
 # ╠═fdf728b9-ade9-46f3-8aaf-cf22aaaa55d2
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
