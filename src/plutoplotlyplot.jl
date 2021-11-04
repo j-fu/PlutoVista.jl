@@ -44,6 +44,7 @@ function PlutoPlotlyPlot(;resolution=(300,300), kwargs...)
                   axisfontsize=10,
                   tickfontsize=10,
                   legendfontsize=10,
+                  colorbarticks=:default,
                   clear=false)
     p.args=merge(default_args,kwargs)
     p.update=false
@@ -154,7 +155,7 @@ function plot!(p::PlutoPlotlyPlot,x,y; kwargs...)
 
 
     
-    if args[:legend]==:none
+    if args[:legend]==:none || args[:legend]==""
         parameter!(p,"showlegend",0)
     else
         parameter!(p,"showlegend",1)

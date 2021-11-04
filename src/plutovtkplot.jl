@@ -39,6 +39,7 @@ function PlutoVTKPlot(;resolution=(300,300), kwargs...)
                   axisfontsize=10,
                   tickfontsize=10,
                   legendfontsize=10,
+                  colorbarticks=:default,
                   clear=false)
 
     p.args=merge(default_args,kwargs)
