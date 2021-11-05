@@ -265,7 +265,7 @@ z: $(@bind gzplane Slider(0:0.01:1,show_value=true,default=0.45))
 
 # ╔═╡ b33a9e6b-7c93-475c-96f4-7259b30c2c47
 md"""
-## tetcontour
+### tetcontour
 """
 
 # ╔═╡ aded5964-8229-423c-b9f3-c80358b95fcc
@@ -320,10 +320,10 @@ TetGen = "c5d3f3f7-f850-59f6-8a2e-ffc6dc1317ea"
 Triangulate = "f7e6ffb2-c36d-4f8f-a77e-16e897189344"
 
 [compat]
-ExtendableGrids = "~0.8.7"
-PlutoUI = "~0.7.16"
-PlutoVista = "~0.8.6"
-SimplexGridFactory = "~0.5.9"
+ExtendableGrids = "~0.8.8"
+PlutoUI = "~0.7.18"
+PlutoVista = "~0.8.9"
+SimplexGridFactory = "~0.5.10"
 TetGen = "~1.3.0"
 Triangulate = "~2.1.0"
 """
@@ -332,8 +332,14 @@ Triangulate = "~2.1.0"
 PLUTO_MANIFEST_TOML_CONTENTS = """
 # This file is machine-generated - editing it directly is not advised
 
-julia_version = "1.7.0-rc2"
+julia_version = "1.6.3"
 manifest_format = "2.0"
+
+[[deps.AbstractPlutoDingetjes]]
+deps = ["Pkg"]
+git-tree-sha1 = "0ec322186e078db08ea3e7da5b8b2885c099b393"
+uuid = "6e696c72-6542-2067-7265-42206c756150"
+version = "1.1.0"
 
 [[deps.AbstractTrees]]
 git-tree-sha1 = "03e0550477d86222521d254b741d470ba17ea0b5"
@@ -373,10 +379,6 @@ git-tree-sha1 = "417b0ed7b8b838aa6ca0a87aadf1bb9eb111ce40"
 uuid = "5ae59095-9a9b-59fe-a467-6f913c188581"
 version = "0.12.8"
 
-[[deps.CompilerSupportLibraries_jll]]
-deps = ["Artifacts", "Libdl"]
-uuid = "e66e0078-7015-5450-92f7-15fbd957f2ae"
-
 [[deps.DataAPI]]
 git-tree-sha1 = "cc70b17275652eb47bc9e5f81635981f13cea5c8"
 uuid = "9a962f9c-6df0-11e9-0e5d-c546b8b5ee8a"
@@ -415,9 +417,9 @@ version = "1.2.9"
 
 [[deps.ExtendableGrids]]
 deps = ["AbstractTrees", "Dates", "DocStringExtensions", "ElasticArrays", "InteractiveUtils", "LinearAlgebra", "Printf", "Random", "SparseArrays", "Test"]
-git-tree-sha1 = "1e8e50f054057f23e908fbd6935766dca6293cc2"
+git-tree-sha1 = "e03c32179da71e9022381e1224c32a7a89febc10"
 uuid = "cfc395e8-590f-11e8-1f13-43a2532b2fa8"
-version = "0.8.7"
+version = "0.8.8"
 
 [[deps.FixedPointNumbers]]
 deps = ["Statistics"]
@@ -432,10 +434,10 @@ uuid = "5c1252a2-5f33-56bf-86c9-59e7332b4326"
 version = "0.4.1"
 
 [[deps.GridVisualize]]
-deps = ["ColorSchemes", "Colors", "DocStringExtensions", "ElasticArrays", "ExtendableGrids", "GeometryBasics", "LinearAlgebra", "Observables", "OrderedCollections", "PkgVersion", "Printf", "Requires", "StaticArrays"]
-git-tree-sha1 = "925ba2f11df005d894b113292d32fca9afe3f8c8"
+deps = ["ColorSchemes", "Colors", "DocStringExtensions", "ElasticArrays", "ExtendableGrids", "GeometryBasics", "HypertextLiteral", "LinearAlgebra", "Observables", "OrderedCollections", "PkgVersion", "Printf", "StaticArrays"]
+git-tree-sha1 = "80232407bd1fd4683429e289f6051b730e58cfa5"
 uuid = "5eed8a63-0fb0-45eb-886d-8d5a387d12b8"
-version = "0.3.9"
+version = "0.4.1"
 
 [[deps.Hyperscript]]
 deps = ["Test"]
@@ -500,7 +502,7 @@ uuid = "29816b5a-b9ab-546f-933c-edad1886dfa8"
 uuid = "8f399da3-3557-5675-b5ff-fb832c97cbdb"
 
 [[deps.LinearAlgebra]]
-deps = ["Libdl", "libblastrampoline_jll"]
+deps = ["Libdl"]
 uuid = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
 
 [[deps.Logging]]
@@ -528,10 +530,6 @@ git-tree-sha1 = "fe29afdef3d0c4a8286128d4e45cc50621b1e43d"
 uuid = "510215fc-4207-5dde-b226-833fc4488ee2"
 version = "0.4.0"
 
-[[deps.OpenBLAS_jll]]
-deps = ["Artifacts", "CompilerSupportLibraries_jll", "Libdl"]
-uuid = "4536629a-c528-5b80-bd46-f80d51c5b363"
-
 [[deps.OrderedCollections]]
 git-tree-sha1 = "85f8e6578bf1f9ee0d11e7bb1b1456435479d47c"
 uuid = "bac558e1-5e72-5ebc-8fee-abe8a469f55d"
@@ -539,9 +537,9 @@ version = "1.4.1"
 
 [[deps.Parsers]]
 deps = ["Dates"]
-git-tree-sha1 = "d911b6a12ba974dabe2291c6d450094a7226b372"
+git-tree-sha1 = "ae4bbcadb2906ccc085cf52ac286dc1377dceccc"
 uuid = "69de0a69-1ddd-5017-9359-2bf0b02dc9f0"
-version = "2.1.1"
+version = "2.1.2"
 
 [[deps.Pkg]]
 deps = ["Artifacts", "Dates", "Downloads", "LibGit2", "Libdl", "Logging", "Markdown", "Printf", "REPL", "Random", "SHA", "Serialization", "TOML", "Tar", "UUIDs", "p7zip_jll"]
@@ -554,16 +552,16 @@ uuid = "eebad327-c553-4316-9ea0-9fa01ccd7688"
 version = "0.1.1"
 
 [[deps.PlutoUI]]
-deps = ["Base64", "Dates", "Hyperscript", "HypertextLiteral", "IOCapture", "InteractiveUtils", "JSON", "Logging", "Markdown", "Random", "Reexport", "UUIDs"]
-git-tree-sha1 = "4c8a7d080daca18545c56f1cac28710c362478f3"
+deps = ["AbstractPlutoDingetjes", "Base64", "Dates", "Hyperscript", "HypertextLiteral", "IOCapture", "InteractiveUtils", "JSON", "Logging", "Markdown", "Random", "Reexport", "UUIDs"]
+git-tree-sha1 = "57312c7ecad39566319ccf5aa717a20788eb8c1f"
 uuid = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
-version = "0.7.16"
+version = "0.7.18"
 
 [[deps.PlutoVista]]
 deps = ["ColorSchemes", "Colors", "DocStringExtensions", "GridVisualize", "UUIDs"]
-git-tree-sha1 = "34fc7e41e6eefa58fef0786ab62a20262df88764"
+git-tree-sha1 = "74a871aabc16ad6bcfc119f24581015ae8efa17a"
 uuid = "646e1f28-b900-46d7-9d87-d554eb38a413"
-version = "0.8.6"
+version = "0.8.9"
 
 [[deps.Preferences]]
 deps = ["TOML"]
@@ -580,19 +578,13 @@ deps = ["InteractiveUtils", "Markdown", "Sockets", "Unicode"]
 uuid = "3fa0cd96-eef1-5676-8a61-b3b8758bbffb"
 
 [[deps.Random]]
-deps = ["SHA", "Serialization"]
+deps = ["Serialization"]
 uuid = "9a3f8284-a2c9-5f02-9a11-845980a1fd5c"
 
 [[deps.Reexport]]
 git-tree-sha1 = "45e428421666073eab6f2da5c9d310d99bb12f9b"
 uuid = "189a3867-3050-52da-a836-e630ba90ab69"
 version = "1.2.2"
-
-[[deps.Requires]]
-deps = ["UUIDs"]
-git-tree-sha1 = "4036a3bd08ac7e968e27c203d45f5fff15020621"
-uuid = "ae029012-a4dd-5104-9daa-d747884805df"
-version = "1.1.3"
 
 [[deps.SHA]]
 uuid = "ea8e919c-243c-51af-8825-aaa63cd721ce"
@@ -602,9 +594,9 @@ uuid = "9e88b42a-f829-5b0c-bbe9-9e923198166b"
 
 [[deps.SimplexGridFactory]]
 deps = ["DocStringExtensions", "ElasticArrays", "ExtendableGrids", "GridVisualize", "LinearAlgebra", "Printf", "Test"]
-git-tree-sha1 = "af52ec74a4b6cfcc5b6d60d259099fa0596de2c1"
+git-tree-sha1 = "84e5e7f53ab95bea59d04168ccefb77e2368393c"
 uuid = "57bfcd06-606e-45d6-baf4-4ba06da0efd5"
-version = "0.5.9"
+version = "0.5.10"
 
 [[deps.Sockets]]
 uuid = "6462fe0b-24de-5631-8697-dd941f90decc"
@@ -688,10 +680,6 @@ uuid = "4ec0a83e-493e-50e2-b9ac-8f72acf5a8f5"
 deps = ["Libdl"]
 uuid = "83775a58-1f1d-513f-b197-d71354ab007a"
 
-[[deps.libblastrampoline_jll]]
-deps = ["Artifacts", "Libdl", "OpenBLAS_jll"]
-uuid = "8e850b90-86db-534c-a0d3-1478176c7d93"
-
 [[deps.nghttp2_jll]]
 deps = ["Artifacts", "Libdl"]
 uuid = "8e850ede-7688-5339-a07c-302acd2aaf8d"
@@ -749,7 +737,7 @@ uuid = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
 # ╠═0a363d31-5a48-49ad-aba2-bc0058ce1225
 # ╟─da36cf26-8105-4569-9d09-6f16383000a0
 # ╠═d009c4cb-9ef6-45bd-960f-0213880f662a
-# ╠═b33a9e6b-7c93-475c-96f4-7259b30c2c47
+# ╟─b33a9e6b-7c93-475c-96f4-7259b30c2c47
 # ╠═aded5964-8229-423c-b9f3-c80358b95fcc
 # ╟─6af0b5d7-5324-43b5-8f99-6f5d35d5deba
 # ╠═809ceb74-8201-4cc1-8cdc-656dc070e020
