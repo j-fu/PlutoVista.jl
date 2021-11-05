@@ -63,12 +63,10 @@ function Base.show(io::IO, ::MIME"text/html", p::PlutoVTKPlot)
     div=""
     if !p.update
     div="""
-        <p>
         <div style="white-space:nowrap;">
-        <div id="$(p.uuid)" style= "width: $(p.w)px; height: $(p.h)px; display: inline-block; "></div>
-        <canvas id="$(uuidcbar)" width=60, height="$(p.h)"  style="display: inline-block; "></canvas>
+        <div id="$(p.uuid)" style= "width: $(p.w-60)px; height: $(p.h-60)px; display: inline-block; "></div>
+        <canvas id="$(uuidcbar)" width=60, height="$(p.h-25)"  style="display: inline-block; "></canvas>
         </div>
-        </p>
     """
     end
     result="""

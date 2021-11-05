@@ -73,11 +73,8 @@ function Base.show(io::IO, ::MIME"text/html", p::PlutoPlotlyPlot)
     # so we can't create a plot and update it in the cell with the draing commands
     if !p.update
         result=result*"""
-        <p>
-        <div style="white-space:nowrap;">
-        <div id="$(p.uuid)" style= "width: $(p.w)px; height: $(p.h)px; ; display: inline-block; "></div>
-        </div>
-        </p>"""
+        <div id="$(p.uuid)" style= "width: $(p.w)px; height: $(p.h)px; ; display: inline-block;style="white-space:nowrap;"></div>
+        """
     end
     p.update=true
     write(io,result)
