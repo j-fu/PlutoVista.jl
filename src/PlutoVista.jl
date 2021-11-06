@@ -41,5 +41,9 @@ include("plutovistaplot.jl")
 export PlutoVistaPlot
 export  tricontour,trimesh,contour,tetcontour,tetmesh,quiver2d
 
+# Tools
+include("plutoutil.jl")
+export ScreenWidthGrabber, PlutoCellWidener
+
 
 end # module

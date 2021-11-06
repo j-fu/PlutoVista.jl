@@ -81,3 +81,11 @@ tetcontour!(p::PlutoVistaPlot,pts,tets,f;backend=:vtk, kwargs...)
 tetmesh
 tetmesh!(p::PlutoVistaPlot,pts,tets; backend=:vtk, kwargs...)
 ```
+
+## Pluto utilities
+
+```@docs
+ScreenWidthGrabber
+PlutoCellWidener
+```
+
