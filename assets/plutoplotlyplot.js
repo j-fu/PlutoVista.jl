@@ -298,6 +298,7 @@ function plutoplotlyplot(uuid,jsdict,w,h)
                 hovertemplate: "f(%{x},%{y})=%{intensity:0.3e}",
                 colorscale: colorscale,
                 colorbar: { thickness: 10,
+                            exponentformat: 'e',
                             tickwidth: 1,
                             tickvals: jsdict[cmd+"colorbarticks"],
                             len: 0.8},
