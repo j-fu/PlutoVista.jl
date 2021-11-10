@@ -194,11 +194,12 @@ function tricontour!(p::PlutoVTKPlot, pts, tris,f;kwargs...)
     command!(p,"tricontour")
 
     levels,crange,colorbarticks=GridVisualize.isolevels(args,f)
+    crange=Float64.(crange)
 
     parameter!(p,"points",vec(vcat(pts,zeros(eltype(pts),length(f))')))
     parameter!(p,"polys",vtkpolys(tris))
 
-    rgb=reinterpret(Float64,get(colorschemes[colormap],f,crange))
+    rgb=reinterpret(Float64,Base.get(colorschemes[colormap],f,crange))
     parameter!(p,"colors",UInt8.(floor.(rgb*255)))
 
     parameter!(p,"isopoints","none")
@@ -325,7 +326,7 @@ function tetcontour!(p::PlutoVTKPlot, pts, tets,func; kwargs...)
     #     end
     # end
 
-    crange=(Float64(crange[1]),Float64(crange[2]))
+    crange=Float64.(crange)
     rgb=reinterpret(Float64,get(colorschemes[colormap],values,crange))
     
 
