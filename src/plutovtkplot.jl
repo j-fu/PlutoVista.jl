@@ -38,6 +38,7 @@ function PlutoVTKPlot(;resolution=(300,300), kwargs...)
                   titlefontsize=12,
                   axisfontsize=10,
                   tickfontsize=10,
+                  zoom=1.0,
                   legendfontsize=10,
                   colorbarticks=:default,
                   clear=false)
@@ -49,8 +50,8 @@ function PlutoVTKPlot(;resolution=(300,300), kwargs...)
     p
 end
 
-const plutovtkplot = read(joinpath(@__DIR__, "..", "assets", "plutovtkplot.js"), String)
 const canvascolorbar = read(joinpath(@__DIR__, "..", "assets", "canvascolorbar.js"), String)
+const plutovtkplot = read(joinpath(@__DIR__, "..", "assets", "plutovtkplot.js"), String)
 
 """
     Base.show(io::IO,::MIME"text/html",p::PlutoVTKPlot)
@@ -94,6 +95,7 @@ function axis3d!(p::PlutoVTKPlot; kwargs...)
     command!(p,"axis")
     parameter!(p,"axisfontsize"   ,kwargs[:axisfontsize])  
     parameter!(p,"tickfontsize"   ,kwargs[:tickfontsize])   
+    parameter!(p,"zoom"   ,kwargs[:zoom])   
     parameter!(p,"cam","3D")
 end
 
@@ -106,6 +108,7 @@ function axis2d!(p::PlutoVTKPlot; kwargs...)
     command!(p,"axis")
     parameter!(p,"axisfontsize"   ,kwargs[:axisfontsize])  
     parameter!(p,"tickfontsize"   ,kwargs[:tickfontsize])   
+    parameter!(p,"zoom"   ,kwargs[:zoom])   
     parameter!(p,"cam","2D")
 end
 
@@ -402,7 +405,12 @@ function trimesh!(p::PlutoVTKPlot,pts, tris; kwargs...)
 
     ntri=size(tris,2)
     command!(p,"trimesh")
-    zcoord=zeros(size(pts,2))
+
+    cminmax=extrema(pts, dims=(2,))
+    extent=maximum([cminmax[i][2]-cminmax[i][1] for i=1:2])
+    zcoord=fill(extent/100,size(pts,2))
+
+
     parameter!(p,"points",vec(vcat(pts,zcoord')))
     parameter!(p,"polys",vtkpolys(tris))
 

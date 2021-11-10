@@ -326,12 +326,21 @@ function plutovtkplot(uuid,jsdict,invalidation)
             var colors=jsdict[cmd+"colors"]
             var lines=jsdict[cmd+"lines"]
             var linecolors=jsdict[cmd+"linecolors"]
-            
+
+            var zshift=points[3]
+            vtk.Common.Core.vtkMatrixBuilder
+                .buildFromRadian()
+                .translate(0,0,-zshift)
+                .apply(points);
+
+
             add_cell_dataset(win,points, polys, colors)
+
+
             
             if (lines != "none")
             { // boundary edges
-            
+
                 if (linecolors!="none")
                 {
                     var linecolorData = vtk.Common.Core.vtkDataArray.newInstance({
@@ -352,9 +361,17 @@ function plutovtkplot(uuid,jsdict,invalidation)
 		    actor.getProperty().setLineWidth(4);
                     win.renderer.addActor(actor);
                 }
+
                 
-                win.boundary_edge_dataset.getPoints().setData(points, 3);
+                win.boundary_edge_dataset.getPoints().setData(Array.from(points), 3);
                 win.boundary_edge_dataset.getLines().setData(lines);
+                var pts=win.boundary_edge_dataset.getPoints().getData();
+
+                vtk.Common.Core.vtkMatrixBuilder
+                    .buildFromRadian()
+                    .translate(0,0,zshift)
+                    .apply(pts);
+
                 if (linecolors!="none")
                 {
                     win.boundary_edge_dataset.getCellData().setActiveScalars('Colors');
@@ -393,9 +410,7 @@ function plutovtkplot(uuid,jsdict,invalidation)
             if (win.cubeAxes == undefined)
             {
  	        var camstyle=jsdict[cmd+"cam"]
-
-
-
+ 	        var zoom=jsdict[cmd+"zoom"]
 
                 win.cubeAxes = vtk.Rendering.Core.vtkCubeAxesActor.newInstance();
   	        win.renderer.addActor(win.cubeAxes);
@@ -404,14 +419,15 @@ function plutovtkplot(uuid,jsdict,invalidation)
                 setinteractorstyle(win.interactor,camstyle)
                 
 
-
                 var camera=win.renderer.getActiveCamera()
                 if (camstyle=="3D")
                 {
                     camera.roll(-30);
                     camera.elevation(-60);
                 }
-
+                else
+                    camera.setParallelProjection(true)
+                    
                 win.cubeAxes.setCamera(camera);
                 
                 win.cubeAxes.setAxisLabels(['x','y','z'])
@@ -430,6 +446,7 @@ function plutovtkplot(uuid,jsdict,invalidation)
 	        win.cubeAxes.setDataBounds(win.axis_actor.getBounds());
 
                 win.renderer.resetCamera();
+                camera.zoom(zoom)
             }
         }
         /////////////////////////////////////////////////////////////////
