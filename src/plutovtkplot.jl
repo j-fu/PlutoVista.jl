@@ -184,7 +184,7 @@ Isolines can be given as a number or as a range.
 """
 function tricontour!(p::PlutoVTKPlot, pts, tris,f;kwargs...)
 
-    default_args=(colormap=:viridis, levels=0, limits=:auto)
+    default_args=(colormap=:viridis, levels=0, limits=:auto,gridscale=1.0)
     args=merge(p.args,default_args)
     args=merge(args,kwargs)
 
@@ -201,6 +201,7 @@ function tricontour!(p::PlutoVTKPlot, pts, tris,f;kwargs...)
 
     parameter!(p,"points",vec(vcat(pts,zeros(eltype(pts),length(f))')))
     parameter!(p,"polys",vtkpolys(tris))
+    parameter!(p,"gridscale",args[:gridscale])
 
     rgb=reinterpret(Float64,Base.get(colorschemes[colormap],f,crange))
     parameter!(p,"colors",UInt8.(floor.(rgb*255)))
@@ -391,6 +392,7 @@ function trimesh!(p::PlutoVTKPlot,pts, tris; kwargs...)
     default_args=(markers=nothing,
                   colormap=nothing,
                   edges=nothing,
+                  gridscale=1.0,
                   edgemarkers=nothing,
                   edgecolormap=nothing)
     
@@ -413,6 +415,7 @@ function trimesh!(p::PlutoVTKPlot,pts, tris; kwargs...)
 
     parameter!(p,"points",vec(vcat(pts,zcoord')))
     parameter!(p,"polys",vtkpolys(tris))
+    parameter!(p,"gridscale",args[:gridscale])
 
 
 

@@ -178,7 +178,21 @@ function plutovtkplot(uuid,jsdict,invalidation)
             var isopoints=jsdict[cmd+"isopoints"]
  	    var isolines=jsdict[cmd+"isolines"]
             var colors=jsdict[cmd+"colors"]
+            var gridscale=jsdict[cmd+"gridscale"]
+            
+            
+            vtk.Common.Core.vtkMatrixBuilder
+                .buildFromRadian()
+                .scale(gridscale,gridscale,gridscale)
+                .apply(points);
 
+            vtk.Common.Core.vtkMatrixBuilder
+                .buildFromRadian()
+                .scale(gridscale,gridscale,gridscale)
+                .apply(isopoints);
+
+            
+            
             { // Gouraud shaded triangles
                 if (win.color_triangle_dataset == undefined)
                 {
@@ -325,12 +339,15 @@ function plutovtkplot(uuid,jsdict,invalidation)
  	    var polys=jsdict[cmd+"polys"]
             var colors=jsdict[cmd+"colors"]
             var lines=jsdict[cmd+"lines"]
+            var gridscale=jsdict[cmd+"gridscale"]
             var linecolors=jsdict[cmd+"linecolors"]
+            zshift=zshift*gridscale
 
             var zshift=points[3]
             vtk.Common.Core.vtkMatrixBuilder
                 .buildFromRadian()
                 .translate(0,0,-zshift)
+                .scale(gridscale,gridscale,gridscale)
                 .apply(points);
 
 
@@ -415,6 +432,7 @@ function plutovtkplot(uuid,jsdict,invalidation)
                 win.cubeAxes = vtk.Rendering.Core.vtkCubeAxesActor.newInstance();
   	        win.renderer.addActor(win.cubeAxes);
 
+                
                 win.interactor.initialize();
                 setinteractorstyle(win.interactor,camstyle)
                 
