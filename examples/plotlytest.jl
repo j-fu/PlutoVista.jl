@@ -1,5 +1,5 @@
 ### A Pluto.jl notebook ###
-# v0.17.1
+# v0.17.5
 
 using Markdown
 using InteractiveUtils
@@ -106,7 +106,7 @@ md"""Number of gridpoints: $(size(pts,2)) """
 # ╔═╡ 81046dcd-3cfb-4133-943f-61b9b3cdb183
 let
 	p=PlutoPlotlyPlot(resolution=(500,300))
-	tricontour!(p,pts,tris,func,isolines=10,colormap=:rainbow)
+	tricontour!(p,pts,tris,func,levels=11,colormap=:summer)
 end
 
 # ╔═╡ e900801e-2020-4aff-bfec-017ad6fcfdcf

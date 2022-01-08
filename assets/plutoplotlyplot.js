@@ -251,6 +251,7 @@ function plutoplotlyplot(uuid,jsdict,w,h)
         }
         else if (jsdict[cmd]=="contour")
         {
+            buttons=[["resetScale2d", "toImage","pan2d","hoverClosestCartesian"]]
             var x=jsdict[cmd+"x"]
             var y=jsdict[cmd+"y"]
             var z=create2DArray(jsdict[cmd+"z"],x.length,y.length)
@@ -273,6 +274,12 @@ function plutoplotlyplot(uuid,jsdict,w,h)
                     size: jsdict[cmd+"cosize"]
                 }
             }
+            
+            layout.scene={
+                aspectmode: "manual",
+                aspectratio : { x: 1.0, y: 5.0 , z: 1.0},
+            }
+            
             data.push(contour)
         }
         else if (jsdict[cmd]=="tricontour")
@@ -280,7 +287,7 @@ function plutoplotlyplot(uuid,jsdict,w,h)
             buttons=[["resetScale2d", "toImage","pan2d","hoverClosestCartesian"]]
 
             var data=[]
-            // this is slower than vtk, but has hover and
+            // this is slower than vtk, but has hover and aspect handling
             var cstops=jsdict[cmd+"cstops"]
             var colors=jsdict[cmd+"colors"]
 
@@ -295,7 +302,7 @@ function plutoplotlyplot(uuid,jsdict,w,h)
                 j: jsdict[cmd+"j"],
                 k: jsdict[cmd+"k"],
                 intensity: f,
-                hovertemplate: "f(%{x},%{y})=%{intensity:0.3e}",
+                hovertemplate: "f(%{x:0.3g},%{y:0.3g})=%{intensity:0.3g}",
                 colorscale: colorscale,
                 colorbar: { thickness: 10,
                             exponentformat: 'e',
@@ -304,15 +311,17 @@ function plutoplotlyplot(uuid,jsdict,w,h)
                             len: 0.8},
                 name : ''
             }
+            
             layout.margin= {
                 l: 5,
                 r: 5,
                 b: 5,
                 t: 5,
                 pad: 0
-            },
+            }
 
-            
+            var aspect=jsdict[cmd+"aspect"]
+
             // shoehorn 3D scene into 2D mode
             layout.scene={
                 dragmode : 'pan',
@@ -328,6 +337,8 @@ function plutoplotlyplot(uuid,jsdict,w,h)
                 xaxis: { tickangle: 0,showspikes: false, autorange: "reversed"},
                 yaxis: { tickangle: 0,showspikes: false},
                 zaxis: { visible: false, showgrid: false,showspikes: false},
+                aspectratio : { x: aspect[0], y: aspect[1] , z: aspect[2]},
+
             }
             data.push(mesh)
 

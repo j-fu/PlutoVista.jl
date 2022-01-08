@@ -52,8 +52,8 @@ function PlutoPlotlyPlot(;resolution=(300,300), kwargs...)
 end
 
 
+const plutoplotlyplot = read(joinpath(@__DIR__, "..", "assets", "plutoplotlyplot.js"), String)
 
-const  plutoplotlyplot = read(joinpath(@__DIR__, "..", "assets", "plutoplotlyplot.js"), String)
 
 """
 $(TYPEDSIGNATURES)
@@ -184,23 +184,26 @@ with isolines using Plotly's mesh3d.
 """
 function tricontour!(p::PlutoPlotlyPlot,pts, tris,f;kwargs...)
 
-    default_args=(colormap=:viridis, levels=0)
+    default_args=(colormap=:viridis, levels=0, aspect=1)
     args=merge(p.args,default_args)
     args=merge(args,kwargs)
-
+    
+    
+    
     levels,crange,colorbarticks=GridVisualize.isolevels(args,f)
-
+    
     zval=0.0
     p.jsdict=Dict{String,Any}("cmdcount" => 0)
-
+    
     command!(p,"tricontour")
     (fmin,fmax)=extrema(f)
-
+    
     parameter!(p,"x",pts[1,:])
     parameter!(p,"y",pts[2,:])
     parameter!(p,"z",fill(zval,length(f)))
     parameter!(p,"f",f)
-
+    parameter!(p,"aspect",[1.0,args[:aspect],1.0])
+    
     
     stops=collect(0:0.01:1)
     rgb=reinterpret(Float64,get(colorschemes[args[:colormap]],stops,(0,1)))
