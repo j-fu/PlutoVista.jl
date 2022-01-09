@@ -140,7 +140,7 @@ Keyword arguments:
 - `levels=0`: either number of interior isolevels, or vector of isolevel values
 - `colorbarticks=:default` : colorbar ticks. Default: levels
 - `limits=:auto`: function limits 
-- `aspect=1`: xy aspect ratio
+- `aspect=1`: xy aspect ratio (plotly backend)
 
 """
 tricontour(pts,tris,f; kwargs...)=tricontour!(PlutoVistaPlot(;kwargs...),pts,tris,f; kwargs...)

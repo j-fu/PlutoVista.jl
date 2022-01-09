@@ -105,7 +105,7 @@ md"""Number of gridpoints: $(size(pts,2)) """
 
 # ╔═╡ 81046dcd-3cfb-4133-943f-61b9b3cdb183
 let
-	p=PlutoPlotlyPlot(resolution=(500,300))
+	p=PlutoPlotlyPlot(resolution=(700,300))
 	tricontour!(p,pts,tris,func,levels=11,colormap=:summer)
 end
 
@@ -124,7 +124,7 @@ let
 	Y1=-1:0.1:1
 	ff=[f(x,y) for x∈ X1, y∈ Y1]
 	p=PlutoPlotlyPlot(resolution=(500,300))
-	contour!(p,collect(X1),collect(Y1),ff; colormap=:hot,isolines=-10:2:10)
+	contour!(p,collect(X1),collect(Y1),ff,colormap=:hot)
 end
 
 # ╔═╡ 5c23809b-9d92-43da-a85d-6c8531c3b547

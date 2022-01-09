@@ -52,8 +52,8 @@ function PlutoPlotlyPlot(;resolution=(300,300), kwargs...)
 end
 
 
-const plutoplotlyplot = read(joinpath(@__DIR__, "..", "assets", "plutoplotlyplot.js"), String)
 
+const plutoplotlyplot = read(joinpath(@__DIR__, "..", "assets", "plutoplotlyplot.js"), String)
 
 """
 $(TYPEDSIGNATURES)
@@ -102,6 +102,25 @@ const mshapes=Dict(
     :none => "none"
 )
 
+
+function axisargs!(p,args)
+    xscale= args[:xscale]==:identity ? :linear :  args[:xscale]
+    yscale= args[:yscale]==:identity ? :linear :  args[:yscale]
+
+
+    parameter!(p,"ylimits",collect(Float32,args[:limits]))
+    parameter!(p,"xlimits",collect(Float32,args[:xlimits]))
+    parameter!(p,"xlabel",args[:xlabel])
+    parameter!(p,"ylabel",args[:ylabel])
+    parameter!(p,"xaxis",String(xscale))
+    parameter!(p,"yaxis",String(yscale))
+    parameter!(p,"title",args[:title])
+    parameter!(p,"legendfontsize",args[:legendfontsize])
+    parameter!(p,"axisfontsize"   ,args[:axisfontsize])  
+    parameter!(p,"titlefontsize"  ,args[:titlefontsize]) 
+    parameter!(p,"tickfontsize"   ,args[:tickfontsize])   
+end
+
 """
 $(SIGNATURES)
 
@@ -125,8 +144,6 @@ function plot!(p::PlutoPlotlyPlot,x,y; kwargs...)
         p.jsdict=Dict{String,Any}("cmdcount" => 0)
     end
 
-    xscale= args[:xscale]==:identity ? :linear :  args[:xscale]
-    yscale= args[:yscale]==:identity ? :linear :  args[:yscale]
 
     
     command!(p,"plot")
@@ -138,19 +155,8 @@ function plot!(p::PlutoPlotlyPlot,x,y; kwargs...)
     parameter!(p,"markertype",mshapes[args[:markertype]])
     parameter!(p,"markersize",args[:markersize])
     parameter!(p,"linestyle",String(args[:linestyle]))
-    parameter!(p,"ylimits",collect(Float32,args[:limits]))
-    parameter!(p,"xlimits",collect(Float32,args[:xlimits]))
-    parameter!(p,"xlabel",args[:xlabel])
-    parameter!(p,"ylabel",args[:ylabel])
-    parameter!(p,"xaxis",String(xscale))
-    parameter!(p,"yaxis",String(yscale))
-    parameter!(p,"title",args[:title])
-    parameter!(p,"legendfontsize",args[:legendfontsize])
-    parameter!(p,"axisfontsize"   ,args[:axisfontsize])  
-    parameter!(p,"titlefontsize"  ,args[:titlefontsize]) 
-    parameter!(p,"tickfontsize"   ,args[:tickfontsize])   
 
-
+    axisargs!(p,args)
     
     if args[:legend]==:none || args[:legend]==""
         parameter!(p,"showlegend",0)
@@ -204,6 +210,7 @@ function tricontour!(p::PlutoPlotlyPlot,pts, tris,f;kwargs...)
     parameter!(p,"f",f)
     parameter!(p,"aspect",[1.0,args[:aspect],1.0])
     
+    axisargs!(p,args)
     
     stops=collect(0:0.01:1)
     rgb=reinterpret(Float64,get(colorschemes[args[:colormap]],stops,(0,1)))
@@ -261,14 +268,14 @@ Experimental. Plot heatmap and isolines on rectangular grid defined by X and Y
 using Plotly's native contour plot.
 """
 function contour!(p::PlutoPlotlyPlot,X,Y,f; kwargs...)
-    default_args=(colormap=:viridis, isolines=0)
+    default_args=(colormap=:viridis, isolines=11,  aspect=1)
     args=merge(p.args,default_args)
     args=merge(args,kwargs)
 
     isolines=args[:isolines]
     colormap=args[:colormap]
 
-
+    limits=args.limits
 
     p.jsdict=Dict{String,Any}("cmdcount" => 0)
     command!(p,"contour")
@@ -280,14 +287,26 @@ function contour!(p::PlutoPlotlyPlot,X,Y,f; kwargs...)
     rgb=UInt8.(floor.(rgb*255))
     parameter!(p,"cstops",stops)
     parameter!(p,"colors",rgb)
+    parameter!(p,"aspect",[1.0,args[:aspect],1.0])
 
+    axisargs!(p,args)
+
+    
+    if limits[1]>limits[2]
+        if isa(isolines,Number)
+            (fmin,fmax)=extrema(f)
+        else
+            (fmin,fmax)=extrema(isolines)
+        end
+    else
+        (fmin,fmax)=limits
+    end
     if isa(isolines,Number)
-        (fmin,fmax)=extrema(f)
         niso=max(2,isolines)
     else
-        (fmin,fmax)=extrema(isolines)
         niso=length(isolines)
-    end        
+    end
+    
     parameter!(p,"costart",fmin)
     parameter!(p,"coend",fmax)
     parameter!(p,"cosize",(fmax-fmin)/(niso-1))
@@ -306,8 +325,14 @@ $(SIGNATURES)
 Experimental. Plot piecewise linear function on  triangular grid given by points and triangles
 as matrices
 """
-function triplot!(p::PlutoPlotlyPlot,pts, tris,f)
+function triplot!(p::PlutoPlotlyPlot,pts, tris,f; kwargs...)
+    default_args=(colormap=:viridis, isolines=11,  aspect=1)
+    args=merge(p.args,default_args)
+    args=merge(args,kwargs)
+    axisargs!(p,args)
+
     p.jsdict=Dict{String,Any}("cmdcount" => 0)
+
     command!(p,"triplot")
 
     parameter!(p,"x",pts[1,:])
@@ -319,7 +344,12 @@ function triplot!(p::PlutoPlotlyPlot,pts, tris,f)
     parameter!(p,"k",tris[3,:].-1)
 end
 
-function triupdate!(p::PlutoPlotlyPlot,pts,tris,f)
+function triupdate!(p::PlutoPlotlyPlot,pts,tris,f; kwargs...)
+    default_args=(colormap=:viridis, isolines=11,  aspect=1)
+    args=merge(p.args,default_args)
+    args=merge(args,kwargs)
+    axisargs!(p,args)
+
     p.jsdict=Dict{String,Any}("cmdcount" => 0)
     command!(p,"triupdate")
 

@@ -130,6 +130,29 @@ function plutoplotlyplot(uuid,jsdict,w,h)
     for (var cmd = 1 ; cmd <= jsdict.cmdcount ; cmd++)
     {  
 
+        legendfontsize= jsdict[cmd+"legendfontsize"]
+        axisfontsize= jsdict[cmd+"axisfontsize"] 
+        titlefontsize= jsdict[cmd+"titlefontsize"]
+        tickfontsize= jsdict[cmd+"tickfontsize"]
+        
+        layout.xaxis.title.text=jsdict[cmd+"xlabel"]
+        layout.yaxis.title.text=jsdict[cmd+"ylabel"]
+        
+        layout.xaxis.type=jsdict[cmd+"xaxis"]
+        layout.yaxis.type=jsdict[cmd+"yaxis"]
+        
+        layout.title.font.size=titlefontsize
+        layout.legend.font.size=legendfontsize
+        layout.xaxis.title.font.size=axisfontsize
+        layout.yaxis.title.font.size=axisfontsize
+
+        layout.title.text=jsdict[cmd+"title"]
+        
+        
+        layout.xaxis.tickfont.size=tickfontsize
+        layout.yaxis.tickfont.size=tickfontsize
+
+        //////////////////////////////////////////////////////////////////////////////////////
         if (jsdict[cmd]=="plot")
         {
             if (graphDiv.data!=undefined && jsdict[cmd+"clear"] == 1)
@@ -146,11 +169,6 @@ function plutoplotlyplot(uuid,jsdict,w,h)
                 data=graphDiv.data
                 layout=graphDiv.layout
             }
-            legendfontsize= jsdict[cmd+"legendfontsize"]
-            axisfontsize= jsdict[cmd+"axisfontsize"] 
-            titlefontsize= jsdict[cmd+"titlefontsize"]
-            tickfontsize= jsdict[cmd+"tickfontsize"]
-            
 
             
             var mode  = jsdict[cmd+"markertype"] == "none" ? "lines" : "lines+markers"
@@ -190,9 +208,6 @@ function plutoplotlyplot(uuid,jsdict,w,h)
                 layout.xaxis.range=[xrange[0],xrange[1]]
                 layout.xaxis.autorange=false
             }
-
-            layout.title.text=jsdict[cmd+"title"]
-
             layout.showlegend= layout.showlegend || (jsdict[cmd+"showlegend"] == 1 ? true : false)
 
             var lxpos=jsdict[cmd+"legendxpos"]
@@ -232,23 +247,11 @@ function plutoplotlyplot(uuid,jsdict,w,h)
             }
 
             
-            layout.xaxis.title.text=jsdict[cmd+"xlabel"]
-            layout.yaxis.title.text=jsdict[cmd+"ylabel"]
-
-            layout.xaxis.type=jsdict[cmd+"xaxis"]
-            layout.yaxis.type=jsdict[cmd+"yaxis"]
-
-            layout.title.font.size=titlefontsize
-            layout.legend.font.size=legendfontsize
-            layout.xaxis.title.font.size=axisfontsize
-            layout.yaxis.title.font.size=axisfontsize
-
-            layout.xaxis.tickfont.size=tickfontsize
-            layout.yaxis.tickfont.size=tickfontsize
             
             data.push(trace)
             
         }
+        //////////////////////////////////////////////////////////////////////////////////////
         else if (jsdict[cmd]=="contour")
         {
             buttons=[["resetScale2d", "toImage","pan2d","hoverClosestCartesian"]]
@@ -267,6 +270,13 @@ function plutoplotlyplot(uuid,jsdict,w,h)
                 y: y,
                 z: z,
                 colorscale: colorscale,
+                zmin: jsdict[cmd+"costart"],
+                zmax: jsdict[cmd+"coend"],
+                colorbar: { thickness: 10,
+                            exponentformat: 'e',
+                            tickwidth: 1,
+                            //tickvals: jsdict[cmd+"colorbarticks"],
+                            len: 0.8},
                 contours: {
                     coloring: 'heatmap',
                     start: jsdict[cmd+"costart"],
@@ -274,14 +284,16 @@ function plutoplotlyplot(uuid,jsdict,w,h)
                     size: jsdict[cmd+"cosize"]
                 }
             }
+            var aspect=jsdict[cmd+"aspect"]
             
-            layout.scene={
-                aspectmode: "manual",
-                aspectratio : { x: 1.0, y: 5.0 , z: 1.0},
+            layout.yaxis={
+                scaleanchor: "x",
+                scaleratio: aspect[1]/aspect[0]
             }
             
             data.push(contour)
         }
+        //////////////////////////////////////////////////////////////////////////////////////
         else if (jsdict[cmd]=="tricontour")
         {
             buttons=[["resetScale2d", "toImage","pan2d","hoverClosestCartesian"]]
@@ -325,21 +337,31 @@ function plutoplotlyplot(uuid,jsdict,w,h)
             // shoehorn 3D scene into 2D mode
             layout.scene={
                 dragmode : 'pan',
-                camera : {
-                    // dirty trick to get axis directions right (turntable rotation 180deg around z...)
-                    up: {x:0.0, y:0.0001, z:-2},
-                    eye: {x:-0.00000001, y:0.0, z:-2},
-                    projection: {
-                        hoverinfo: "x+y+text",
-                        type: 'orthographic'
-                    },
-                },
+                 camera : {
+                     // dirty trick to get axis directions right (turntable rotation 180deg around z...)
+                     up:  {x:0.0, y:0.0001, z:-2},
+                     eye: {x:-0.00000001, y:0.0, z:-2},
+                     projection: {
+                         hoverinfo: "x+y+text",
+                         type: 'orthographic'
+                     },
+                 },
+                // need to fix schene handling: this ovewrites the defaults set above...
                 xaxis: { tickangle: 0,showspikes: false, autorange: "reversed"},
                 yaxis: { tickangle: 0,showspikes: false},
                 zaxis: { visible: false, showgrid: false,showspikes: false},
                 aspectratio : { x: aspect[0], y: aspect[1] , z: aspect[2]},
 
             }
+
+
+            
+            // layout.yaxis={
+            //     scaleanchor: "x",
+            //     scaleratio: aspect[1]/aspect[0]
+            // }
+
+
             data.push(mesh)
 
             var iso_x=jsdict[cmd+"iso_x"]
@@ -366,6 +388,7 @@ function plutoplotlyplot(uuid,jsdict,w,h)
             }
 //           Plotly.newPlot(uuid, data,layout)
         }
+        //////////////////////////////////////////////////////////////////////
         else if (jsdict[cmd]=="triplot"|| jsdict[cmd]=="triupdate")
         { //  Experimental, slower than vtk
 
