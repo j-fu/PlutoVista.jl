@@ -71,7 +71,7 @@ function add_outline_dataset(win,opoints,opolys,ocolors)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
-function add_cell_dataset(win,points,polys,colors)
+function add_cell_dataset(win,points,polys,colors,aspect)
 {            
     { // colored cells
         if (colors!="none")
@@ -83,6 +83,7 @@ function add_cell_dataset(win,points,polys,colors)
                 var mapper = vtk.Rendering.Core.vtkMapper.newInstance();
                 mapper.setInputData(win.cell_color_dataset);
                 mapper.setColorModeToDirectScalars()
+                actor.setScale([1,aspect,1])
                 actor.setMapper(mapper);
                 win.renderer.addActor(actor);
             }
@@ -111,6 +112,7 @@ function add_cell_dataset(win,points,polys,colors)
 	    actor.getProperty().setRepresentation(1);
 	    actor.getProperty().setColor(0, 0, 0);
 	    actor.getProperty().setLineWidth(1.5);
+            actor.setScale([1,aspect,1])
 	    mapper.setInputData(win.cell_edge_dataset);
 	    actor.setMapper(mapper);
 	    win.renderer.addActor(actor);
@@ -179,6 +181,7 @@ function plutovtkplot(uuid,jsdict,invalidation)
  	    var isolines=jsdict[cmd+"isolines"]
             var colors=jsdict[cmd+"colors"]
             var gridscale=jsdict[cmd+"gridscale"]
+            var aspect=jsdict[cmd+"aspect"]
             
             
             vtk.Common.Core.vtkMatrixBuilder
@@ -202,6 +205,7 @@ function plutovtkplot(uuid,jsdict,invalidation)
                     mapper.setInputData(win.color_triangle_dataset);
                     mapper.setColorModeToDirectScalars()
                     actor.setMapper(mapper);
+                    actor.setScale(1,aspect,1)
                     win.renderer.addActor(actor);
                     
                     // the axis actor is later used to read axis bounds
@@ -234,6 +238,7 @@ function plutovtkplot(uuid,jsdict,invalidation)
                     mapper.setInputData(win.isoline_dataset);
                     actor.setMapper(mapper);
                     actor.getProperty().setColor(0, 0, 0)
+                    actor.setScale(1,aspect,1)
                     win.renderer.addActor(actor);
                 }
                 
@@ -341,6 +346,7 @@ function plutovtkplot(uuid,jsdict,invalidation)
             var lines=jsdict[cmd+"lines"]
             var gridscale=jsdict[cmd+"gridscale"]
             var linecolors=jsdict[cmd+"linecolors"]
+            var aspect=jsdict[cmd+"aspect"]
             zshift=zshift*gridscale
 
             var zshift=points[3]
@@ -351,7 +357,7 @@ function plutovtkplot(uuid,jsdict,invalidation)
                 .apply(points);
 
 
-            add_cell_dataset(win,points, polys, colors)
+            add_cell_dataset(win,points, polys, colors,aspect)
 
 
             
@@ -374,6 +380,7 @@ function plutovtkplot(uuid,jsdict,invalidation)
                     var actor = vtk.Rendering.Core.vtkActor.newInstance();
                     mapper.setInputData(win.boundary_edge_dataset);
                     actor.setMapper(mapper);
+                    actor.setScale([1,aspect,1])
                     actor.getProperty().setColor(0, 0, 0)
 		    actor.getProperty().setLineWidth(4);
                     win.renderer.addActor(actor);
@@ -410,7 +417,7 @@ function plutovtkplot(uuid,jsdict,invalidation)
  	    var opolys=jsdict[cmd+"opolys"]
             var ocolors=jsdict[cmd+"ocolors"]
 
-            add_cell_dataset(win,points, polys, colors)
+            add_cell_dataset(win,points, polys, colors,1.0)
 
             
             if (outline==1)
@@ -428,7 +435,10 @@ function plutovtkplot(uuid,jsdict,invalidation)
             {
  	        var camstyle=jsdict[cmd+"cam"]
  	        var zoom=jsdict[cmd+"zoom"]
-
+                var xlabel=jsdict[cmd+"xlabel"]
+                var ylabel=jsdict[cmd+"ylabel"]
+                var zlabel=jsdict[cmd+"zlabel"]
+                
                 win.cubeAxes = vtk.Rendering.Core.vtkCubeAxesActor.newInstance();
   	        win.renderer.addActor(win.cubeAxes);
 
@@ -448,7 +458,7 @@ function plutovtkplot(uuid,jsdict,invalidation)
                     
                 win.cubeAxes.setCamera(camera);
                 
-                win.cubeAxes.setAxisLabels(['x','y','z'])
+                win.cubeAxes.setAxisLabels([xlabel,ylabel,zlabel])
                 if (camstyle=="2D")
                     win.cubeAxes.setGridLines(false)
 
@@ -461,7 +471,8 @@ function plutovtkplot(uuid,jsdict,invalidation)
                 win.cubeAxes.setAxisTextStyle({fontSize: axisfontsize})
                 
                 win.cubeAxes.getProperty().setColor(0.75,0.75,0.75);
-	        win.cubeAxes.setDataBounds(win.axis_actor.getBounds());
+                var databounds=win.axis_actor.getBounds()
+	        win.cubeAxes.setDataBounds(databounds);
 
                 win.renderer.resetCamera();
                 camera.zoom(zoom)

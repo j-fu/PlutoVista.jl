@@ -82,7 +82,7 @@ md"""Number of gridpoints: $(size(pts,2)) """
 # ╔═╡ 81046dcd-3cfb-4133-943f-61b9b3cdb183
 let
 	p=PlutoVTKPlot(resolution=(300,300),axisfontsize=20)
-	tricontour!(p,pts,tris,func;cmap=:spring,levels=(0.1:0.2:1),limits=(0,1))
+	tricontour!(p,pts,tris,func;cmap=:spring,levels=(0.1:0.2:1),limits=(0,1),xlabel="a",aspect=1.5)
 end
 
 # ╔═╡ 7019ce3f-f2db-4581-8bd9-64f76231a62a

@@ -136,6 +136,8 @@ Arguments:
 Keyword arguments:
 - `title=""`
 - `clear=false`
+- `xlabel="x"`: x axis label     
+- `ylabel="y"`: y axis label     
 - `colormap=:viridis`
 - `levels=0`: either number of interior isolevels, or vector of isolevel values
 - `colorbarticks=:default` : colorbar ticks. Default: levels

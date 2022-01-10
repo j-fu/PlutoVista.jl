@@ -38,6 +38,10 @@ function PlutoVTKPlot(;resolution=(300,300), kwargs...)
                   titlefontsize=12,
                   axisfontsize=10,
                   tickfontsize=10,
+                  xlabel="x",
+                  ylabel="y",
+                  zlabel="z",
+                  aspect=1.0,
                   zoom=1.0,
                   legendfontsize=10,
                   colorbarticks=:default,
@@ -92,11 +96,17 @@ Add 3D coordinate system axes to the plot.
 Sets camera handling to 3D mode.
 """
 function axis3d!(p::PlutoVTKPlot; kwargs...)
+    args=merge(p.args,kwargs)
+    
     command!(p,"axis")
     parameter!(p,"axisfontsize"   ,kwargs[:axisfontsize])  
     parameter!(p,"tickfontsize"   ,kwargs[:tickfontsize])   
     parameter!(p,"zoom"   ,kwargs[:zoom])   
     parameter!(p,"cam","3D")
+    parameter!(p,"xlabel",args[:xlabel])
+    parameter!(p,"ylabel",args[:ylabel])
+    parameter!(p,"zlabel",args[:zlabel])
+
 end
 
 """
@@ -105,10 +115,15 @@ Add 2D coordinate system axes to the plot.
 Sets camera handling to 2D mode.
 """
 function axis2d!(p::PlutoVTKPlot; kwargs...)
+    args=merge(p.args,kwargs)
+    
     command!(p,"axis")
     parameter!(p,"axisfontsize"   ,kwargs[:axisfontsize])  
     parameter!(p,"tickfontsize"   ,kwargs[:tickfontsize])   
     parameter!(p,"zoom"   ,kwargs[:zoom])   
+    parameter!(p,"xlabel",args[:xlabel])
+    parameter!(p,"ylabel",args[:aspect]==1  ?  args[:ylabel] : "$(args[:ylabel])*$(args[:aspect])" )
+    parameter!(p,"zlabel",args[:zlabel])
     parameter!(p,"cam","2D")
 end
 
@@ -208,6 +223,7 @@ function tricontour!(p::PlutoVTKPlot, pts, tris,f;kwargs...)
 
     parameter!(p,"isopoints","none")
     parameter!(p,"isolines","none")
+    parameter!(p,"aspect",args[:aspect])
     
     
     iso_pts=GridVisualize.marching_triangles(pts,tris,f,collect(levels))
@@ -398,6 +414,7 @@ function trimesh!(p::PlutoVTKPlot,pts, tris; kwargs...)
     
     args=merge(p.args,default_args)
     args=merge(args,kwargs)
+    parameter!(p,"aspect",args[:aspect])
     
     colormap=args[:colormap]
     markers=args[:markers]
@@ -416,6 +433,7 @@ function trimesh!(p::PlutoVTKPlot,pts, tris; kwargs...)
     parameter!(p,"points",vec(vcat(pts,zcoord')))
     parameter!(p,"polys",vtkpolys(tris))
     parameter!(p,"gridscale",args[:gridscale])
+    parameter!(p,"aspect",args[:aspect])
 
 
 
