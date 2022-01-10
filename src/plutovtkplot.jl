@@ -122,7 +122,15 @@ function axis2d!(p::PlutoVTKPlot; kwargs...)
     parameter!(p,"tickfontsize"   ,kwargs[:tickfontsize])   
     parameter!(p,"zoom"   ,kwargs[:zoom])   
     parameter!(p,"xlabel",args[:xlabel])
-    parameter!(p,"ylabel",args[:aspect]==1  ?  args[:ylabel] : "$(args[:ylabel])*$(args[:aspect])" )
+    aspect=args[:aspect]
+    if aspect<1.0
+        parameter!(p,"ylabel","$(args[:ylabel])/$(1/args[:aspect])")
+    elseif aspect>1.0
+        parameter!(p,"ylabel","$(args[:ylabel])*$(aspect)")
+    else
+        parameter!(p,"ylabel","$(args[:ylabel])")
+    end
+    
     parameter!(p,"zlabel",args[:zlabel])
     parameter!(p,"cam","2D")
 end

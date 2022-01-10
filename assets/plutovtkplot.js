@@ -183,7 +183,6 @@ function plutovtkplot(uuid,jsdict,invalidation)
             var gridscale=jsdict[cmd+"gridscale"]
             var aspect=jsdict[cmd+"aspect"]
             
-            
             vtk.Common.Core.vtkMatrixBuilder
                 .buildFromRadian()
                 .scale(gridscale,gridscale,gridscale)
