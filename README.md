@@ -11,6 +11,8 @@ and [vtk.js](https://kitware.github.io/vtk-js/index.html) (thus using WebGL)  fo
 It uses the Pluto [💁 API to make objects available inside JS](https://github.com/fonsp/Pluto.jl/pull/1124)
 to pass plot data from Julia to HTML5.
 
+It can serve as a backend for [GridVisualize.jl](https://github.com/j-fu/GridVisualize.jl).
+
 Example notebook: [pluto](https://raw.githubusercontent.com/j-fu/PlutoVista.jl/main/examples/plutovista.jl),
 [html](https://j-fu.github.io/PlutoVista.jl/dev/plutovista.html)
 
