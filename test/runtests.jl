@@ -4,7 +4,7 @@ function testnotebook(input)
     # de-markdown eventual cells with Pkg.develop and write
     # to pluto-tmp.jl
     notebook=Pluto.load_notebook_nobackup(input)
-    pkgcellfortest=findfirst(c->occursin("Pkg.develop",c.code),notebook.cells)
+    pkgcellfortest=findfirst(c->occursin("Pkg.activate",c.code),notebook.cells)
     if  pkgcellfortest!=nothing
         # de-markdown pkg cell
         notebook.cells[pkgcellfortest].code=replace(notebook.cells[pkgcellfortest].code,"md"=>"")

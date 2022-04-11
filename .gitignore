@@ -3,7 +3,8 @@ startup.jl
 docs/build
 docs/src/examples
 *~
-Manifest.toml
+./Manifest.toml
+docs/Manifest.toml
 deps/build.log
 deps/deps.jl
 deps/usr

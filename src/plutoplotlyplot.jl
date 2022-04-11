@@ -141,7 +141,7 @@ function plot!(p::PlutoPlotlyPlot,x,y; kwargs...)
 
     
     if args[:clear]
-        p.jsdict=Dict{String,Any}("cmdcount" => 0)
+        reset!(p)
     end
 
 
@@ -189,6 +189,7 @@ Experimental. Plot piecewise linear function on  triangular grid given as "heatm
 with isolines using Plotly's mesh3d.
 """
 function tricontour!(p::PlutoPlotlyPlot,pts, tris,f;kwargs...)
+    reset!(p)
 
     default_args=(colormap=:viridis, levels=0, aspect=1)
     args=merge(p.args,default_args)
@@ -199,7 +200,6 @@ function tricontour!(p::PlutoPlotlyPlot,pts, tris,f;kwargs...)
     levels,crange,colorbarticks=GridVisualize.isolevels(args,f)
     
     zval=0.0
-    p.jsdict=Dict{String,Any}("cmdcount" => 0)
     
     command!(p,"tricontour")
     (fmin,fmax)=extrema(f)
@@ -268,6 +268,7 @@ Experimental. Plot heatmap and isolines on rectangular grid defined by X and Y
 using Plotly's native contour plot.
 """
 function contour!(p::PlutoPlotlyPlot,X,Y,f; kwargs...)
+    reset!(p)
     default_args=(colormap=:viridis, isolines=11,  aspect=1)
     args=merge(p.args,default_args)
     args=merge(args,kwargs)
@@ -277,7 +278,7 @@ function contour!(p::PlutoPlotlyPlot,X,Y,f; kwargs...)
 
     limits=args.limits
 
-    p.jsdict=Dict{String,Any}("cmdcount" => 0)
+
     command!(p,"contour")
     parameter!(p,"x",collect(X))
     parameter!(p,"y",collect(Y))
@@ -326,12 +327,12 @@ Experimental. Plot piecewise linear function on  triangular grid given by points
 as matrices
 """
 function triplot!(p::PlutoPlotlyPlot,pts, tris,f; kwargs...)
+    reset!(p)
     default_args=(colormap=:viridis, isolines=11,  aspect=1)
     args=merge(p.args,default_args)
     args=merge(args,kwargs)
     axisargs!(p,args)
 
-    p.jsdict=Dict{String,Any}("cmdcount" => 0)
 
     command!(p,"triplot")
 
@@ -345,12 +346,12 @@ function triplot!(p::PlutoPlotlyPlot,pts, tris,f; kwargs...)
 end
 
 function triupdate!(p::PlutoPlotlyPlot,pts,tris,f; kwargs...)
+    reset!(p)
     default_args=(colormap=:viridis, isolines=11,  aspect=1)
     args=merge(p.args,default_args)
     args=merge(args,kwargs)
     axisargs!(p,args)
 
-    p.jsdict=Dict{String,Any}("cmdcount" => 0)
     command!(p,"triupdate")
 
     # make 3D points from 2D points by adding function value as

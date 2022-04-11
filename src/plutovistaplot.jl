@@ -422,6 +422,15 @@ function parameter!(p::T,name,value) where {T <: AbstractPlutoVistaBackend}
     p
 end
 
+
+"""
+$(SIGNATURES)
+
+Reset command list
+"""
+reset!(p::T) where {T <: AbstractPlutoVistaBackend} = p.jsdict=Dict{String,Any}("cmdcount" => 0)
+
+
 """
 $(SIGNATURES)
 

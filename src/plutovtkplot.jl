@@ -206,6 +206,7 @@ Plot piecewise linear function on  triangular grid given as "heatmap".
 Isolines can be given as a number or as a range.
 """
 function tricontour!(p::PlutoVTKPlot, pts, tris,f;kwargs...)
+    reset!(p)
 
     default_args=(colormap=:viridis, levels=0, limits=:auto,gridscale=1.0)
     args=merge(p.args,default_args)
@@ -214,7 +215,6 @@ function tricontour!(p::PlutoVTKPlot, pts, tris,f;kwargs...)
     colormap=args[:colormap]
 
     
-    p.jsdict=Dict{String,Any}("cmdcount" => 0)
 
 
     command!(p,"tricontour")
@@ -281,6 +281,7 @@ Plot isosurfaces given by `levels` and contour maps on planes given by the `*pla
 for piecewise linear function on  tetrahedral mesh. 
 """
 function tetcontour!(p::PlutoVTKPlot, pts, tets,func; kwargs...)
+    reset!(p)
 
     default_args=(colormap=:viridis,
                   levels=5,
@@ -304,7 +305,6 @@ function tetcontour!(p::PlutoVTKPlot, pts, tets,func; kwargs...)
     facemarkers=args[:facemarkers]
     facecolormap=args[:facecolormap]
 
-    p.jsdict=Dict{String,Any}("cmdcount" => 0)
     command!(p,"tetcontour")
     xyzmin=zeros(3)
     xyzmax=ones(3)
@@ -412,6 +412,7 @@ $(SIGNATURES)
 Plot  triangular grid with optional region and boundary markers.
 """
 function trimesh!(p::PlutoVTKPlot,pts, tris; kwargs...)
+    reset!(p)
 
     default_args=(markers=nothing,
                   colormap=nothing,
@@ -525,6 +526,7 @@ $(SIGNATURES)
 Plot parts of tetrahedral mesh below the planes given by the `*plane` parameters.
 """
 function tetmesh!(p::PlutoVTKPlot, pts, tets;kwargs...)
+    reset!(p)
 
     default_args=(markers=nothing,
                   colormap=nothing,
@@ -550,8 +552,6 @@ function tetmesh!(p::PlutoVTKPlot, pts, tets;kwargs...)
     zplane=args[:zplanes][1]
     
     
-
-
     ntet=size(tets,2)
     command!(p,"tetmesh")
     nregions=  markers==nothing  ? 0 : maximum(markers)
@@ -658,7 +658,7 @@ function tetmesh!(p::PlutoVTKPlot, pts, tets;kwargs...)
     else
         parameter!(p,"outline",0)
     end
-    
+
     parameter!(p,"polys",facets)
     parameter!(p,"points",vec(points))
     parameter!(p,"colors",UInt8.(floor.(rgb*255)))
@@ -676,8 +676,10 @@ $(SIGNATURES)
 2D quiver.
 """
 function quiver2d!(p::PlutoVTKPlot, pts, qvec; kwargs...)
-
-    args=merge((kwargs...),p.args)
+    args=merge(p.args,kwargs)
+    if args[:clear]
+        reset!(p)
+    end
     command!(p,"quiver")
     zcoord=zeros(size(pts,2))
 
@@ -766,8 +768,8 @@ Experimental: Plot piecewise linear function on  triangular grid given by points
 as matrices
 """
 function triplot!(p::PlutoVTKPlot,pts, tris,f; kwargs...)
+    reset!(p)
     args=merge((kwargs...),p.args)
-    p.jsdict=Dict{String,Any}("cmdcount" => 0)
     command!(p,"triplot")
     # make 3D points from 2D points by adding function value as
     # z coordinate
@@ -780,6 +782,7 @@ end
 
 
 function plot!(p::PlutoVTKPlot,x,y; kwargs...)
+    reset!(p)
     command!(p,"plot")
     n=length(x)
     points=vec(vcat(x',y',zeros(n)'))
