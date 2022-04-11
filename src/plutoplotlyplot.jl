@@ -62,7 +62,7 @@ Show plotly plot.
 """
 function Base.show(io::IO, ::MIME"text/html", p::PlutoPlotlyPlot)
     result="""
-        <script type="text/javascript" src="https://cdn.plot.ly/plotly-1.58.4.min.js"></script>
+        <script type="text/javascript" src="https://cdn.plot.ly/plotly-2.10.0.min.js"></script>
         <script>
         $(plutoplotlyplot)
         var jsdict = $(Main.PlutoRunner.publish_to_js(p.jsdict))

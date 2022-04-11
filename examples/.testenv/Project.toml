@@ -1,0 +1,9 @@
+[deps]
+ExtendableGrids = "cfc395e8-590f-11e8-1f13-43a2532b2fa8"
+LaTeXStrings = "b964fa9f-0449-5b57-a5c2-d3ea65f4040f"
+PlutoUI = "7f904dfe-b85e-4ff6-b463-dae2292396a8"
+PlutoVista = "646e1f28-b900-46d7-9d87-d554eb38a413"
+Revise = "295af30f-e4ad-537b-8983-00126c2a3abe"
+SimplexGridFactory = "57bfcd06-606e-45d6-baf4-4ba06da0efd5"
+TetGen = "c5d3f3f7-f850-59f6-8a2e-ffc6dc1317ea"
+Triangulate = "f7e6ffb2-c36d-4f8f-a77e-16e897189344"
