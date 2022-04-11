@@ -164,7 +164,7 @@ html"""<hr>"""
 md"""
 begin
     using Pkg
-    Pkg.activate(joinpath(@__DIR__,".testenv"))
+    Pkg.activate(@__DIR__)
     using Revise
 end
 """;

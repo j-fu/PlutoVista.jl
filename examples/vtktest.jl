@@ -174,9 +174,9 @@ html"""<hr>"""
 # ╔═╡ 08980845-f030-4a64-a4b2-ab027b3a2721
 md"""
 begin  
-	 using Pkg
-       Pkg.activate(joinpath(@__DIR__,".testenv"))
-       using Revise
+     using Pkg
+     Pkg.activate(@__DIR__)
+     using Revise
 end	
 """;
 
