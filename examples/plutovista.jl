@@ -318,7 +318,7 @@ Triangulate = "f7e6ffb2-c36d-4f8f-a77e-16e897189344"
 [compat]
 ExtendableGrids = "~0.9.5"
 PlutoUI = "~0.7.38"
-PlutoVista = "~0.8.12"
+PlutoVista = "~0.8.13"
 SimplexGridFactory = "~0.5.15"
 TetGen = "~1.3.0"
 Triangulate = "~2.1.2"
@@ -330,7 +330,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.8.0-beta3"
 manifest_format = "2.0"
-project_hash = "270f66fb359f7e22652bb7b3ca43f72c1321a7e0"
+project_hash = "f8beeab34b190b6197d3011ecb1313d4d086b8e9"
 
 [[deps.AbstractPlutoDingetjes]]
 deps = ["Pkg"]
@@ -602,9 +602,9 @@ version = "0.7.38"
 
 [[deps.PlutoVista]]
 deps = ["ColorSchemes", "Colors", "DocStringExtensions", "GridVisualize", "HypertextLiteral", "UUIDs"]
-git-tree-sha1 = "2435d1d3e02db324414f268f30999b5c06a0d10f"
+git-tree-sha1 = "118d1871e3511131bae2196e238d0054bd9a62b0"
 uuid = "646e1f28-b900-46d7-9d87-d554eb38a413"
-version = "0.8.12"
+version = "0.8.13"
 
 [[deps.Preferences]]
 deps = ["TOML"]
