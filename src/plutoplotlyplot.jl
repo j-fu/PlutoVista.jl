@@ -60,7 +60,7 @@ $(TYPEDSIGNATURES)
 
 Show plotly plot.
 """
-function Base.show(io::IO, ::MIME"text/html", p::PlutoPlotlyPlot)
+function Base.show(io::IO, ::Union{MIME"text/html", MIME"juliavscode/html"}, p::PlutoPlotlyPlot)
     result="""
         <script type="text/javascript" src="https://cdn.plot.ly/plotly-2.10.0.min.js"></script>
         <script>
