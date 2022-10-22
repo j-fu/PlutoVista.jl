@@ -362,12 +362,16 @@ y: $(@bind gyplane Slider(0:0.01:1,show_value=true,default=0.45))
 z: $(@bind gzplane Slider(0:0.01:1,show_value=true,default=0.45))
 """
 
+# ╔═╡ 16e07a0f-8bd8-4eea-8dd5-aea42fe64ed1
+gridplot3=tetmesh(resolution=(500,500))
+
 # ╔═╡ d009c4cb-9ef6-45bd-960f-0213880f662a
- tetmesh(pts3,tets;
+tetmesh!(gridplot3,pts3,tets;
 		markers=g3[CellRegions],
-	faces=g3[BFaceNodes],
-	facemarkers=g3[BFaceRegions],
-	xplanes=[gxplane],yplanes=[gyplane],zplanes=[gzplane],resolution=(500,500))
+	    faces=g3[BFaceNodes],
+	    facemarkers=g3[BFaceRegions],
+	    xplanes=[gxplane],yplanes=[gyplane],zplanes=[gzplane])
+
 
 # ╔═╡ b33a9e6b-7c93-475c-96f4-7259b30c2c47
 md"""
@@ -461,10 +465,10 @@ ExtendableGrids = "~0.9.5"
 GridVisualize = "~0.5.1"
 HypertextLiteral = "~0.9.3"
 PlutoUI = "~0.7.38"
-PlutoVista = "~0.8.12"
+PlutoVista = "~0.8.13"
 SimplexGridFactory = "~0.5.15"
 TetGen = "~1.3.0"
-Triangulate = "~2.1.2"
+Triangulate = "~2.1.3"
 """
 
 # ╔═╡ 00000000-0000-0000-0000-000000000002
@@ -473,7 +477,7 @@ PLUTO_MANIFEST_TOML_CONTENTS = """
 
 julia_version = "1.8.0-beta3"
 manifest_format = "2.0"
-project_hash = "3f7468e3c88c814e79704905a0f574a5fde5d402"
+project_hash = "30b4bbf09d126803e7ebc740d81c5857caa56a2a"
 
 [[deps.AbstractPlutoDingetjes]]
 deps = ["Pkg"]
@@ -745,9 +749,9 @@ version = "0.7.38"
 
 [[deps.PlutoVista]]
 deps = ["ColorSchemes", "Colors", "DocStringExtensions", "GridVisualize", "HypertextLiteral", "UUIDs"]
-git-tree-sha1 = "2435d1d3e02db324414f268f30999b5c06a0d10f"
+git-tree-sha1 = "118d1871e3511131bae2196e238d0054bd9a62b0"
 uuid = "646e1f28-b900-46d7-9d87-d554eb38a413"
-version = "0.8.12"
+version = "0.8.13"
 
 [[deps.Preferences]]
 deps = ["TOML"]
@@ -860,9 +864,9 @@ version = "1.6.1+0"
 
 [[deps.Triangulate]]
 deps = ["DocStringExtensions", "Libdl", "Printf", "Test", "Triangle_jll"]
-git-tree-sha1 = "ffa6491b39ad78fd977e3b09fc6a21f28d82a4ae"
+git-tree-sha1 = "796a9c0b02a3414af6065098bb7cf0e88dfa450e"
 uuid = "f7e6ffb2-c36d-4f8f-a77e-16e897189344"
-version = "2.1.2"
+version = "2.1.3"
 
 [[deps.UUIDs]]
 deps = ["Random", "SHA"]
@@ -955,6 +959,7 @@ version = "16.2.1+1"
 # ╠═39def16b-87e6-461f-8c6f-224c094b3585
 # ╠═0d5a620d-f8d0-4928-9214-0c4024c69755
 # ╟─da36cf26-8105-4569-9d09-6f16383000a0
+# ╠═16e07a0f-8bd8-4eea-8dd5-aea42fe64ed1
 # ╠═d009c4cb-9ef6-45bd-960f-0213880f662a
 # ╟─b33a9e6b-7c93-475c-96f4-7259b30c2c47
 # ╠═aded5964-8229-423c-b9f3-c80358b95fcc

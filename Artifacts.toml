@@ -1,0 +1,6 @@
+["vtk.js"]
+git-tree-sha1 = "56963250c3002e4b718533aa24b665d0616f9f2e"
+
+    [["vtk.js".download]]
+    sha256 = "11e867fd06364a824b747db2c07bd470a6976c6ca32f70a4238aa1dacb0917d1"
+    url = "https://registry.npmjs.org/@kitware/vtk.js/-/vtk.js-25.9.2.tgz"

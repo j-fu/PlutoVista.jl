@@ -56,6 +56,7 @@ end
 
 const canvascolorbar = read(joinpath(@__DIR__, "..", "assets", "canvascolorbar.js"), String)
 const plutovtkplot = read(joinpath(@__DIR__, "..", "assets", "plutovtkplot.js"), String)
+const vtkjs = read(joinpath(artifact"vtk.js","package","index.js"),String)
 
 """
     Base.show(io::IO,::MIME"text/html",p::PlutoVTKPlot)
@@ -75,8 +76,8 @@ function Base.show(io::IO, ::MIME"text/html", p::PlutoVTKPlot)
     """
     end
     result="""
-        <script type="text/javascript" src="https://unpkg.com/vtk.js@25"></script>
         <script>
+        $(vtkjs)
         $(plutovtkplot)
         $(canvascolorbar)
         const jsdict = $(Main.PlutoRunner.publish_to_js(p.jsdict))

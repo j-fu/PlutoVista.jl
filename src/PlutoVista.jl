@@ -4,6 +4,7 @@ using Colors
 using ColorSchemes
 using DocStringExtensions
 using GridVisualize
+using Pkg.Artifacts
 
 abstract type AbstractPlutoVistaBackend end
 
