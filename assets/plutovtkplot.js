@@ -111,7 +111,7 @@ function add_cell_dataset(win,points,polys,colors,aspect)
             mapper.setColorModeToDefault()
 	    actor.getProperty().setRepresentation(1);
 	    actor.getProperty().setColor(0, 0, 0);
-	    actor.getProperty().setLineWidth(1.5);
+	    actor.getProperty().setLineWidth(1);
             actor.setScale([1,aspect,1])
 	    mapper.setInputData(win.cell_edge_dataset);
 	    actor.setMapper(mapper);
@@ -381,7 +381,7 @@ function plutovtkplot(uuid,jsdict,invalidation)
                     actor.setMapper(mapper);
                     actor.setScale([1,aspect,1])
                     actor.getProperty().setColor(0, 0, 0)
-		    actor.getProperty().setLineWidth(4);
+		    actor.getProperty().setLineWidth(3);
                     win.renderer.addActor(actor);
                 }
 
