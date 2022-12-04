@@ -222,7 +222,7 @@ function tricontour!(p::PlutoVTKPlot, pts, tris,f;kwargs...)
     levels,crange,colorbarticks=makeisolevels(f,
                                               args[:levels],
                                               args[:limits] == :auto ? (1,-1) : args[:limits] ,
-                                              args[:colorbarticks]== :default ? nothing : args[:colorbartics])
+                                              args[:colorbarticks]== :default ? nothing : args[:colorbarticks])
 
 
     crange=Float64.(crange)
@@ -305,7 +305,7 @@ function tetcontour!(p::PlutoVTKPlot, pts, tets,func; kwargs...)
     levels,crange,colorbarticks=makeisolevels(func,
                                               args[:levels],
                                               args[:limits] == :auto ? (1,-1) : args[:limits] ,
-                                              args[:colorbarticks]== :default ? nothing : args[:colorbartics])
+                                              args[:colorbarticks]== :default ? nothing : args[:colorbarticks])
 
     colormap=args[:colormap]
     faces=args[:faces]
