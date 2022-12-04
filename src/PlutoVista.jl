@@ -3,7 +3,7 @@ using UUIDs
 using Colors
 using ColorSchemes
 using DocStringExtensions
-using GridVisualize
+using GridVisualizeTools
 
 abstract type AbstractPlutoVistaBackend end
 

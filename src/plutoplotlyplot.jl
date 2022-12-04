@@ -197,7 +197,10 @@ function tricontour!(p::PlutoPlotlyPlot,pts, tris,f;kwargs...)
     
     
     
-    levels,crange,colorbarticks=GridVisualize.isolevels(args,f)
+    levels,crange,colorbarticks=makeisolevels(func,
+                                              args[:levels],
+                                              args[:limits] == :auto ? (1,-1) : args[:limits] ,
+                                              args[:colorbartics]== :default ? nothing : args[:colorbartics])
     
     zval=0.0
     
@@ -227,13 +230,12 @@ function tricontour!(p::PlutoPlotlyPlot,pts, tris,f;kwargs...)
 
 
     (fmin,fmax)=extrema(f)
-
     if levels==0
         parameter!(p,"iso_x","none")
         parameter!(p,"iso_y","none")
         parameter!(p,"iso_z","none")
     else
-        iso_pts0=GridVisualize.marching_triangles(pts,tris,f,levels)
+        iso_pts0=marching_triangles(pts,tris,f,levels)
         niso_pts=length(iso_pts0)
         iso_pts=vcat(reshape(reinterpret(Float32,iso_pts0),(2,niso_pts)))
 

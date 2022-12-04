@@ -163,7 +163,7 @@ end
 Plot transparent outline of grid boundaries.
 """
 function outline!(p::PlutoVTKPlot,pts,faces,facemarkers,facecolormap,nbregions,xyzmin,xyzmax;alpha=0.1)
-    bregpoints0,bregfacets0=GridVisualize.extract_visible_bfaces3D(pts,faces,facemarkers,nbregions,
+    bregpoints0,bregfacets0=extract_visible_bfaces3D(pts,faces,facemarkers,nbregions,
                                                                    xyzmax,
                                                                    primepoints=hcat(xyzmin,xyzmax)
                                                                    )
@@ -219,7 +219,12 @@ function tricontour!(p::PlutoVTKPlot, pts, tris,f;kwargs...)
 
     command!(p,"tricontour")
 
-    levels,crange,colorbarticks=GridVisualize.isolevels(args,f)
+    levels,crange,colorbarticks=makeisolevels(f,
+                                              args[:levels],
+                                              args[:limits] == :auto ? (1,-1) : args[:limits] ,
+                                              args[:colorbarticks]== :default ? nothing : args[:colorbartics])
+
+
     crange=Float64.(crange)
 
     parameter!(p,"points",vec(vcat(pts,zeros(eltype(pts),length(f))')))
@@ -234,7 +239,7 @@ function tricontour!(p::PlutoVTKPlot, pts, tris,f;kwargs...)
     parameter!(p,"aspect",args[:aspect])
     
     
-    iso_pts=GridVisualize.marching_triangles(pts,tris,f,collect(levels))
+    iso_pts=marching_triangles(pts,tris,f,collect(levels))
     niso_pts=length(iso_pts)
     iso_pts=vcat(reshape(reinterpret(Float32,iso_pts),(2,niso_pts)),zeros(niso_pts)')
     iso_lines=Vector{UInt32}(undef,niso_pts+Int32(niso_pts//2))
@@ -297,8 +302,10 @@ function tetcontour!(p::PlutoVTKPlot, pts, tets,func; kwargs...)
     args=merge(p.args,default_args)
     args=merge(args,kwargs)
 
-
-    levels,crange=GridVisualize.isolevels(args,func)
+    levels,crange,colorbarticks=makeisolevels(func,
+                                              args[:levels],
+                                              args[:limits] == :auto ? (1,-1) : args[:limits] ,
+                                              args[:colorbarticks]== :default ? nothing : args[:colorbartics])
 
     colormap=args[:colormap]
     faces=args[:faces]
@@ -317,7 +324,7 @@ function tetcontour!(p::PlutoVTKPlot, pts, tets,func; kwargs...)
     end
 
     if facecolormap==nothing
-        facecolormap=GridVisualize.bregion_cmap(nbregions)
+        facecolormap=bregion_cmap(nbregions)
     end
         
     @views for idim=1:3
@@ -329,13 +336,13 @@ function tetcontour!(p::PlutoVTKPlot, pts, tets,func; kwargs...)
     yplanes=args[:yplanes] 
     zplanes=args[:zplanes]  
         
-    cpts0,faces0,values=GridVisualize.marching_tetrahedra(pts,tets,func,
-                                                          primepoints=hcat(xyzmin,xyzmax),
-                                                          primevalues=crange,
-                                                          GridVisualize.makeplanes(xyzmin,xyzmax,xplanes,yplanes,zplanes),
-                                                          levels;
-                                                          tol=0.0
-                                                          )
+    cpts0,faces0,values=marching_tetrahedra(pts,tets,func,
+                                            primepoints=hcat(xyzmin,xyzmax),
+                                            primevalues=crange,
+                                            makeplanes(xyzmin,xyzmax,xplanes,yplanes,zplanes),
+                                            levels;
+                                            tol=0.0
+                                            )
 
     cfaces=reshape(reinterpret(Int32,faces0),(3,length(faces0)))
     cpts=copy(reinterpret(Float32,cpts0))
@@ -450,7 +457,7 @@ function trimesh!(p::PlutoVTKPlot,pts, tris; kwargs...)
     if markers!=nothing
         nregions=maximum(markers)
         if colormap==nothing
-            colormap=GridVisualize.region_cmap(nregions)
+            colormap=region_cmap(nregions)
         end
         if typeof(colormap)==Symbol
             cmap=colorschemes[colormap]
@@ -488,7 +495,7 @@ function trimesh!(p::PlutoVTKPlot,pts, tris; kwargs...)
         if edgemarkers!=nothing
             (fmin,nbregions)=Int64.(extrema(edgemarkers))
             if edgecolormap==nothing
-                edgecolormap=GridVisualize.bregion_cmap(nbregions)
+                edgecolormap=bregion_cmap(nbregions)
             end
             if typeof(edgecolormap)==Symbol
                 ecmap=colorschemes[edgecolormap]
@@ -570,11 +577,11 @@ function tetmesh!(p::PlutoVTKPlot, pts, tets;kwargs...)
 
 
     if colormap==nothing
-        colormap=GridVisualize.region_cmap(nregions)
+        colormap=region_cmap(nregions)
     end
 
     if facecolormap==nothing
-        facecolormap=GridVisualize.bregion_cmap(nbregions)
+        facecolormap=bregion_cmap(nbregions)
     end
 
 
@@ -590,7 +597,7 @@ function tetmesh!(p::PlutoVTKPlot, pts, tets;kwargs...)
     
     xyzcut=[xplane,yplane,zplane]
 
-    regpoints0,regfacets0=GridVisualize.extract_visible_cells3D(pts,tets,markers,nregions,
+    regpoints0,regfacets0=extract_visible_cells3D(pts,tets,markers,nregions,
                                                                 xyzcut,
                                                                 primepoints=hcat(xyzmin,xyzmax)
                                                                 )
@@ -623,7 +630,7 @@ function tetmesh!(p::PlutoVTKPlot, pts, tets;kwargs...)
 
 
     if faces!=nothing
-        bregpoints0,bregfacets0=GridVisualize.extract_visible_bfaces3D(pts,faces,facemarkers,nbregions,
+        bregpoints0,bregfacets0=extract_visible_bfaces3D(pts,faces,facemarkers,nbregions,
                                                                        xyzcut,
                                                                        primepoints=hcat(xyzmin,xyzmax)
                                                                        )
