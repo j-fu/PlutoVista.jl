@@ -197,7 +197,7 @@ function tricontour!(p::PlutoPlotlyPlot,pts, tris,f;kwargs...)
     
     
     
-    levels,crange,colorbarticks=makeisolevels(func,
+    levels,crange,colorbarticks=makeisolevels(f,
                                               args[:levels],
                                               args[:limits] == :auto ? (1,-1) : args[:limits] ,
                                               args[:colorbarticks]== :default ? nothing : args[:colorbarticks])
