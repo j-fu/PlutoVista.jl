@@ -283,9 +283,11 @@ contour!(p::PlutoVTKPlot,X,Y,f; kwargs...)=tricontour!(p,triang(X,Y)...,vec(f);k
 $(SIGNATURES)
 
 Plot isosurfaces given by `levels` and contour maps on planes given by the `*planes` parameters
-for piecewise linear function on  tetrahedral mesh. 
+for piecewise linear function on  tetrahedral mesh.
+
+`pts,tets,func` can be arrays of grid data, allowing to plot discontinouos functions
 """
-function tetcontour!(p::PlutoVTKPlot, pts, tets,func; kwargs...)
+function tetcontour!(p::PlutoVTKPlot, pts, tets,func; parentpts=pts, kwargs...)
     reset!(p)
 
     default_args=(colormap=:viridis,
@@ -326,12 +328,12 @@ function tetcontour!(p::PlutoVTKPlot, pts, tets,func; kwargs...)
     if facecolormap==nothing
         facecolormap=bregion_cmap(nbregions)
     end
-        
-    @views for idim=1:3
-        xyzmin[idim]=minimum(pts[idim,:])
-        xyzmax[idim]=maximum(pts[idim,:])
-    end 
 
+    @views for idim=1:3
+        xyzmin[idim]=minimum(parentpts[idim,:])
+        xyzmax[idim]=maximum(parentpts[idim,:])
+    end 
+    
     xplanes=args[:xplanes] 
     yplanes=args[:yplanes] 
     zplanes=args[:zplanes]  
@@ -400,7 +402,7 @@ function tetcontour!(p::PlutoVTKPlot, pts, tets,func; kwargs...)
 
     if args[:outlinealpha]>0 && faces!=nothing
         parameter!(p,"outline",1)
-        outline!(p,pts,faces,facemarkers,facecolormap,nbregions,xyzmin,xyzmax;alpha=args[:outlinealpha])
+        outline!(p,parentpts,faces,facemarkers,facecolormap,nbregions,xyzmin,xyzmax;alpha=args[:outlinealpha])
     else
         parameter!(p,"outline",0)
     end
