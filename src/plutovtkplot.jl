@@ -300,6 +300,7 @@ function tetcontour!(p::PlutoVTKPlot, pts, tets,func; parentpts=pts, kwargs...)
                   yplanes=[prevfloat(Inf)],
                   zplanes=[prevfloat(Inf)],
                   levelalpha=0.25,
+                  gridscale=1.0,
                   outlinealpha=0.1)
     args=merge(p.args,default_args)
     args=merge(args,kwargs)
@@ -348,6 +349,7 @@ function tetcontour!(p::PlutoVTKPlot, pts, tets,func; parentpts=pts, kwargs...)
 
     cfaces=reshape(reinterpret(Int32,faces0),(3,length(faces0)))
     cpts=copy(reinterpret(Float32,cpts0))
+    parameter!(p,"gridscale",args[:gridscale])
     parameter!(p,"points",cpts)
     parameter!(p,"polys",vtkpolys(cfaces))
     nan_replacement=0.5*(crange[1]+crange[2])
@@ -541,6 +543,7 @@ function tetmesh!(p::PlutoVTKPlot, pts, tets;kwargs...)
                   colormap=nothing,
                   faces=nothing,
                   facemarkers=nothing,
+                  gridscale=1.0,
                   facecolormap=nothing,
                   xplanes=[prevfloat(Inf)],
                   yplanes=[prevfloat(Inf)],
@@ -563,6 +566,7 @@ function tetmesh!(p::PlutoVTKPlot, pts, tets;kwargs...)
     
     ntet=size(tets,2)
     command!(p,"tetmesh")
+    parameter!(p,"gridscale",args[:gridscale])
     nregions=  markers==nothing  ? 0 : maximum(markers)
     nbregions= facemarkers==nothing ? 0 :  maximum(facemarkers)
 

@@ -92,7 +92,7 @@ function add_cell_dataset(win,points,polys,colors,aspect)
                 name: 'Colors',
                 values: colors,
                 numberOfComponents: 3,
-            });
+            });s
             
             win.cell_color_dataset.getPoints().setData(points, 3);
             win.cell_color_dataset.getPolys().setData(polys,1);
@@ -286,6 +286,18 @@ function plutovtkplot(uuid,jsdict,invalidation)
  	    var opolys=jsdict[cmd+"opolys"]
             var ocolors=jsdict[cmd+"ocolors"]
             var transparent=jsdict[cmd+"transparent"]
+            var gridscale=jsdict[cmd+"gridscale"]
+
+
+            vtk.Common.Core.vtkMatrixBuilder
+                .buildFromRadian()
+                .scale(gridscale,gridscale,gridscale)
+                .apply(points);
+
+            vtk.Common.Core.vtkMatrixBuilder
+                .buildFromRadian()
+                .scale(gridscale,gridscale,gridscale)
+                .apply(opoints);
 
 
             { // isosurfaces and plane sections
@@ -410,6 +422,8 @@ function plutovtkplot(uuid,jsdict,invalidation)
     	    var points=jsdict[cmd+"points"]
  	    var polys=jsdict[cmd+"polys"]
             var colors=jsdict[cmd+"colors"]
+            var gridscale=jsdict[cmd+"gridscale"]
+
             
             var outline=jsdict[cmd+"outline"]
     	    var opoints=jsdict[cmd+"opoints"]
@@ -417,6 +431,16 @@ function plutovtkplot(uuid,jsdict,invalidation)
             var ocolors=jsdict[cmd+"ocolors"]
 
             add_cell_dataset(win,points, polys, colors,1.0)
+
+            vtk.Common.Core.vtkMatrixBuilder
+                .buildFromRadian()
+                .scale(gridscale,gridscale,gridscale)
+                .apply(points);
+
+            vtk.Common.Core.vtkMatrixBuilder
+                .buildFromRadian()
+                .scale(gridscale,gridscale,gridscale)
+                .apply(opoints);
 
             
             if (outline==1)
