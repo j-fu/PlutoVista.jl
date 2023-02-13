@@ -92,7 +92,7 @@ function add_cell_dataset(win,points,polys,colors,aspect)
                 name: 'Colors',
                 values: colors,
                 numberOfComponents: 3,
-            });s
+            });
             
             win.cell_color_dataset.getPoints().setData(points, 3);
             win.cell_color_dataset.getPolys().setData(polys,1);
