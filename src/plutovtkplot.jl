@@ -54,8 +54,9 @@ function PlutoVTKPlot(;resolution=(300,300), kwargs...)
     p
 end
 
-const canvascolorbar = read(joinpath(@__DIR__, "..", "assets", "canvascolorbar.js"), String)
-const plutovtkplot = read(joinpath(@__DIR__, "..", "assets", "plutovtkplot.js"), String)
+const vtk = read(joinpath(@__DIR__, "..", "imports", "vtk.js"), String)
+const canvascolorbar = read(joinpath(@__DIR__, "..", "src_js", "canvascolorbar.js"), String)
+const plutovtkplot = read(joinpath(@__DIR__, "..", "src_js", "plutovtkplot.js"), String)
 
 """
     Base.show(io::IO,::MIME"text/html",p::PlutoVTKPlot)
@@ -75,8 +76,8 @@ function Base.show(io::IO, ::MIME"text/html", p::PlutoVTKPlot)
     """
     end
     result="""
-        <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/vtk.js@25"></script>
         <script>
+        $(vtk)
         $(plutovtkplot)
         $(canvascolorbar)
         const jsdict = $(Main.PlutoRunner.publish_to_js(p.jsdict))

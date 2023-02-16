@@ -53,7 +53,8 @@ end
 
 
 
-const plutoplotlyplot = read(joinpath(@__DIR__, "..", "assets", "plutoplotlyplot.js"), String)
+const plotly = read(joinpath(@__DIR__, "..", "imports", "plotly.min.js"), String)
+const plutoplotlyplot = read(joinpath(@__DIR__, "..", "src_js", "plutoplotlyplot.js"), String)
 
 """
 $(TYPEDSIGNATURES)
@@ -62,8 +63,8 @@ Show plotly plot.
 """
 function Base.show(io::IO, ::Union{MIME"text/html", MIME"juliavscode/html"}, p::PlutoPlotlyPlot)
     result="""
-        <script type="text/javascript" src="https://cdn.plot.ly/plotly-2.10.0.min.js"></script>
         <script>
+        $(plotly)
         $(plutoplotlyplot)
         var jsdict = $(Main.PlutoRunner.publish_to_js(p.jsdict))
         plutoplotlyplot("$(p.uuid)",jsdict,$(p.w), $(p.h))        

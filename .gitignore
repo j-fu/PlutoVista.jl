@@ -1,5 +1,6 @@
+quarry
 QUARRY
-startup.jl
+*.html
 docs/build
 docs/src/examples
 *~
@@ -8,7 +9,6 @@ docs/Manifest.toml
 deps/build.log
 deps/deps.jl
 deps/usr
-.repl_history.jl
-
+.repl_history
 .vscode/settings.json
 Manifest.toml
