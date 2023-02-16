@@ -10,3 +10,5 @@ deps/deps.jl
 deps/usr
 .repl_history.jl
 
+.vscode/settings.json
+Manifest.toml
