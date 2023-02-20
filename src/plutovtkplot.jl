@@ -58,6 +58,7 @@ const vtk = read(joinpath(@__DIR__, "..", "imports", "vtk.js"), String)
 const canvascolorbar = read(joinpath(@__DIR__, "..", "src_js", "canvascolorbar.js"), String)
 const plutovtkplot = read(joinpath(@__DIR__, "..", "src_js", "plutovtkplot.js"), String)
 
+
 """
     Base.show(io::IO,::MIME"text/html",p::PlutoVTKPlot)
 
@@ -68,7 +69,10 @@ function Base.show(io::IO, ::MIME"text/html", p::PlutoVTKPlot)
     uuidcbar="$(p.uuid)"*"cbar"
     div=""
     if !p.update
-    div="""
+        div="""
+        <script>
+        $(vtk)
+        </script>
         <div style="white-space:nowrap;">
         <div id="$(p.uuid)" style= "width: $(p.w-60)px; height: $(p.h-60)px; display: inline-block; "></div>
         <canvas id="$(uuidcbar)" width=60, height="$(p.h-25)"  style="display: inline-block; "></canvas>
@@ -77,7 +81,6 @@ function Base.show(io::IO, ::MIME"text/html", p::PlutoVTKPlot)
     end
     result="""
         <script>
-        $(vtk)
         $(plutovtkplot)
         $(canvascolorbar)
         const jsdict = $(Main.PlutoRunner.publish_to_js(p.jsdict))
@@ -86,7 +89,7 @@ function Base.show(io::IO, ::MIME"text/html", p::PlutoVTKPlot)
         </script>
         """
      p.update=true
-     write(io,result*div)
+     write(io,div*result)
 end
 
 

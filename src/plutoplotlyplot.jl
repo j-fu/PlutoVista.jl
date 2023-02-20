@@ -52,7 +52,6 @@ function PlutoPlotlyPlot(;resolution=(300,300), kwargs...)
 end
 
 
-
 const plotly = read(joinpath(@__DIR__, "..", "imports", "plotly.min.js"), String)
 const plutoplotlyplot = read(joinpath(@__DIR__, "..", "src_js", "plutoplotlyplot.js"), String)
 
@@ -64,7 +63,6 @@ Show plotly plot.
 function Base.show(io::IO, ::Union{MIME"text/html", MIME"juliavscode/html"}, p::PlutoPlotlyPlot)
     result="""
         <script>
-        $(plotly)
         $(plutoplotlyplot)
         var jsdict = $(Main.PlutoRunner.publish_to_js(p.jsdict))
         plutoplotlyplot("$(p.uuid)",jsdict,$(p.w), $(p.h))        
@@ -73,9 +71,12 @@ function Base.show(io::IO, ::Union{MIME"text/html", MIME"juliavscode/html"}, p::
     # updating only works when the div remains as output from another cell
     # so we can't create a plot and update it in the cell with the draing commands
     if !p.update
-        result=result*"""
+        result="""
+        <script>
+        $(plotly)
+        </script>
         <div id="$(p.uuid)" style= "width: $(p.w)px; height: $(p.h)px; ; display: inline-block;style="white-space:nowrap;"></div>
-        """
+        """*result
     end
     p.update=true
     write(io,result)
