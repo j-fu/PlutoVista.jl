@@ -1,9 +1,10 @@
 name = "PlutoVista"
 uuid = "646e1f28-b900-46d7-9d87-d554eb38a413"
 authors = ["Juergen Fuhrmann <juergen.fuhrmann@wias-berlin.de>"]
-version = "0.8.24"
+version = "1.0.0"
 
 [deps]
+AbstractPlutoDingetjes = "6e696c72-6542-2067-7265-42206c756150"
 ColorSchemes = "35d6a980-a343-548e-a6ea-1d62b119f2f4"
 Colors = "5ae59095-9a9b-59fe-a467-6f913c188581"
 DocStringExtensions = "ffbed154-4ef7-542d-bbb7-c09d3a79fcae"
@@ -13,10 +14,11 @@ Pluto = "c3e4b0f8-55cb-11ea-2926-15256bba5781"
 UUIDs = "cf7118a7-6976-5b1a-9a39-7adc72f591a4"
 
 [compat]
+AbstractPlutoDingetjes = "1.2"
 ColorSchemes = "3"
 Colors = "0.12,1"
 DocStringExtensions = "0.8,0.9"
-GridVisualizeTools = "0.3"
+GridVisualizeTools = "0.3,1"
 HypertextLiteral = "0.9"
-Pluto = "0.19"
+Pluto = "0.19.28"
 julia = "1.6"

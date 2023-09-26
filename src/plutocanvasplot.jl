@@ -100,7 +100,7 @@ function Base.show(io::IO, ::MIME"text/html", p::PlutoCanvasPlot)
     result="""
     <script>
     $(plutocanvasplot)
-    const jsdict = $(Main.PlutoRunner.publish_to_js(p.jsdict))
+    const jsdict = $(AbstractPlutoDingetjes.Display.published_to_js(p.jsdict))
     plutocanvasplot("$(p.uuid)",jsdict)        
     </script>
     <canvas id="$(p.uuid)" width="$(p.w)" height="$(p.h)"></canvas>

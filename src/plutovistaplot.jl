@@ -379,7 +379,7 @@ $(SIGNATURES)
 Enter new command named `cmd`.
 
 The idea is to pass one single Dict with all plot data to javascript
-using `publish_to_js`.
+using `AbstractPlutoDingetjes.Display.published_to_js`.
 
 For this purpose we need a some "language" hidden in 
 behind the dict.

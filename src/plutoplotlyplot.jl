@@ -15,7 +15,7 @@ mutable struct PlutoPlotlyPlot  <: AbstractPlutoVistaBackend
 
     update::Bool
     # uuid for identifying html element
-    uuid::UUID
+    uuid::String
     PlutoPlotlyPlot(::Nothing)=new()
 end
 
@@ -28,7 +28,7 @@ Create a plotly plot.
 """
 function PlutoPlotlyPlot(;resolution=(300,300), kwargs...)
     p=PlutoPlotlyPlot(nothing)
-    p.uuid=uuid1()
+    p.uuid=string(uuid1())
     p.jsdict=Dict{String,Any}("cmdcount" => 0)
     p.w=resolution[1]
     p.h=resolution[2]
@@ -52,31 +52,33 @@ function PlutoPlotlyPlot(;resolution=(300,300), kwargs...)
 end
 
 
-const plutoplotlyplot = read(joinpath(@__DIR__, "..", "src_js", "plutoplotlyplot.js"), String)
+const plutoplotlyplot = JavaScript(read(joinpath(@__DIR__, "..", "src_js", "plutoplotlyplot.js"), String))
 
 """
 $(TYPEDSIGNATURES)
 
 Show plotly plot.
 """
-function Base.show(io::IO, ::Union{MIME"text/html", MIME"juliavscode/html"}, p::PlutoPlotlyPlot)
-    result="""
+function Base.show(io::IO, m::Union{MIME"text/html", MIME"juliavscode/html"}, p::PlutoPlotlyPlot)
+    # Updating only works when the div remains as output from another cell
+    # so we can't create a plot and update it in the cell with the drawing commands
+    if p.update
+        div=@htl("")
+    else
+       div=@htl("""
+             <script src="https://cdn.plot.ly/plotly-2.18.2.min.js"> </script>
+             <div id=$(p.uuid) style= "width: $(p.w)px; height: $(p.h)px; display: inline-block; white-space:nowrap;"></div>
+           """)
+        p.update=true
+    end
+    show(io,m,@htl("""
+        $(div)
         <script>
         $(plutoplotlyplot)
-        var jsdict = $(Main.PlutoRunner.publish_to_js(p.jsdict))
-        plutoplotlyplot("$(p.uuid)",jsdict,$(p.w), $(p.h))        
+        var jsdict = $(AbstractPlutoDingetjes.Display.published_to_js(p.jsdict))
+        plutoplotlyplot($(p.uuid),jsdict,$(p.w), $(p.h))
         </script>
-        """
-    # updating only works when the div remains as output from another cell
-    # so we can't create a plot and update it in the cell with the draing commands
-    if !p.update
-        result="""
-        <script src="https://cdn.plot.ly/plotly-2.18.2.min.js"> </script>
-        <div id="$(p.uuid)" style= "width: $(p.w)px; height: $(p.h)px; ; display: inline-block;style="white-space:nowrap;"></div>
-        """*result
-    end
-    p.update=true
-    write(io,result)
+    """))
 end
 
 
