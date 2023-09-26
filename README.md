@@ -9,11 +9,10 @@ Plot library for Pluto notebooks based on [plotly.js](https://plotly.com/javascr
 and [vtk.js](https://kitware.github.io/vtk-js/index.html) (thus using WebGL)  for 2/3D data.
 
 It uses the Pluto [💁 API to make objects available inside JS](https://github.com/fonsp/Pluto.jl/pull/1124)
-to pass plot data from Julia to HTML5.
+to pass plot data from Julia to HTML5. This functionality is now available via [AbstractPlutoDingetjes.jl](https://github.com/JuliaPluto/AbstractPlutoDingetjes.jl).
 
 It can serve as a backend for [GridVisualize.jl](https://github.com/j-fu/GridVisualize.jl).
 
 Example notebook: [pluto](https://raw.githubusercontent.com/j-fu/PlutoVista.jl/main/examples/plutovista.jl),
 [html](https://j-fu.github.io/PlutoVista.jl/dev/plutovista.html)
-
 

@@ -18,7 +18,7 @@ mutable struct PlutoVTKPlot  <: AbstractPlutoVistaBackend
     args
     
     # uuid for identifying html element
-    uuid::UUID
+    uuid::String
     PlutoVTKPlot(::Nothing)=new()
 end
 
@@ -29,7 +29,7 @@ Create a vtk plot with given resolution in the notebook.
 """
 function PlutoVTKPlot(;resolution=(300,300), kwargs...)
     p=PlutoVTKPlot(nothing)
-    p.uuid=uuid1()
+    p.uuid=string(uuid1())
     p.jsdict=Dict{String,Any}("cmdcount" => 0,"cbar" => 0)
     p.w=resolution[1]
     p.h=resolution[2]
@@ -54,8 +54,8 @@ function PlutoVTKPlot(;resolution=(300,300), kwargs...)
     p
 end
 
-const canvascolorbar = read(joinpath(@__DIR__, "..", "src_js", "canvascolorbar.js"), String)
-const plutovtkplot = read(joinpath(@__DIR__, "..", "src_js", "plutovtkplot.js"), String)
+const canvascolorbar = JavaScript(read(joinpath(@__DIR__, "..", "src_js", "canvascolorbar.js"), String))
+const plutovtkplot = JavaScript(read(joinpath(@__DIR__, "..", "src_js", "plutovtkplot.js"), String))
 
 
 """
@@ -64,29 +64,32 @@ const plutovtkplot = read(joinpath(@__DIR__, "..", "src_js", "plutovtkplot.js"),
 Show plot in html. This creates a vtk.js based renderer along with a canvas
 for handling the colorbar.
 """
-function Base.show(io::IO, ::MIME"text/html", p::PlutoVTKPlot)
+function Base.show(io::IO, m::Union{MIME"text/html", MIME"juliavscode/html"}, p::PlutoVTKPlot)
     uuidcbar="$(p.uuid)"*"cbar"
-    div=""
-    if !p.update
-        div="""
+    if p.update
+        div=@htl("")
+    else
+        div=@htl("""
         <script src="https://cdn.jsdelivr.net/npm/vtk.js@25.15.1/vtk.js"></script>
         <div style="white-space:nowrap;">
-        <div id="$(p.uuid)" style= "width: $(p.w-60)px; height: $(p.h-60)px; display: inline-block; "></div>
-        <canvas id="$(uuidcbar)" width=60, height="$(p.h-25)"  style="display: inline-block; "></canvas>
+        <div id=$(p.uuid) style= "width: $(p.w-60)px; height: $(p.h-60)px; display: inline-block; "></div>
+        <canvas id="$(uuidcbar)" width=60, height=$(p.h-25)  style="display: inline-block; "></canvas>
         </div>
-    """
+        """)
+    p.update=true
     end
-    result="""
+
+    show(io,m,@htl("""
+        $(div)
         <script>
         $(plutovtkplot)
         $(canvascolorbar)
-        const jsdict = $(Main.PlutoRunner.publish_to_js(p.jsdict))
-        plutovtkplot("$(p.uuid)",jsdict,invalidation)
-        canvascolorbar("$(uuidcbar)",20,$(p.h),jsdict)        
+        const jsdict = $(AbstractPlutoDingetjes.Display.published_to_js(p.jsdict))
+        plutovtkplot($(p.uuid),jsdict,invalidation)
+        canvascolorbar($(uuidcbar),20,$(p.h),jsdict)        
         </script>
-        """
-     p.update=true
-     write(io,div*result)
+     """))
+
 end
 
 
