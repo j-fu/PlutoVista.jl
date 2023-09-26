@@ -21,6 +21,7 @@ function mkdocs()
              modules = [PlutoVista],
              doctest = false,
              clean = false,
+             warnonly = true,
              authors = "J. Fuhrmann",
              repo="https://github.com/j-fu/PlutoVista.jl",
              pages=[
