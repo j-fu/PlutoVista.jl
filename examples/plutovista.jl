@@ -14,15 +14,6 @@ macro bind(def, element)
     end
 end
 
-# ╔═╡ fdf728b9-ade9-46f3-8aaf-cf22aaaa55d2
-# Un-Markdown this cell for debugging and developing
-begin
-     using Pkg
-     Pkg.activate(@__DIR__)
-	  Pkg.develop(path="..")
-     using Revise
-end;
-
 # ╔═╡ c102e87a-b570-4d86-b087-3506396fc065
 begin
 	using PlutoUI
@@ -1088,7 +1079,6 @@ deps = ["Artifacts", "Libdl"]
 uuid = "3f19e933-33d8-53b3-aaab-bd5110c3b7a0"
 version = "17.4.0+0"
 """
->>>>>>> abstractplutodingetjes
 
 # ╔═╡ Cell order:
 # ╟─93ca4fd0-8f61-4174-b459-55f5395c0f56
@@ -1146,4 +1136,5 @@ version = "17.4.0+0"
 # ╠═36e48e9c-9452-4b07-bce4-c1cfe3c19409
 # ╟─b074a389-bd07-4548-a75c-efa8c7663b15
 # ╠═fdf728b9-ade9-46f3-8aaf-cf22aaaa55d2
-# ╠═74092e75-1e59-4a2e-9808-7042c968181c
+# ╟─00000000-0000-0000-0000-000000000001
+# ╟─00000000-0000-0000-0000-000000000002
