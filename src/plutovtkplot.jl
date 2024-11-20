@@ -409,7 +409,9 @@ function trimesh!(p::PlutoVTKPlot, pts, tris; kwargs...)
                     edges = nothing,
                     gridscale = 1.0,
                     edgemarkers = nothing,
-                    edgecolormap = nothing)
+                    edgecolormap = nothing,
+                    show_colorbar = true
+                   )
 
     args = merge(p.args, default_args)
     args = merge(args, kwargs)
@@ -446,14 +448,16 @@ function trimesh!(p::PlutoVTKPlot, pts, tris; kwargs...)
         rgb = reinterpret(Float64, get(cmap, markers, (1, size(cmap))))
         parameter!(p, "colors", UInt8.(floor.(rgb * 255)))
 
-        bar_stops = collect(1:size(cmap))
-        bar_rgb = reinterpret(Float64, get(cmap, bar_stops, (1, size(cmap))))
-        bar_rgb = UInt8.(floor.(bar_rgb * 255))
-        p.jsdict["cbar"] = 2
-        p.jsdict["cbar_stops"] = bar_stops
-        p.jsdict["cbar_colors"] = bar_rgb
-        p.jsdict["cbar_levels"] = collect(1:size(cmap))
-        p.jsdict["cbar_fontsize"] = args[:legendfontsize]
+        if args[:show_colorbar]
+            bar_stops = collect(1:size(cmap))
+            bar_rgb = reinterpret(Float64, get(cmap, bar_stops, (1, size(cmap))))
+            bar_rgb = UInt8.(floor.(bar_rgb * 255))
+            p.jsdict["cbar"] = 2
+            p.jsdict["cbar_stops"] = bar_stops
+            p.jsdict["cbar_colors"] = bar_rgb
+            p.jsdict["cbar_levels"] = collect(1:size(cmap))
+            p.jsdict["cbar_fontsize"] = args[:legendfontsize]
+        end
 
     else
         parameter!(p, "colors", "none")
@@ -516,6 +520,7 @@ function tetmesh!(p::PlutoVTKPlot, pts, tets; kwargs...)
                     facemarkers = nothing,
                     gridscale = 1.0,
                     facecolormap = nothing,
+                    show_colorbar = true,
                     xplanes = [prevfloat(Inf)],
                     yplanes = [prevfloat(Inf)],
                     zplanes = [prevfloat(Inf)],
@@ -587,14 +592,16 @@ function tetmesh!(p::PlutoVTKPlot, pts, tets; kwargs...)
     rgb = reinterpret(Float64, get(cmap, regmarkers, (1, size(cmap))))
     nfaces = length(rgb) ÷ 3
 
-    bar_stops = collect(1:size(cmap))
-    bar_rgb = reinterpret(Float64, get(cmap, bar_stops, (1, size(cmap))))
-    bar_rgb = UInt8.(floor.(bar_rgb * 255))
-    p.jsdict["cbar"] = 2
-    p.jsdict["cbar_stops"] = bar_stops
-    p.jsdict["cbar_colors"] = bar_rgb
-    p.jsdict["cbar_levels"] = collect(1:size(cmap))
-    p.jsdict["cbar_fontsize"] = args[:legendfontsize]
+    if args[:show_colorbar]
+        bar_stops = collect(1:size(cmap))
+        bar_rgb = reinterpret(Float64, get(cmap, bar_stops, (1, size(cmap))))
+        bar_rgb = UInt8.(floor.(bar_rgb * 255))
+        p.jsdict["cbar"] = 2
+        p.jsdict["cbar_stops"] = bar_stops
+        p.jsdict["cbar_colors"] = bar_rgb
+        p.jsdict["cbar_levels"] = collect(1:size(cmap))
+        p.jsdict["cbar_fontsize"] = args[:legendfontsize]
+    end
 
     if faces != nothing
         bregpoints0, bregfacets0 = extract_visible_bfaces3D(pts, faces, facemarkers, nbregions,
