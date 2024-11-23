@@ -174,7 +174,7 @@ function plot!(p::PlutoPlotlyPlot,x,y; kwargs...)
     if args[:color] == :auto
         parameter!(p,"color","auto")
     else
-        rgb=RGB(args[:color])
+        rgb=rgbcolor(args[:color])
         rgb=[rgb.r,rgb.g,rgb.b]
         rgb=UInt8.(floor.(rgb*255))
         parameter!(p,"color",rgb)
