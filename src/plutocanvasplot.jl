@@ -96,7 +96,7 @@ end
 Show plot
 """
 function Base.show(io::IO, ::MIME"text/html", p::PlutoCanvasPlot)
-    plutocanvasplot = read(joinpath(@__DIR__, "..", "assets", "plutocanvasplot.js"), String)
+    plutocanvasplot = read(joinpath(@__DIR__, "..", "src_js", "plutocanvasplot.js"), String)
     result="""
     <script>
     $(plutocanvasplot)
