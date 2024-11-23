@@ -241,6 +241,7 @@ Keyword arguments:
 - `edges`: `2 x n_edges` optional  array of point indices describing edges
 - `edgemarkers=nothing`: optional `n_edges` vector of integer edge markers
 - `edgecolormap=nothing`: optional colormap for edge markers
+- `show_colorbar=true`: optional show the colorbar next to the plot
 
 """
 trimesh(pts,tris; kwargs...)=trimesh!(PlutoVistaPlot(;kwargs...),pts,tris; kwargs...)
@@ -348,6 +349,7 @@ Keyword arguments:
 - `yplanes`: array of y coordinate values for cut-off in y-direction
 - `zplanes`: array of z coordinate values for cut-off in z-direction
 - `outlinealpha=0.1`: alpha value for outline. Outliene is for value 0.0
+- `show_colorbar=true`: optional show the colorbar next to the plot
 """
 tetmesh(pts,tets; kwargs...)=tetmesh!(PlutoVistaPlot(;kwargs...),pts,tets; kwargs...)
 
