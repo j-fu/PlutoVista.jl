@@ -1,23 +1,25 @@
 ### A Pluto.jl notebook ###
-# v0.19.28
+# v0.20.3
 
 using Markdown
 using InteractiveUtils
 
 # This Pluto notebook uses @bind for interactivity. When running this notebook outside of Pluto, the following 'mock version' of @bind gives bound variables a default value (instead of an error).
 macro bind(def, element)
+    #! format: off
     quote
         local iv = try Base.loaded_modules[Base.PkgId(Base.UUID("6e696c72-6542-2067-7265-42206c756150"), "AbstractPlutoDingetjes")].Bonds.initial_value catch; b -> missing; end
         local el = $(esc(element))
         global $(esc(def)) = Core.applicable(Base.get, el) ? Base.get(el) : iv(el)
         el
     end
+    #! format: on
 end
 
 # ╔═╡ 08980845-f030-4a64-a4b2-ab027b3a2721
 begin  
      using Pkg
-     Pkg.activate(joinpath(@__DIR__,"..","test"))
+     Pkg.activate(joinpath(@__DIR__))
 	 Pkg.develop(path="..")
      using Revise
 end	
@@ -26,7 +28,7 @@ end
 begin
     using PlutoUI
     using PlutoVista
-    using GridVisualize
+    using TetGen
     using Printf
     using Triangulate
 	using ExtendableGrids
@@ -92,19 +94,40 @@ let
 end
 
 # ╔═╡ 2e3546f6-eb47-4693-aa00-902570fab7b5
-function grid3d(;n=15)
-    X=collect(0:1/n:1)
-    g=simplexgrid(X,X,X)
+function grid3d(;vol=0.1)
+    input = TetGen.RawTetGenIO{Cdouble}()
+    outerpoints = [-1 -1 -1;
+                   1 -1 -1;
+                   1 1 -1;
+                   -1 1 -1;
+                   -1 -1 1;
+                   1 -1 1;
+                   1 1 1;
+                   -1 1 1]'
+
+    input.pointlist = hcat(outerpoints, outerpoints / 2)
+
+    outerfacets = [1 2 3 4;
+                   5 6 7 8;
+                   1 2 6 5;
+                   2 3 7 6;
+                   3 4 8 7;
+                   4 1 5 8]'
+    input.holelist = [0 0 0;]'
+
+    TetGen.facetlist!(input, hcat(outerfacets, outerfacets .+ 8))
+	input.facetmarkerlist=collect(1:12)
+    tetrahedralize(input, "pQa$(vol)")
 end
 
 # ╔═╡ bd0a59a2-564d-42bd-ab6f-a50b26f9241f
-function func3d(;n=15)
-    g=grid3d(n=n)
-    g, map((x,y,z)->sinpi(2*x)*sinpi(3.5*y)*sinpi(1.5*z),g)
+function func3d(;vol=0.0005)
+    g=grid3d(;vol)
+    g,  [ sinpi(2*g.pointlist[1,i])*sinpi(3.5*g.pointlist[2,i])*sinpi(1.5*g.pointlist[3,i]) for i=1:size(g.pointlist,2)]
 end
 
 # ╔═╡ 368b8cf5-fabd-4b84-b33c-b15c4452393b
-	g,f=func3d(;n=20)
+g,f=func3d()
 
 # ╔═╡ f64729e4-d2b4-40d3-acbb-1395dbe0337d
 p3d=PlutoVTKPlot(resolution=(300,300))
@@ -119,13 +142,10 @@ z: $(@bind zplane Slider(0:0.01:1,show_value=true,default=0.45))
 """
 
 # ╔═╡ 3681ef5b-c794-44da-9fe7-cedcd68b426c
-tetcontour!(p3d,g[Coordinates],g[CellNodes],f;levels=[flevel],
-	faces=g[BFaceNodes],
-	facemarkers=g[BFaceRegions],
+tetcontour!(p3d,g.pointlist,g.tetrahedronlist,f;levels=[flevel],
+	faces=g.trifacelist,
+	facemarkers=g.trifacemarkerlist,
 	xplanes=[xplane],yplanes=[yplane],zplanes=[zplane],outlinealpha=0.1, levelalpha=0.25)
-
-# ╔═╡ 0f440c27-7ff1-4db5-b4eb-8ce1e9018ef1
-g[BFaceNodes]
 
 # ╔═╡ 606f6837-f3b7-4a52-b9c3-034799c7bf93
 g3x=let
@@ -199,7 +219,6 @@ html"""<hr>"""
 # ╠═f64729e4-d2b4-40d3-acbb-1395dbe0337d
 # ╟─7be35f33-5f7a-4765-8bb6-1487e209efc8
 # ╠═3681ef5b-c794-44da-9fe7-cedcd68b426c
-# ╠═0f440c27-7ff1-4db5-b4eb-8ce1e9018ef1
 # ╠═606f6837-f3b7-4a52-b9c3-034799c7bf93
 # ╠═ecb3bb5e-6ae5-4d6e-9834-d52ce977b3fc
 # ╟─90ff6ffc-84dc-45fd-8d09-9eb916397630

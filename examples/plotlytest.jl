@@ -1,17 +1,19 @@
 ### A Pluto.jl notebook ###
-# v0.19.28
+# v0.20.3
 
 using Markdown
 using InteractiveUtils
 
 # This Pluto notebook uses @bind for interactivity. When running this notebook outside of Pluto, the following 'mock version' of @bind gives bound variables a default value (instead of an error).
 macro bind(def, element)
+    #! format: off
     quote
         local iv = try Base.loaded_modules[Base.PkgId(Base.UUID("6e696c72-6542-2067-7265-42206c756150"), "AbstractPlutoDingetjes")].Bonds.initial_value catch; b -> missing; end
         local el = $(esc(element))
         global $(esc(def)) = Core.applicable(Base.get, el) ? Base.get(el) : iv(el)
         el
     end
+    #! format: on
 end
 
 # ╔═╡ dc111222-038e-479b-993e-5ed58755df27
@@ -128,9 +130,6 @@ end
 # ╔═╡ 5c23809b-9d92-43da-a85d-6c8531c3b547
 let X=collect(0:0.1:10); plot(X,sin.(X)) end
 
-# ╔═╡ edfe1dd2-94a5-403f-b589-53bfca839057
-"\$x^k\$"
-
 # ╔═╡ 9709e98a-50f3-4ee5-912c-e370c8c93193
  function fpdens(x::AbstractFloat;sample_size=1000) 
     xleft=x
@@ -189,7 +188,6 @@ html"""<hr>"""
 # ╠═5cb73674-c144-4fd9-8ff6-ac767548822e
 # ╠═34072263-1180-4bc0-a004-2f112ea4cbed
 # ╠═5c23809b-9d92-43da-a85d-6c8531c3b547
-# ╠═edfe1dd2-94a5-403f-b589-53bfca839057
 # ╠═9709e98a-50f3-4ee5-912c-e370c8c93193
 # ╠═f8684eae-00c8-4e19-b638-5be32c045cfc
 # ╠═7f5612f3-a0cb-4319-b4bf-4eefe5dc2a18
