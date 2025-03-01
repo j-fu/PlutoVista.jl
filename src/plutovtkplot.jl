@@ -213,7 +213,6 @@ function tricontour!(p::PlutoVTKPlot, pts, tris, f; kwargs...)
                                                   args[:levels],
                                                   args[:limits] == :auto ? (1, -1) : args[:limits],
                                                   args[:colorbarticks] == :default ? nothing : args[:colorbarticks])
-
     crange = Float64.(crange)
 
     parameter!(p, "points", vec(vcat(pts, zeros(eltype(pts), length(f))')))
@@ -227,7 +226,7 @@ function tricontour!(p::PlutoVTKPlot, pts, tris, f; kwargs...)
     parameter!(p, "isolines", "none")
     parameter!(p, "aspect", args[:aspect])
 
-    iso_pts = marching_triangles(pts, tris, f, collect(levels))
+    iso_pts = first(marching_triangles([pts], [tris], f, [], collect(levels)))
     niso_pts = length(iso_pts)
     iso_pts = vcat(reshape(reinterpret(Float32, iso_pts), (2, niso_pts)), zeros(niso_pts)')
     iso_lines = Vector{UInt32}(undef, niso_pts + Int32(niso_pts // 2))
