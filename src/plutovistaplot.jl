@@ -443,7 +443,7 @@ function triang(X,Y)
     ny=length(Y)
     num_pts=nx*ny
     num_tris=2*(nx-1)*(ny-1)
-    pts=zeros(Float32,2,num_pts)
+    pts=zeros(Float64,2,num_pts)
     tris=zeros(Int32,3,num_tris)
 
     ipoint=0
