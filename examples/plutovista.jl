@@ -174,8 +174,14 @@ func=0.5*[sin(10*pts[1,i])*cos(10*pts[2,i]) for i=1:size(pts,2)];
 tricontour(pts,tris,func;colormap=:viridis),
 tricontour(pts,tris,func;colormap=:summer,levels=3)
 
+# ╔═╡ 7efbe3be-f171-4fc2-bd54-89bf73b5deb9
+
+
 # ╔═╡ 8b25e922-12db-4fae-8f28-65fe4faf40f3
 tricontour(pts,tris,func;colormap=:hot,levels=-0.5:0.2:0.5)
+
+# ╔═╡ 0992bcf9-e2a0-4f9c-9514-ce130c153f16
+
 
 # ╔═╡ dce20465-d227-4273-82b7-c6a4621942b9
 md"""
@@ -336,7 +342,9 @@ html"""<hr>"""
 # ╟─8186bd23-5727-4d87-805c-5e5c6a092535
 # ╠═ee9a6fb2-3978-40f4-803b-7cb8d50b4fac
 # ╠═c6d700ec-91a1-4ef7-a104-8574cc162b9a
+# ╠═7efbe3be-f171-4fc2-bd54-89bf73b5deb9
 # ╠═8b25e922-12db-4fae-8f28-65fe4faf40f3
+# ╠═0992bcf9-e2a0-4f9c-9514-ce130c153f16
 # ╟─dce20465-d227-4273-82b7-c6a4621942b9
 # ╠═20a88415-f2b4-4806-9ffc-6be979d12d0a
 # ╠═39412087-3ee3-41fb-818f-23e5396abba3

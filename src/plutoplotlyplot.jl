@@ -51,7 +51,6 @@ function PlutoPlotlyPlot(;resolution=(300,300), kwargs...)
     p
 end
 
-
 const plutoplotlyplot = JavaScript(read(joinpath(@__DIR__, "..", "src_js", "plutoplotlyplot.js"), String))
 
 """
@@ -260,7 +259,7 @@ function tricontour!(p::PlutoPlotlyPlot,pts, tris,f;kwargs...)
         parameter!(p,"iso_y",iso_y)
         parameter!(p,"iso_z",iso_z)
     end
-
+    p
 end
 
 
