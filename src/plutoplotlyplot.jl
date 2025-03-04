@@ -51,7 +51,6 @@ function PlutoPlotlyPlot(;resolution=(300,300), kwargs...)
     p
 end
 
-
 const plutoplotlyplot = JavaScript(read(joinpath(@__DIR__, "..", "src_js", "plutoplotlyplot.js"), String))
 
 """
@@ -236,7 +235,7 @@ function tricontour!(p::PlutoPlotlyPlot,pts, tris,f;kwargs...)
         parameter!(p,"iso_y","none")
         parameter!(p,"iso_z","none")
     else
-        iso_pts0=marching_triangles(pts,tris,f,levels)
+        iso_pts0=first(marching_triangles(Float32.(pts),tris,f,[],levels))
         niso_pts=length(iso_pts0)
         iso_pts=vcat(reshape(reinterpret(Float32,iso_pts0),(2,niso_pts)))
 
@@ -260,7 +259,7 @@ function tricontour!(p::PlutoPlotlyPlot,pts, tris,f;kwargs...)
         parameter!(p,"iso_y",iso_y)
         parameter!(p,"iso_z",iso_z)
     end
-
+    p
 end
 
 
