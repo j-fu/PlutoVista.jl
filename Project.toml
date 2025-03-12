@@ -1,7 +1,7 @@
 name = "PlutoVista"
 uuid = "646e1f28-b900-46d7-9d87-d554eb38a413"
 authors = ["Juergen Fuhrmann <juergen.fuhrmann@wias-berlin.de>", "Patrick Jaap <patrick.jaap@wias-berlin.de>"]
-version = "1.2.0"
+version = "1.2.1"
 
 [deps]
 AbstractPlutoDingetjes = "6e696c72-6542-2067-7265-42206c756150"
