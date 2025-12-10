@@ -4,11 +4,10 @@ QUARRY
 docs/build
 docs/src/examples
 *~
-./Manifest.toml
-docs/Manifest.toml
 deps/build.log
 deps/deps.jl
 deps/usr
 .repl_history
 .vscode/settings.json
-Manifest.toml
+Manifest*.toml
+pluto-tmp.jl
