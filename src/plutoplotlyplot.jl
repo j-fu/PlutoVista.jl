@@ -65,7 +65,7 @@ function Base.show(io::IO, m::Union{MIME"text/html", MIME"juliavscode/html"}, p:
         div=@htl("")
     else
        div=@htl("""
-             <script src="https://cdn.plot.ly/plotly-2.18.2.min.js"> </script>
+             <script src="https://cdn.plot.ly/plotly-3.3.0.min.js"> </script>
              <div id=$(p.uuid) style= "width: $(p.w)px; height: $(p.h)px; display: inline-block; white-space:nowrap;"></div>
            """)
         p.update=true

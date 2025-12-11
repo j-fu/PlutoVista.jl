@@ -68,7 +68,7 @@ function Base.show(io::IO, m::Union{MIME"text/html", MIME"juliavscode/html"}, p:
         div = @htl("")
     else
         div = @htl("""
-          <script src="https://cdn.jsdelivr.net/npm/vtk.js@25.15.1/vtk.js"></script>
+          <script src="https://cdn.jsdelivr.net/npm/vtk.js@34.15.5/vtk.js"></script>
           <div style="white-space:nowrap;">
           <div id=$(p.uuid) style= "width: $(p.w-60)px; height: $(p.h-60)px; display: inline-block; "></div>
           <canvas id="$(uuidcbar)" width=60, height=$(p.h-25)  style="display: inline-block; "></canvas>
