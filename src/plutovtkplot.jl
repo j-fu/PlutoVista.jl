@@ -68,7 +68,7 @@ function Base.show(io::IO, m::Union{MIME"text/html", MIME"juliavscode/html"}, p:
         div = @htl("")
     else
         div = @htl("""
-          <script src="https://cdn.jsdelivr.net/npm/vtk.js@34.15.5/vtk.js"></script>
+          <script src="https://cdn.jsdelivr.net/npm/vtk.js@36.5.1/vtk.js"></script>
           <div style="white-space:nowrap;">
           <div id=$(p.uuid) style= "width: $(p.w-60)px; height: $(p.h-60)px; display: inline-block; "></div>
           <canvas id="$(uuidcbar)" width=60, height=$(p.h-25)  style="display: inline-block; "></canvas>
@@ -467,7 +467,7 @@ function trimesh!(p::PlutoVTKPlot, pts, tris; kwargs...)
         lines = Vector{UInt32}(undef, 3 * nedges)
         iline = 0
         for i = 1:nedges
-            lines[iline + 1] = 2
+            lines[iline + 1] = 2                # two points in line
             lines[iline + 2] = edges[1, i] - 1  #  0-1 discrepancy between jl and js...
             lines[iline + 3] = edges[2, i] - 1
             iline = iline + 3
@@ -484,7 +484,9 @@ function trimesh!(p::PlutoVTKPlot, pts, tris; kwargs...)
             else
                 ecmap = ColorScheme(edgecolormap)
             end
+
             edgergb = reinterpret(Float64, get(ecmap, edgemarkers, (1, size(ecmap))))
+            
             parameter!(p, "linecolors", UInt8.(floor.(edgergb * 255)))
 
             ebar_stops = collect(1:size(ecmap))
