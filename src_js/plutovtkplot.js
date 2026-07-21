@@ -369,27 +369,19 @@ function plutovtkplot(uuid,jsdict,invalidation)
 
 
             add_cell_dataset(win,points, polys, colors,aspect)
-
-
             
             if (lines != "none")
             { // boundary edges
-
-                if (linecolors!="none")
-                {
-                    var linecolorData = vtk.Common.Core.vtkDataArray.newInstance({
-                        name: 'Colors',
-                        values: linecolors,
-                        numberOfComponents: 3,
-                    });
-                }
-                
+                // See https://discourse.vtk.org/t/how-do-i-use-vtkjs-to-color-cells-individually/9797/5
                 if (win.boundary_edge_dataset == undefined)
                 {
                     win.boundary_edge_dataset=vtk.Common.DataModel.vtkPolyData.newInstance();
                     var mapper = vtk.Rendering.Core.vtkMapper.newInstance();
                     var actor = vtk.Rendering.Core.vtkActor.newInstance();
                     mapper.setInputData(win.boundary_edge_dataset);
+                    mapper.setScalarModeToUseCellFieldData()
+                    mapper.setColorModeToDirectScalars();
+                    mapper.setColorByArrayName('Colors');
                     actor.setMapper(mapper);
                     actor.setScale([1,aspect,1])
                     actor.getProperty().setColor(0, 0, 0)
@@ -397,7 +389,6 @@ function plutovtkplot(uuid,jsdict,invalidation)
                     win.renderer.addActor(actor);
                 }
 
-                
                 win.boundary_edge_dataset.getPoints().setData(Array.from(points), 3);
                 win.boundary_edge_dataset.getLines().setData(lines);
                 var pts=win.boundary_edge_dataset.getPoints().getData();
@@ -409,9 +400,14 @@ function plutovtkplot(uuid,jsdict,invalidation)
 
                 if (linecolors!="none")
                 {
-                    win.boundary_edge_dataset.getCellData().setActiveScalars('Colors');
+                    var linecolorData = vtk.Common.Core.vtkDataArray.newInstance({
+                        name: 'Colors',
+                        values: linecolors,
+                        numberOfComponents: 3,
+                    });
                     win.boundary_edge_dataset.getCellData().setScalars(linecolorData);
                 }
+                
                 win.boundary_edge_dataset.modified()
             }
 

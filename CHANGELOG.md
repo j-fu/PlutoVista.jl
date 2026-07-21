@@ -2,6 +2,10 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.0] - 2026-07-21
+- fix bug in trimesh boundary coloring
+- update vtk.js to 36.5.1
+
 ## [1.2.1] - 2025-03-13
 - Remove superflous test output
 
