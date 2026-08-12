@@ -2,6 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 
+## [1.3.1] - 2026-08-12
+- bugfix - pin Tc to Float64 when calling marching_triangles
+
 ## [1.3.0] - 2026-07-21
 - fix bug in trimesh boundary coloring
 - update vtk.js to 36.5.1
